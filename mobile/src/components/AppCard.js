@@ -1,11 +1,23 @@
+import React from "react";
 import { StyleSheet, View } from "react-native";
+import { COLORS } from "../utils/constants";
 
-import { defaultColors } from "../utils/colors";
-
-export default function AppCard({ children, colors = defaultColors, style }) {
-  return <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, style]}>{children}</View>;
+export default function AppCard({ children, style }) {
+  return <View style={[styles.card, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: 12, borderWidth: 1, marginBottom: 14, padding: 16 },
+  card: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    gap: 10,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1
+  }
 });

@@ -1,35 +1,72 @@
+import React from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
+import { COLORS } from "../utils/constants";
 
-import { defaultColors } from "../utils/colors";
-
-export default function AppButton({
-  title,
-  onPress,
-  loading = false,
-  disabled = false,
-  colors = defaultColors,
-  variant = "primary",
-}) {
-  const backgroundColor = variant === "danger"
-    ? colors.danger
-    : variant === "secondary" ? colors.card : colors.primary;
-  const textColor = variant === "secondary" ? colors.primary : "#FFFFFF";
+export default function AppButton({ title, onPress, variant = "primary", loading = false, disabled = false, compact = false }) {
+  const isSecondary = variant === "secondary";
+  const isDanger = variant === "danger";
+  const isSuccess = variant === "success";
 
   return (
     <Pressable
-      disabled={disabled || loading}
       onPress={onPress}
+      disabled={disabled || loading}
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor, borderColor: colors.primary, opacity: pressed || disabled ? 0.65 : 1 },
+        compact && styles.compact,
+        isSecondary && styles.secondary,
+        isDanger && styles.danger,
+        isSuccess && styles.success,
+        !isSecondary && !isDanger && !isSuccess && styles.primary,
+        (pressed || disabled) && styles.dimmed
       ]}
     >
-      {loading ? <ActivityIndicator color={textColor} /> : <Text style={[styles.text, { color: textColor }]}>{title}</Text>}
+      {loading ? (
+        <ActivityIndicator color={isSecondary ? COLORS.primary : COLORS.surface} />
+      ) : (
+        <Text style={[styles.text, isSecondary ? styles.secondaryText : styles.primaryText]}>{title}</Text>
+      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  button: { alignItems: "center", borderRadius: 10, borderWidth: 1, marginTop: 12, padding: 14 },
-  text: { fontSize: 16, fontWeight: "700" },
+  button: {
+    minHeight: 50,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 18
+  },
+  compact: {
+    minHeight: 42,
+    paddingHorizontal: 12
+  },
+  primary: {
+    backgroundColor: COLORS.primary
+  },
+  secondary: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.primary
+  },
+  danger: {
+    backgroundColor: COLORS.danger
+  },
+  success: {
+    backgroundColor: COLORS.success
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: "700"
+  },
+  primaryText: {
+    color: COLORS.surface
+  },
+  secondaryText: {
+    color: COLORS.primary
+  },
+  dimmed: {
+    opacity: 0.7
+  }
 });

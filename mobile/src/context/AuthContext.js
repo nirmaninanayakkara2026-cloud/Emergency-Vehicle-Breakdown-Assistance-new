@@ -1,7 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-
-import { getCurrentUser, loginUser, registerUser } from "../services/authService";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { getStoredUser, logoutUser, mockLogin, mockRegister } from "../services/authService";
 
 const AuthContext = createContext(null);
 
@@ -10,42 +8,41 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const restoreSession = async () => {
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
+    async function loadUser() {
       try {
-        setUser(await getCurrentUser());
-      } catch (_error) {
-        await AsyncStorage.multiRemove(["authToken", "authUser"]);
+        const storedUser = await getStoredUser();
+        setUser(storedUser);
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    restoreSession();
+    loadUser();
   }, []);
 
-  const saveSession = async (data) => {
-    await AsyncStorage.multiSet([
-      ["authToken", data.token],
-      ["authUser", JSON.stringify(data.user)],
-    ]);
-    setUser(data.user);
-  };
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      login: async (credentials) => {
+        const loggedInUser = await mockLogin(credentials);
+        setUser(loggedInUser);
+      },
+      register: async (details) => {
+        const registeredUser = await mockRegister(details);
+        setUser(registeredUser);
+      },
+      logout: async () => {
+        await logoutUser();
+        setUser(null);
+      }
+    }),
+    [user, loading]
+  );
 
-  const login = async (credentials) => saveSession(await loginUser(credentials));
-  const register = async (details) => saveSession(await registerUser(details));
-  const logout = async () => {
-    await AsyncStorage.multiRemove(["authToken", "authUser"]);
-    setUser(null);
-  };
-
-  const value = useMemo(() => ({ loading, login, logout, register, user }), [loading, user]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth() {
+  return useContext(AuthContext);
+}

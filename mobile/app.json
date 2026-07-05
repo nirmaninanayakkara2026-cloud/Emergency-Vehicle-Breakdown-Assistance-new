@@ -1,24 +1,22 @@
 {
   "expo": {
-    "name": "Emergency Breakdown Assistance",
-    "slug": "emergency-breakdown-assistance",
-    "version": "0.1.0",
+    "name": "Breakdown Assist",
+    "slug": "emergency-vehicle-breakdown-assistance",
+    "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
-    "plugins": [
-      [
-        "expo-location",
-        {
-          "locationWhenInUsePermission": "Allow Emergency Breakdown Assistance to use your location to find nearby help."
-        }
-      ]
-    ],
-    "android": {
-      "package": "com.emergencybreakdown.app",
-      "usesCleartextTraffic": true
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0f766e"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "bundleIdentifier": "com.emergencybreakdown.app"
+      "supportsTablet": true
+    },
+    "android": {},
+    "web": {
+      "bundler": "metro"
     }
   }
 }
