@@ -16,7 +16,7 @@ export const COLORS = {
 export const PROVIDER_ROLES = [
   "mechanic",
   "garage",
-  "towing",
+  "towing_service",
   "spare_parts_shop"
 ];
 
@@ -52,5 +52,6 @@ export const MOCK_LOCATION = {
 };
 
 export const STORAGE_KEYS = {
-  user: "evba_user"
+  token: "authToken",
+  user: "authUser"
 };

@@ -1,6 +1,6 @@
 # Emergency Vehicle Breakdown Assistance Mobile App
 
-Current phase: **Phase 1 complete - Mobile UI with mock data only**
+Current phase: **Mobile UI with backend authentication and temporary mock feature data**
 
 This Expo React Native app is a beginner-friendly mobile UI demo for an Emergency Vehicle Breakdown Assistance final-year project.
 
@@ -21,7 +21,7 @@ Open the app with Expo Go or an Android/iOS emulator.
 
 ## Completed Phase 1 Features
 
-- Mock authentication with role-based navigation.
+- Backend authentication with role-based navigation.
 - Driver home screen with quick roadside assistance actions.
 - Request mechanic form using simple vehicle and breakdown details.
 - Mock provider recommendation list.
@@ -57,7 +57,39 @@ All app data is stored locally in `src/data`.
 - `troubleshootingGuides.js` contains local guide steps for common breakdown types.
 - `mockProviderProfile.js` contains a sample provider summary.
 
-No backend, AI model, photo upload, safety checklist, or triage screen is implemented in Phase 1.
+Authentication uses the backend API. Provider recommendations, request tracking demo data, spare parts shops, and troubleshooting guides still use temporary local mock data.
+
+## Backend API Configuration
+
+The mobile app cannot use `localhost` when running on a physical phone through Expo Go. Set the backend URL in:
+
+```text
+src/services/api.js
+```
+
+Current value:
+
+```js
+export const API_BASE_URL = "http://192.168.1.2:5050/api";
+```
+
+To find your computer IPv4 address on Windows:
+
+```bash
+ipconfig
+```
+
+Look for the Wi-Fi adapter `IPv4 Address`, then update `API_BASE_URL`.
+
+If your backend runs on the requested default port `5000`, use:
+
+```js
+export const API_BASE_URL = "http://YOUR_LOCAL_IP:5000/api";
+```
+
+On this machine, port `5000` is occupied by Windows, so the backend has been tested on `5050`.
+
+No AI model, photo upload, safety checklist, or triage screen is implemented in this phase.
 
 ## Next Phase
 

@@ -1,25 +1,35 @@
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import AppInput from "../../components/AppInput";
 import ScreenContainer from "../../components/ScreenContainer";
 import { useAuth } from "../../context/AuthContext";
-import { COLORS, PROVIDER_ROLES } from "../../utils/constants";
-
-const roles = ["driver", ...PROVIDER_ROLES];
+import { COLORS } from "../../utils/constants";
 
 export default function LoginScreen({ navigation }) {
   const { login } = useAuth();
-  const [email, setEmail] = useState("driver@example.com");
-  const [password, setPassword] = useState("password");
-  const [role, setRole] = useState("driver");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleLogin() {
+    setError("");
+
+    if (!email.trim() || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await login({ email, password, role });
+      await login({
+        email: email.trim().toLowerCase(),
+        password
+      });
+    } catch (loginError) {
+      setError(loginError.message);
     } finally {
       setLoading(false);
     }
@@ -29,30 +39,15 @@ export default function LoginScreen({ navigation }) {
     <ScreenContainer>
       <View style={styles.header}>
         <Text style={styles.title}>Breakdown Assist</Text>
-        <Text style={styles.subtitle}>Emergency vehicle assistance demo app</Text>
+        <Text style={styles.subtitle}>Login with your backend account.</Text>
       </View>
 
       <AppCard>
         <AppInput label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
         <AppInput label="Password" value={password} onChangeText={setPassword} secureTextEntry />
-
-        <Text style={styles.label}>Login as</Text>
-        <View style={styles.roleGrid}>
-          {roles.map((item) => (
-            <Pressable
-              key={item}
-              onPress={() => setRole(item)}
-              style={[styles.roleOption, role === item && styles.selectedRole]}
-            >
-              <Text style={[styles.roleText, role === item && styles.selectedRoleText]}>
-                {item.replaceAll("_", " ")}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
+        {error ? <Text style={styles.error}>{error}</Text> : null}
         <AppButton title="Login" onPress={handleLogin} loading={loading} />
-        <AppButton title="Create demo account" variant="secondary" onPress={() => navigation.navigate("Register")} />
+        <AppButton title="Create account" variant="secondary" onPress={() => navigation.navigate("Register")} />
       </AppCard>
     </ScreenContainer>
   );
@@ -73,33 +68,9 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 16
   },
-  label: {
-    color: COLORS.text,
-    fontWeight: "700"
-  },
-  roleGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8
-  },
-  roleOption: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    backgroundColor: COLORS.surface
-  },
-  selectedRole: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary
-  },
-  roleText: {
-    color: COLORS.text,
-    textTransform: "capitalize"
-  },
-  selectedRoleText: {
-    color: COLORS.surface,
-    fontWeight: "700"
+  error: {
+    color: COLORS.danger,
+    fontWeight: "700",
+    lineHeight: 20
   }
 });

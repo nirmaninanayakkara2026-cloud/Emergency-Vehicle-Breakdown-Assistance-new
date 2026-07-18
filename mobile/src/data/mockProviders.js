@@ -16,7 +16,7 @@ export const mockProviders = [
   {
     id: "p2",
     name: "Quick Tow Colombo",
-    role: "towing",
+    role: "towing_service",
     distanceKm: 4.1,
     rating: 4.5,
     phone: "0779876543",

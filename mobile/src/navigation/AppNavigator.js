@@ -2,10 +2,11 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
+import AdminNavigator from "./AdminNavigator";
 import AuthNavigator from "./AuthNavigator";
 import DriverNavigator from "./DriverNavigator";
 import ProviderNavigator from "./ProviderNavigator";
-import { COLORS } from "../utils/constants";
+import { COLORS, PROVIDER_ROLES } from "../utils/constants";
 
 function SplashScreen() {
   return (
@@ -23,9 +24,16 @@ export default function AppNavigator() {
     return <SplashScreen />;
   }
 
+  function renderRoleNavigator() {
+    if (!user) return <AuthNavigator />;
+    if (user.role === "admin") return <AdminNavigator />;
+    if (PROVIDER_ROLES.includes(user.role)) return <ProviderNavigator />;
+    return <DriverNavigator />;
+  }
+
   return (
     <NavigationContainer>
-      {!user ? <AuthNavigator /> : user.isProvider ? <ProviderNavigator /> : <DriverNavigator />}
+      {renderRoleNavigator()}
     </NavigationContainer>
   );
 }
