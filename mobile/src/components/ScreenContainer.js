@@ -2,13 +2,15 @@ import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { COLORS } from "../utils/constants";
 
-export default function ScreenContainer({ children, scroll = true }) {
+export default function ScreenContainer({ children, scroll = true, refreshControl }) {
   const content = <View style={styles.content}>{children}</View>;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       {scroll ? (
-        <ScrollView contentContainerStyle={styles.scrollContent}>{content}</ScrollView>
+        <ScrollView contentContainerStyle={styles.scrollContent} refreshControl={refreshControl}>
+          {content}
+        </ScrollView>
       ) : (
         content
       )}

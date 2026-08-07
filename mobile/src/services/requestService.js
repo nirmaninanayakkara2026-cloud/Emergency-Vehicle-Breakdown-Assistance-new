@@ -1,32 +1,83 @@
-import { mockProviders } from "../data/mockProviders";
-import { mockRequests } from "../data/mockRequests";
 import { mockSparePartsShops } from "../data/mockSparePartsShops";
+import api from "./api";
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
+function getErrorMessage(error) {
+  return error.response?.data?.message || error.message || "Something went wrong";
+}
 
 export async function createBreakdownRequest(payload) {
-  await delay();
-  return {
-    id: `R-${Date.now().toString().slice(-4)}`,
-    status: "Searching",
-    providerName: null,
-    eta: null,
-    ...payload
-  };
+  try {
+    const response = await api.post("/breakdown-requests", payload);
+    return response.data.data.request;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 }
 
-export async function getCurrentRequest() {
-  await delay();
-  return mockRequests[0];
+export async function getMyRequests() {
+  try {
+    const response = await api.get("/breakdown-requests/my");
+    return response.data.data.requests;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 }
 
-export async function getRecommendedProviders() {
-  await delay();
-  return mockProviders;
+export async function getRequestById(id) {
+  try {
+    const response = await api.get(`/breakdown-requests/${id}`);
+    return response.data.data.request;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getRequestRecommendations(requestId) {
+  try {
+    const response = await api.get(`/breakdown-requests/${requestId}/recommendations`);
+    return response.data.data.recommendations;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function selectProvider(requestId, providerId) {
+  try {
+    const response = await api.patch(`/breakdown-requests/${requestId}/select-provider`, { providerId });
+    return response.data.data.request;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function cancelRequest(requestId) {
+  try {
+    const response = await api.patch(`/breakdown-requests/${requestId}/cancel`);
+    return response.data.data.request;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function updateRequestStatus(requestId, status) {
+  try {
+    const response = await api.patch(`/breakdown-requests/${requestId}/status`, { status });
+    return response.data.data.request;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getAssignedRequests() {
+  try {
+    const response = await api.get("/breakdown-requests/provider/assigned");
+    return response.data.data.requests;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 }
 
 export async function findSpareParts(query, vehicleType) {
-  await delay();
   const keyword = (query || "").toLowerCase();
 
   return mockSparePartsShops.filter((shop) => {

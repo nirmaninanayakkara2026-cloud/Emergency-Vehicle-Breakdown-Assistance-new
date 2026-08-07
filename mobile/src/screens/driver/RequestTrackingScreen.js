@@ -1,24 +1,53 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, RefreshControl, StyleSheet, Text, View } from "react-native";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import ScreenContainer from "../../components/ScreenContainer";
-import { getCurrentRequest } from "../../services/requestService";
-import { COLORS, MOCK_LOCATION } from "../../utils/constants";
+import { getRequestById } from "../../services/requestService";
+import { COLORS } from "../../utils/constants";
 
-const timeline = ["Pending", "Accepted", "On the way", "In progress", "Completed"];
+const timeline = ["pending", "recommended", "accepted", "on_the_way", "in_progress", "completed"];
 
-export default function RequestTrackingScreen({ route }) {
+function formatValue(value) {
+  return value ? value.replaceAll("_", " ") : "Not available";
+}
+
+export default function RequestTrackingScreen({ navigation, route }) {
   const [request, setRequest] = useState(route.params?.request || null);
   const [loading, setLoading] = useState(!route.params?.request);
-  const currentStatus = request?.status || "Pending";
-  const activeIndex = Math.max(0, timeline.indexOf(currentStatus));
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const requestId = route.params?.requestId || request?._id;
+
+  const loadRequest = useCallback(async () => {
+    setError("");
+
+    if (!requestId) {
+      setError("Request id is missing.");
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    try {
+      const data = await getRequestById(requestId);
+      setRequest(data);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [requestId]);
 
   useEffect(() => {
-    if (!request) {
-      getCurrentRequest().then(setRequest).finally(() => setLoading(false));
-    }
-  }, [request]);
+    loadRequest();
+  }, [loadRequest]);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await loadRequest();
+  }
 
   if (loading || !request) {
     return (
@@ -28,53 +57,48 @@ export default function RequestTrackingScreen({ route }) {
     );
   }
 
-  const location = request.currentLocation || {
-    address: request.location || MOCK_LOCATION.address,
-    latitude: MOCK_LOCATION.latitude,
-    longitude: MOCK_LOCATION.longitude
-  };
+  const activeIndex = timeline.indexOf(request.status);
+  const selectedProvider = request.selectedProviderId;
 
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>My Request</Text>
+    <ScreenContainer refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
+      <Text style={styles.title}>Request Tracking</Text>
+
+      {error ? (
+        <AppCard>
+          <Text style={styles.error}>{error}</Text>
+          <AppButton title="Retry" onPress={loadRequest} />
+        </AppCard>
+      ) : null}
 
       <AppCard>
-        <Text style={styles.cardTitle}>Status Timeline</Text>
+        <Text style={styles.cardTitle}>Status</Text>
         {timeline.map((status, index) => (
           <View key={status} style={styles.timelineRow}>
             <View style={[styles.dot, index <= activeIndex && styles.activeDot]} />
-            <Text style={[styles.timelineText, index <= activeIndex && styles.activeText]}>{status}</Text>
+            <Text style={[styles.timelineText, index <= activeIndex && styles.activeText]}>{formatValue(status)}</Text>
           </View>
         ))}
       </AppCard>
 
       <AppCard>
-        <Text style={styles.requestId}>{request.id}</Text>
+        <Text style={styles.cardTitle}>Request</Text>
+        <Text style={styles.label}>Current status</Text>
+        <Text style={styles.status}>{formatValue(request.status)}</Text>
         <Text style={styles.label}>Selected provider</Text>
-        <Text style={styles.body}>{request.providerName || "City Auto Mechanics"}</Text>
-        <Text style={styles.label}>Provider phone</Text>
-        <Text style={styles.body}>{request.providerPhone || request.provider?.phone || "0771234567"}</Text>
-        <Text style={styles.label}>Vehicle type</Text>
-        <Text style={styles.body}>{request.vehicleType}</Text>
-        <Text style={styles.label}>Breakdown type</Text>
-        <Text style={styles.body}>{request.breakdownType || request.issue || "flat_tyre"}</Text>
-        <Text style={styles.label}>Urgency</Text>
-        <Text style={styles.body}>{request.urgencyLevel || "medium"}</Text>
+        <Text style={styles.body}>{selectedProvider?.businessName || "No provider selected"}</Text>
+        <Text style={styles.label}>Vehicle</Text>
+        <Text style={styles.body}>{formatValue(request.vehicleType)}</Text>
+        <Text style={styles.label}>Breakdown</Text>
+        <Text style={styles.body}>{formatValue(request.breakdownType)}</Text>
+        <Text style={styles.label}>Required service</Text>
+        <Text style={styles.body}>{formatValue(request.requiredServiceType)}</Text>
         <Text style={styles.label}>Location</Text>
-        <Text style={styles.body}>
-          {location.address} ({location.latitude}, {location.longitude})
-        </Text>
+        <Text style={styles.body}>{request.location?.address || "Not available"}</Text>
       </AppCard>
 
-      <AppCard>
-        <AppButton title="Call Provider" onPress={() => Alert.alert("Call Provider", "Mock phone call action.")} />
-        <AppButton title="Chat" variant="secondary" onPress={() => Alert.alert("Chat", "Mock chat action.")} />
-        <AppButton
-          title="Mark as Completed"
-          variant="secondary"
-          onPress={() => Alert.alert("Completed", "Request marked as completed in mock UI.")}
-        />
-      </AppCard>
+      <AppButton title="Refresh" variant="secondary" onPress={loadRequest} />
+      <AppButton title="Back to My Requests" variant="secondary" onPress={() => navigation.navigate("MyRequests")} />
     </ScreenContainer>
   );
 }
@@ -106,15 +130,11 @@ const styles = StyleSheet.create({
   },
   timelineText: {
     color: COLORS.muted,
-    fontWeight: "700"
+    fontWeight: "700",
+    textTransform: "capitalize"
   },
   activeText: {
     color: COLORS.text
-  },
-  requestId: {
-    color: COLORS.text,
-    fontSize: 18,
-    fontWeight: "900"
   },
   label: {
     color: COLORS.primaryDark,
@@ -122,6 +142,17 @@ const styles = StyleSheet.create({
   },
   body: {
     color: COLORS.muted,
+    lineHeight: 21,
     textTransform: "capitalize"
+  },
+  status: {
+    color: COLORS.success,
+    fontWeight: "900",
+    textTransform: "capitalize"
+  },
+  error: {
+    color: COLORS.danger,
+    fontWeight: "700",
+    lineHeight: 20
   }
 });

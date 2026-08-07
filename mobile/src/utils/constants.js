@@ -45,6 +45,25 @@ export const URGENCY_LEVELS = [
   { label: "High", value: "high" }
 ];
 
+export const PROVIDER_SPECIALIZATIONS = [
+  { label: "Tire", value: "tire" },
+  { label: "Battery", value: "battery" },
+  { label: "Electrical", value: "electrical" },
+  { label: "Engine", value: "engine" },
+  { label: "Brake", value: "brake" },
+  { label: "Towing", value: "towing" },
+  { label: "Fuel support", value: "fuel_support" },
+  { label: "General", value: "general" },
+  { label: "Spare parts", value: "spare_parts" }
+];
+
+export const REQUEST_STATUS_OPTIONS = [
+  { label: "Accepted", value: "accepted" },
+  { label: "On the way", value: "on_the_way" },
+  { label: "In progress", value: "in_progress" },
+  { label: "Completed", value: "completed" }
+];
+
 export const MOCK_LOCATION = {
   latitude: 6.9271,
   longitude: 79.8612,

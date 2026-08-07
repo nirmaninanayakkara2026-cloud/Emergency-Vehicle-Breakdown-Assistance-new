@@ -28,7 +28,7 @@ export default function DriverHomeScreen({ navigation }) {
       <AppCard>
         <Text style={styles.cardTitle}>Driver Menu</Text>
         <AppButton title="Find Spare Parts" variant="secondary" onPress={() => navigation.navigate("SparePartsFinder")} />
-        <AppButton title="My Requests" variant="secondary" onPress={() => navigation.navigate("RequestTracking")} />
+        <AppButton title="My Requests" variant="secondary" onPress={() => navigation.navigate("MyRequests")} />
         <AppButton title="Profile" variant="secondary" onPress={() => navigation.navigate("Profile")} />
       </AppCard>
     </ScreenContainer>

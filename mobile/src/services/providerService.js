@@ -1,19 +1,59 @@
-import { mockRequests } from "../data/mockRequests";
-import { mockProviderProfile } from "../data/mockProviderProfile";
+import api from "./api";
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export async function getProviderRequests() {
-  await delay();
-  return mockRequests;
+function getErrorMessage(error) {
+  return error.response?.data?.message || error.message || "Something went wrong";
 }
 
-export async function getProviderProfile() {
-  await delay();
-  return mockProviderProfile;
+export async function createProviderProfile(payload) {
+  try {
+    const response = await api.post("/providers/profile", payload);
+    return response.data.data.profile;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 }
 
-export async function getProviderRequestById(id) {
-  await delay();
-  return mockRequests.find((request) => request.id === id) || mockRequests[0];
+export async function getMyProviderProfile() {
+  try {
+    const response = await api.get("/providers/profile/me");
+    return response.data.data.profile;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function updateProviderProfile(payload) {
+  try {
+    const response = await api.patch("/providers/profile/me", payload);
+    return response.data.data.profile;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function updateAvailability(availabilityStatus) {
+  try {
+    const response = await api.patch("/providers/availability", { availabilityStatus });
+    return response.data.data.profile;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getProviders(params = {}) {
+  try {
+    const response = await api.get("/providers", { params });
+    return response.data.data.providers;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getProviderById(id) {
+  try {
+    const response = await api.get(`/providers/${id}`);
+    return response.data.data.provider;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 }

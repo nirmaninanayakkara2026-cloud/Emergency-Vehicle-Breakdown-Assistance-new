@@ -5,6 +5,8 @@ import RequestMechanicScreen from "../screens/driver/RequestMechanicScreen";
 import SelfBreakdownAssistantScreen from "../screens/driver/SelfBreakdownAssistantScreen";
 import RecommendationScreen from "../screens/driver/RecommendationScreen";
 import RequestTrackingScreen from "../screens/driver/RequestTrackingScreen";
+import MyRequestsScreen from "../screens/driver/MyRequestsScreen";
+import RequestDetailsScreen from "../screens/driver/RequestDetailsScreen";
 import SparePartsFinderScreen from "../screens/driver/SparePartsFinderScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import { COLORS } from "../utils/constants";
@@ -25,6 +27,8 @@ export default function DriverNavigator() {
       <Stack.Screen name="SelfBreakdownAssistant" component={SelfBreakdownAssistantScreen} options={{ title: "Breakdown Assistant" }} />
       <Stack.Screen name="Recommendation" component={RecommendationScreen} options={{ title: "Recommendations" }} />
       <Stack.Screen name="RequestTracking" component={RequestTrackingScreen} options={{ title: "Track Request" }} />
+      <Stack.Screen name="MyRequests" component={MyRequestsScreen} options={{ title: "My Requests" }} />
+      <Stack.Screen name="RequestDetails" component={RequestDetailsScreen} options={{ title: "Request Details" }} />
       <Stack.Screen name="SparePartsFinder" component={SparePartsFinderScreen} options={{ title: "Spare Parts" }} />
       <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: "Profile" }} />
     </Stack.Navigator>

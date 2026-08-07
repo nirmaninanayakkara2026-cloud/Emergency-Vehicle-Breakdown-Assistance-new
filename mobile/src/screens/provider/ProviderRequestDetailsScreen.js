@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, RefreshControl, StyleSheet, Text, View } from "react-native";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import ScreenContainer from "../../components/ScreenContainer";
-import { getProviderRequestById } from "../../services/providerService";
-import { COLORS, MOCK_LOCATION } from "../../utils/constants";
+import { getRequestById, updateRequestStatus } from "../../services/requestService";
+import { COLORS, REQUEST_STATUS_OPTIONS } from "../../utils/constants";
 
 function formatValue(value) {
   return value ? value.replaceAll("_", " ") : "Not available";
@@ -12,23 +12,48 @@ function formatValue(value) {
 
 export default function ProviderRequestDetailsScreen({ route }) {
   const [request, setRequest] = useState(route.params?.request || null);
-  const [status, setStatus] = useState(route.params?.request?.status || "Pending");
+  const [loading, setLoading] = useState(!route.params?.request);
+  const [refreshing, setRefreshing] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState("");
+  const [error, setError] = useState("");
+  const requestId = route.params?.requestId || request?._id;
+
+  const loadRequest = useCallback(async () => {
+    setError("");
+    try {
+      const data = await getRequestById(requestId);
+      setRequest(data);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [requestId]);
 
   useEffect(() => {
-    if (!request) {
-      getProviderRequestById(route.params?.requestId).then((data) => {
-        setRequest(data);
-        setStatus(data.status);
-      });
-    }
-  }, [request, route.params?.requestId]);
+    loadRequest();
+  }, [loadRequest]);
 
-  function updateStatus(nextStatus) {
-    setStatus(nextStatus);
-    Alert.alert("Status updated", `Request status is now ${nextStatus}.`);
+  async function handleRefresh() {
+    setRefreshing(true);
+    await loadRequest();
   }
 
-  if (!request) {
+  async function handleUpdateStatus(status) {
+    setUpdatingStatus(status);
+    setError("");
+    try {
+      const updatedRequest = await updateRequestStatus(request._id, status);
+      setRequest(updatedRequest);
+    } catch (statusError) {
+      setError(statusError.message);
+    } finally {
+      setUpdatingStatus("");
+    }
+  }
+
+  if (loading || !request) {
     return (
       <ScreenContainer>
         <ActivityIndicator color={COLORS.primary} />
@@ -36,23 +61,19 @@ export default function ProviderRequestDetailsScreen({ route }) {
     );
   }
 
-  const location = request.currentLocation || {
-    ...MOCK_LOCATION,
-    address: request.location || MOCK_LOCATION.address
-  };
-
   return (
-    <ScreenContainer>
+    <ScreenContainer refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
       <AppCard>
         <View style={styles.header}>
-          <Text style={styles.title}>{request.id}</Text>
-          <Text style={styles.status}>{status}</Text>
+          <Text style={styles.title}>{request._id}</Text>
+          <Text style={styles.status}>{formatValue(request.status)}</Text>
         </View>
 
+        {error ? <Text style={styles.error}>{error}</Text> : null}
         <Text style={styles.label}>Driver name</Text>
-        <Text style={styles.body}>{request.driverName}</Text>
+        <Text style={styles.body}>{request.driverId?.name || "Not available"}</Text>
         <Text style={styles.label}>Phone</Text>
-        <Text style={styles.body}>{request.driverPhone || "0771002003"}</Text>
+        <Text style={styles.body}>{request.driverId?.phone || "Not available"}</Text>
         <Text style={styles.label}>Vehicle type</Text>
         <Text style={styles.body}>{formatValue(request.vehicleType)}</Text>
         {request.vehicleModel ? (
@@ -63,23 +84,29 @@ export default function ProviderRequestDetailsScreen({ route }) {
         ) : null}
         <Text style={styles.label}>Breakdown type</Text>
         <Text style={styles.body}>{formatValue(request.breakdownType)}</Text>
+        <Text style={styles.label}>Required service type</Text>
+        <Text style={styles.body}>{formatValue(request.requiredServiceType)}</Text>
         <Text style={styles.label}>Urgency</Text>
         <Text style={styles.body}>{formatValue(request.urgencyLevel)}</Text>
         <Text style={styles.label}>Description</Text>
-        <Text style={styles.body}>{request.problemDescription || "No description provided."}</Text>
+        <Text style={styles.body}>{request.problemDescription}</Text>
         <Text style={styles.label}>Location address</Text>
-        <Text style={styles.body}>{location.address}</Text>
-        <Text style={styles.label}>Current status</Text>
-        <Text style={styles.body}>{status}</Text>
+        <Text style={styles.body}>{request.location?.address || "Not available"}</Text>
       </AppCard>
 
       <AppCard>
         <Text style={styles.cardTitle}>Update Status</Text>
         <View style={styles.buttonGrid}>
-          <AppButton title="Accepted" variant="success" compact onPress={() => updateStatus("Accepted")} />
-          <AppButton title="On the way" variant="secondary" compact onPress={() => updateStatus("On the way")} />
-          <AppButton title="In progress" variant="secondary" compact onPress={() => updateStatus("In progress")} />
-          <AppButton title="Completed" compact onPress={() => updateStatus("Completed")} />
+          {REQUEST_STATUS_OPTIONS.map((option) => (
+            <AppButton
+              key={option.value}
+              title={option.label}
+              compact
+              variant={option.value === "completed" ? "success" : "secondary"}
+              loading={updatingStatus === option.value}
+              onPress={() => handleUpdateStatus(option.value)}
+            />
+          ))}
         </View>
       </AppCard>
     </ScreenContainer>
@@ -96,7 +123,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     color: COLORS.primaryDark,
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "900"
   },
   status: {
@@ -125,5 +152,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8
+  },
+  error: {
+    color: COLORS.danger,
+    fontWeight: "700",
+    lineHeight: 20
   }
 });

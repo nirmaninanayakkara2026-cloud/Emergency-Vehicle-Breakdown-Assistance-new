@@ -363,6 +363,35 @@ Content-Type: application/json
 
 Only the driver who created the request can select a provider.
 
+### Get Rule-Based Recommendations
+
+```http
+GET /api/breakdown-requests/:id/recommendations
+Authorization: Bearer driver_jwt_token
+```
+
+Returns up to five approved, available providers that match the request vehicle type, required service type, specialization, and service radius. This is temporary rule-based logic and will later be replaced by the trained AI model.
+
+Example response item:
+
+```json
+{
+  "providerId": "provider_profile_id",
+  "businessName": "City Auto Mechanics",
+  "providerType": "mechanic",
+  "specializations": ["battery", "electrical"],
+  "distanceKm": 2.4,
+  "rating": 4.5,
+  "responseTimeMinutes": 20,
+  "estimatedPriceRange": {
+    "minimum": 2500,
+    "maximum": 8000
+  },
+  "recommendationScore": 86.5,
+  "availability": "available"
+}
+```
+
 ### Update Request Status
 
 ```http

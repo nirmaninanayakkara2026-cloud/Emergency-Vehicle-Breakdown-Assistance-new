@@ -1,6 +1,6 @@
 # Emergency Vehicle Breakdown Assistance Mobile App
 
-Current phase: **Mobile UI with backend authentication and temporary mock feature data**
+Current phase: **Mobile UI connected to backend authentication, provider profiles, and breakdown requests**
 
 This Expo React Native app is a beginner-friendly mobile UI demo for an Emergency Vehicle Breakdown Assistance final-year project.
 
@@ -22,14 +22,17 @@ Open the app with Expo Go or an Android/iOS emulator.
 ## Completed Phase 1 Features
 
 - Backend authentication with role-based navigation.
+- Backend provider profile creation and availability updates.
+- Backend driver breakdown request creation using Expo Location.
+- Backend driver request list and request details.
+- Backend provider assigned request dashboard and status updates.
 - Driver home screen with quick roadside assistance actions.
-- Request mechanic form using simple vehicle and breakdown details.
-- Mock provider recommendation list.
-- Request tracking screen with status timeline.
+- Request mechanic form using simple vehicle, breakdown, urgency, description, and location details.
+- Approved provider listing from the backend.
 - Self breakdown assistant using local troubleshooting guide data.
 - Spare parts finder using local spare parts shop data.
-- Provider dashboard with profile summary, online/offline toggle, and incoming requests.
-- Provider request details screen with local status update buttons.
+- Provider dashboard with profile summary, availability controls, and assigned requests.
+- Provider request details screen with backend status update buttons.
 - Shared profile screen with logout.
 - Reusable UI components for buttons, inputs, cards, selectors, and screen layout.
 
@@ -40,9 +43,11 @@ Open the app with Expo Go or an Android/iOS emulator.
 - Driver Home
 - Request Mechanic
 - Recommendations
-- Request Tracking / My Requests
+- My Requests
+- Request Details
 - Self Breakdown Assistant
 - Spare Parts Finder
+- Provider Profile
 - Provider Dashboard
 - Provider Request Details
 - Profile
@@ -57,7 +62,9 @@ All app data is stored locally in `src/data`.
 - `troubleshootingGuides.js` contains local guide steps for common breakdown types.
 - `mockProviderProfile.js` contains a sample provider summary.
 
-Authentication uses the backend API. Provider recommendations, request tracking demo data, spare parts shops, and troubleshooting guides still use temporary local mock data.
+Authentication, provider profiles, approved provider listing, breakdown request creation, driver request history, provider assigned requests, provider selection, request cancellation, and status updates use the backend API.
+
+Spare parts shops and troubleshooting guides still use temporary local mock data.
 
 ## Backend API Configuration
 

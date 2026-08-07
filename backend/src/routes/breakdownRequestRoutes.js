@@ -4,6 +4,7 @@ const {
   createBreakdownRequest,
   getAssignedProviderRequests,
   getBreakdownRequestById,
+  getBreakdownRequestRecommendations,
   getMyBreakdownRequests,
   selectProvider,
   updateBreakdownRequestStatus
@@ -21,6 +22,7 @@ router.get(
   authorizeRoles(...PROVIDER_ROLES),
   getAssignedProviderRequests
 );
+router.get("/:id/recommendations", protect, authorizeRoles("driver"), getBreakdownRequestRecommendations);
 router.get("/:id", protect, getBreakdownRequestById);
 router.patch("/:id/select-provider", protect, authorizeRoles("driver"), selectProvider);
 router.patch("/:id/status", protect, authorizeRoles(...PROVIDER_ROLES), updateBreakdownRequestStatus);

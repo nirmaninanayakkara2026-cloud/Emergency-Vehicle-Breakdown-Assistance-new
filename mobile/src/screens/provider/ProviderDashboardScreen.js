@@ -1,47 +1,87 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, RefreshControl, StyleSheet, Text, View } from "react-native";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
+import AppSelect from "../../components/AppSelect";
 import ScreenContainer from "../../components/ScreenContainer";
-import { useAuth } from "../../context/AuthContext";
-import { getProviderProfile, getProviderRequests } from "../../services/providerService";
-import { COLORS } from "../../utils/constants";
+import { getMyProviderProfile, updateAvailability } from "../../services/providerService";
+import { getAssignedRequests, updateRequestStatus } from "../../services/requestService";
+import { COLORS, REQUEST_STATUS_OPTIONS } from "../../utils/constants";
+
+const availabilityOptions = [
+  { label: "Online", value: "available" },
+  { label: "Busy", value: "busy" },
+  { label: "Offline", value: "offline" }
+];
 
 function formatValue(value) {
   return value ? value.replaceAll("_", " ") : "Not available";
 }
 
 export default function ProviderDashboardScreen({ navigation }) {
-  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isOnline, setIsOnline] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [updatingId, setUpdatingId] = useState("");
 
-  useEffect(() => {
-    async function loadProviderData() {
+  const loadDashboard = useCallback(async () => {
+    setError("");
+    try {
       const [profileData, requestData] = await Promise.all([
-        getProviderProfile(),
-        getProviderRequests()
+        getMyProviderProfile(),
+        getAssignedRequests()
       ]);
       setProfile(profileData);
       setRequests(requestData);
+    } catch (dashboardError) {
+      if (dashboardError.message.toLowerCase().includes("profile not found")) {
+        navigation.replace("ProviderProfile");
+        return;
+      }
+      setError(dashboardError.message);
+    } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  }, [navigation]);
 
-    loadProviderData();
-  }, []);
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
 
-  function updateRequestStatus(requestId, status) {
-    setRequests((currentRequests) =>
-      currentRequests.map((request) =>
-        request.id === requestId ? { ...request, status } : request
-      )
-    );
-    Alert.alert("Request updated", `Status changed to ${status}.`);
+  async function handleRefresh() {
+    setRefreshing(true);
+    await loadDashboard();
   }
 
-  if (loading || !profile) {
+  async function handleAvailability(nextStatus) {
+    setError("");
+    try {
+      const updatedProfile = await updateAvailability(nextStatus);
+      setProfile(updatedProfile);
+    } catch (availabilityError) {
+      setError(availabilityError.message);
+    }
+  }
+
+  async function handleStatusUpdate(requestId, status) {
+    setUpdatingId(`${requestId}-${status}`);
+    setError("");
+    try {
+      const updatedRequest = await updateRequestStatus(requestId, status);
+      setRequests((currentRequests) =>
+        currentRequests.map((request) => (request._id === requestId ? updatedRequest : request))
+      );
+    } catch (statusError) {
+      setError(statusError.message);
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
+  if (loading) {
     return (
       <ScreenContainer>
         <ActivityIndicator color={COLORS.primary} />
@@ -50,68 +90,70 @@ export default function ProviderDashboardScreen({ navigation }) {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
       <View style={styles.header}>
         <Text style={styles.title}>Provider Dashboard</Text>
         <AppButton title="Profile" variant="secondary" compact onPress={() => navigation.navigate("Profile")} />
       </View>
 
-      <AppCard>
-        <View style={styles.summaryTop}>
-          <View style={styles.summaryText}>
-            <Text style={styles.providerName}>{profile.name || user?.name}</Text>
-            <Text style={styles.providerType}>{formatValue(profile.type || user?.role)}</Text>
-          </View>
-          <Pressable
-            onPress={() => setIsOnline((current) => !current)}
-            style={[styles.toggle, isOnline ? styles.online : styles.offline]}
-          >
-            <Text style={styles.toggleText}>{isOnline ? "Online" : "Offline"}</Text>
-          </Pressable>
-        </View>
-        <View style={styles.statsRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{profile.rating}</Text>
-            <Text style={styles.statLabel}>Rating</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{profile.completedJobs}</Text>
-            <Text style={styles.statLabel}>Completed jobs</Text>
-          </View>
-        </View>
-      </AppCard>
+      {error ? (
+        <AppCard>
+          <Text style={styles.error}>{error}</Text>
+          <AppButton title="Retry" onPress={loadDashboard} />
+        </AppCard>
+      ) : null}
 
-      <Text style={styles.sectionTitle}>Incoming Requests</Text>
+      {profile ? (
+        <AppCard>
+          <Text style={styles.providerName}>{profile.businessName}</Text>
+          <Text style={styles.body}>Type: {formatValue(profile.providerType)}</Text>
+          <Text style={styles.body}>Rating: {profile.averageRating} ({profile.totalReviews} reviews)</Text>
+          <Text style={styles.body}>Completed jobs: {profile.completedJobs}</Text>
+          <AppSelect
+            label="Availability"
+            options={availabilityOptions}
+            value={profile.availabilityStatus}
+            onChange={handleAvailability}
+          />
+          <AppButton title="Edit Provider Profile" variant="secondary" onPress={() => navigation.navigate("ProviderProfile")} />
+        </AppCard>
+      ) : null}
+
+      <Text style={styles.sectionTitle}>Assigned Requests</Text>
+      {requests.length === 0 ? (
+        <AppCard>
+          <Text style={styles.body}>No assigned breakdown requests yet.</Text>
+        </AppCard>
+      ) : null}
       {requests.map((request) => (
-        <AppCard key={request.id}>
+        <AppCard key={request._id}>
           <View style={styles.cardHeader}>
-            <Text style={styles.driverName}>{request.driverName}</Text>
-            <Text style={styles.status}>{request.status}</Text>
+            <Text style={styles.driverName}>{request.driverId?.name || "Driver"}</Text>
+            <Text style={styles.status}>{formatValue(request.status)}</Text>
           </View>
           <Text style={styles.body}>Vehicle: {formatValue(request.vehicleType)}</Text>
           <Text style={styles.body}>Breakdown: {formatValue(request.breakdownType)}</Text>
+          <Text style={styles.body}>Required service: {formatValue(request.requiredServiceType)}</Text>
           <Text style={styles.body}>Urgency: {formatValue(request.urgencyLevel)}</Text>
-          <Text style={styles.body}>Distance: {request.distanceKm} km</Text>
+          <Text style={styles.body}>Location: {request.location?.address || "Not available"}</Text>
           <Text style={styles.description}>{request.problemDescription}</Text>
+          <AppButton
+            title="View Details"
+            variant="secondary"
+            compact
+            onPress={() => navigation.navigate("ProviderRequestDetails", { requestId: request._id, request })}
+          />
           <View style={styles.actions}>
-            <AppButton
-              title="View Details"
-              variant="secondary"
-              compact
-              onPress={() => navigation.navigate("ProviderRequestDetails", { request })}
-            />
-            <AppButton
-              title="Accept"
-              variant="success"
-              compact
-              onPress={() => updateRequestStatus(request.id, "Accepted")}
-            />
-            <AppButton
-              title="Reject"
-              variant="danger"
-              compact
-              onPress={() => updateRequestStatus(request.id, "Rejected")}
-            />
+            {REQUEST_STATUS_OPTIONS.map((option) => (
+              <AppButton
+                key={option.value}
+                title={option.label}
+                compact
+                variant={option.value === "completed" ? "success" : "secondary"}
+                loading={updatingId === `${request._id}-${option.value}`}
+                onPress={() => handleStatusUpdate(request._id, option.value)}
+              />
+            ))}
           </View>
         </AppCard>
       ))}
@@ -132,59 +174,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "900"
   },
-  summaryTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12
-  },
-  summaryText: {
-    flex: 1,
-    gap: 4
-  },
   providerName: {
     color: COLORS.text,
     fontSize: 20,
     fontWeight: "900"
-  },
-  providerType: {
-    color: COLORS.muted,
-    fontSize: 15,
-    textTransform: "capitalize"
-  },
-  toggle: {
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 9
-  },
-  online: {
-    backgroundColor: COLORS.success
-  },
-  offline: {
-    backgroundColor: COLORS.muted
-  },
-  toggleText: {
-    color: COLORS.surface,
-    fontWeight: "800"
-  },
-  statsRow: {
-    flexDirection: "row",
-    gap: 12
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: COLORS.softSurface,
-    borderRadius: 8,
-    padding: 12
-  },
-  statNumber: {
-    color: COLORS.primaryDark,
-    fontSize: 22,
-    fontWeight: "900"
-  },
-  statLabel: {
-    color: COLORS.muted,
-    fontWeight: "700"
   },
   sectionTitle: {
     color: COLORS.text,
@@ -209,6 +202,7 @@ const styles = StyleSheet.create({
   },
   body: {
     color: COLORS.muted,
+    lineHeight: 21,
     textTransform: "capitalize"
   },
   description: {
@@ -219,5 +213,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8
+  },
+  error: {
+    color: COLORS.danger,
+    fontWeight: "700",
+    lineHeight: 20
   }
 });

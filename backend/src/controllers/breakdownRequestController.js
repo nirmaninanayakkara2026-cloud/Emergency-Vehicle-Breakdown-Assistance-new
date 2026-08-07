@@ -9,6 +9,7 @@ const {
   validateBreakdownRequestInput,
   validateStatusUpdateInput
 } = require("../utils/requestValidation");
+const { getRecommendationsForRequest } = require("../services/recommendationService");
 
 function isProviderRole(role) {
   return PROVIDER_ROLES.includes(role);
@@ -137,6 +138,37 @@ async function getBreakdownRequestById(req, res, next) {
       success: true,
       message: "Breakdown request fetched successfully",
       data: { request }
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getBreakdownRequestRecommendations(req, res, next) {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      res.status(400);
+      throw new Error("Breakdown request id is invalid");
+    }
+
+    const request = await BreakdownRequest.findById(req.params.id);
+
+    if (!request) {
+      res.status(404);
+      throw new Error("Breakdown request not found");
+    }
+
+    if (!isSameId(request.driverId, req.user._id)) {
+      res.status(403);
+      throw new Error("Only the driver who created the request can view recommendations");
+    }
+
+    const recommendations = await getRecommendationsForRequest(request);
+
+    return res.status(200).json({
+      success: true,
+      message: "Provider recommendations fetched successfully",
+      data: { recommendations }
     });
   } catch (error) {
     return next(error);
@@ -295,6 +327,7 @@ module.exports = {
   createBreakdownRequest,
   getAssignedProviderRequests,
   getBreakdownRequestById,
+  getBreakdownRequestRecommendations,
   getMyBreakdownRequests,
   selectProvider,
   updateBreakdownRequestStatus
