@@ -2,9 +2,12 @@
 
 Backend foundation for the Emergency Vehicle Breakdown Assistance Mobile Application.
 
-Current phase: **Backend foundation with authentication**
+Current phase: **Final integrated backend with AI 1 diagnosis, AI 2 safe self-troubleshooting, provider recommendation, and request tracking**
 
-No AI model, mobile app connection, photo upload, detailed vehicle management, safety checklist, or triage feature is implemented in this phase.
+The backend calls the FastAPI AI service configured by `AI_SERVICE_URL` for AI 1
+fault classification and AI 2 troubleshooting. AI 1 request creation has a safe
+rule-based fallback. AI 2 fails closed and offers mechanic escalation instead of
+inventing troubleshooting instructions when the service is unavailable.
 
 ## Technology
 
@@ -35,7 +38,15 @@ PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=7d
+AI_SERVICE_URL=http://localhost:8000
+AI_SERVICE_TIMEOUT_MS=5000
+OPENAI_API_KEY=
+OPENAI_MODEL=
 ```
+
+OpenAI clarification is optional and runs only for predictions marked as
+needing more information. Keep both OpenAI values blank to disable it. The API
+key must remain server-side and must never be included in client responses.
 
 If `MONGO_URI` is empty, the server still starts and skips the database connection. Add a valid MongoDB connection string when database work begins.
 
@@ -284,7 +295,9 @@ Returns one approved provider profile.
 
 ## Breakdown Request API
 
-Temporary service-type mapping is used for Phase 1 backend logic. This will later be replaced by the trained AI model.
+AI 1 supplies the primary service type. The following rule mapping remains as a
+non-blocking fallback when FastAPI is offline, times out, or returns an invalid
+response.
 
 Mapping:
 
@@ -322,6 +335,43 @@ Content-Type: application/json
 
 Only drivers can create breakdown requests.
 
+The stored `aiPrediction` includes the predicted fault, driver-facing label,
+required service, confidence and margin, ambiguity/follow-up flags, and either
+`ai_model` or `rule_fallback` as `predictionSource`.
+
+### Request Clarification Questions
+
+```http
+POST /api/breakdown-requests/:id/clarification
+Authorization: Bearer driver_jwt_token
+```
+
+Only the driver who owns the request may call this route. OpenAI is called only
+when AI 1 sets `needsMoreInformation` and fewer than two clarification rounds
+have been used. If OpenAI is unavailable, the request remains usable and the
+response contains `clarificationAvailable: false`.
+
+### Submit Clarification Answers
+
+```http
+POST /api/breakdown-requests/:id/clarification-answer
+Authorization: Bearer driver_jwt_token
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "clarification_1",
+      "answer": "Clicking sound"
+    }
+  ]
+}
+```
+
+Answers must use the options supplied by the clarification endpoint. Accepted
+answers are appended to `diagnosticInputText`, then AI 1 runs again and updates
+the stored prediction and backward-compatible `requiredServiceType`.
+
 ### Get My Driver Requests
 
 ```http
@@ -350,7 +400,7 @@ Drivers can view their own requests. Selected providers can view requests assign
 ### Select Provider
 
 ```http
-PATCH /api/breakdown-requests/:id/select-provider
+POST /api/breakdown-requests/:id/select-provider
 Authorization: Bearer driver_jwt_token
 Content-Type: application/json
 ```
@@ -363,14 +413,16 @@ Content-Type: application/json
 
 Only the driver who created the request can select a provider.
 
-### Get Rule-Based Recommendations
+### Get Provider Recommendations
 
 ```http
-GET /api/breakdown-requests/:id/recommendations
+GET /api/providers/recommendations?requestId=:id
 Authorization: Bearer driver_jwt_token
 ```
 
-Returns up to five approved, available providers that match the request vehicle type, required service type, specialization, and service radius. This is temporary rule-based logic and will later be replaced by the trained AI model.
+Returns up to five approved, active, available providers that match the request
+vehicle type, required service, specialization, and service radius. Internal
+ranking scores are never returned to drivers.
 
 Example response item:
 
@@ -387,7 +439,6 @@ Example response item:
     "minimum": 2500,
     "maximum": 8000
   },
-  "recommendationScore": 86.5,
   "availability": "available"
 }
 ```
@@ -402,14 +453,15 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "on_the_way"
+  "status": "provider_en_route"
 }
 ```
 
 Allowed provider statuses:
 
 - `accepted`
-- `on_the_way`
+- `provider_en_route`
+- `arrived`
 - `in_progress`
 - `completed`
 
@@ -418,11 +470,55 @@ Only the selected provider can update these statuses.
 ### Cancel Request
 
 ```http
-PATCH /api/breakdown-requests/:id/cancel
+POST /api/breakdown-requests/:id/cancel
 Authorization: Bearer driver_jwt_token
 ```
 
 Only the driver who created the request can cancel it.
+
+## AI 2 Self-Assistant
+
+The mobile application calls these authenticated Node.js endpoints. Node.js then
+calls the authoritative FastAPI AI 2 engine configured by `AI_SERVICE_URL`.
+The mobile application never receives locally generated repair instructions.
+
+```text
+POST /api/self-assistant/start
+POST /api/self-assistant/:sessionId/safety-confirm
+POST /api/self-assistant/:sessionId/step
+POST /api/self-assistant/:sessionId/stop
+POST /api/self-assistant/:sessionId/result
+POST /api/self-assistant/:sessionId/cancel
+GET  /api/self-assistant/:sessionId
+GET  /api/self-assistant/history
+```
+
+All routes require a driver JWT. Session reads and mutations are restricted to
+the driver who created the session. If FastAPI is unavailable, the service fails
+closed with `troubleshooting_unavailable` and offers mechanic escalation without
+returning guessed steps.
+
+## Provider Recommendation and Tracking
+
+Provider recommendations use transparent business rules: service match (40%),
+distance (25%), rating (15%), availability (10%), and response time (10%). Only
+approved, active, available, vehicle-compatible providers inside their service
+radius are eligible. Driver responses omit internal numeric score components.
+
+```text
+GET  /api/providers/recommendations?requestId=:requestId
+POST /api/breakdown-requests/:id/select-provider
+POST /api/breakdown-requests/:id/accept
+POST /api/breakdown-requests/:id/reject
+PATCH /api/breakdown-requests/:id/status
+POST /api/breakdown-requests/:id/cancel
+POST /api/breakdown-requests/:id/review
+```
+
+Provider status progression is enforced as `accepted` → `provider_en_route` →
+`arrived` → `in_progress` → `completed`. Rejected providers are excluded from
+subsequent recommendations. Cost ranges are service-based LKR estimates and are
+stored separately from the provider's optional final cost.
 
 ## Project Structure
 
@@ -434,20 +530,27 @@ backend/
     models/
       BreakdownRequest.js
       ProviderProfile.js
+      TroubleshootingSession.js
       User.js
     controllers/
       authController.js
       breakdownRequestController.js
       providerController.js
+      selfAssistantController.js
     routes/
       authRoutes.js
       breakdownRequestRoutes.js
       healthRoutes.js
       providerRoutes.js
+      selfAssistantRoutes.js
     middleware/
       authMiddleware.js
       errorMiddleware.js
     services/
+      ai2TroubleshootingService.js
+      providerRecommendationService.js
+    config/
+      serviceCostRanges.js
     utils/
       generateToken.js
       domainConstants.js

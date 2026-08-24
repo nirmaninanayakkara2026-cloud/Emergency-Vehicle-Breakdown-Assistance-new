@@ -1,0 +1,19 @@
+AI 2 TROUBLESHOOTING KNOWLEDGE AUDIT
+
+Original archive records: 99
+Usable troubleshooting guides: 92
+LOW risk: 7
+CAUTION risk: 23
+HIGH risk: 62
+Guides requiring professional help: 62
+Fault categories represented: 12
+Records excluded: 7
+Records with incomplete branching: 30
+Total troubleshooting steps: 106
+Total result options: 150
+
+SAFETY POLICY
+Risk levels are produced only by deterministic project rules.
+HIGH-risk source procedures are retained only in source_diagnosis_steps and are not returned as user-facing steps.
+LOW and CAUTION paths preserve source order because the archive contains no result-specific branching.
+No result is treated as a completed repair because the source does not establish repair outcomes.

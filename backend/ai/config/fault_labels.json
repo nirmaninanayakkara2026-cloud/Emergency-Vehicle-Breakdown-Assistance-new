@@ -1,0 +1,11 @@
+{
+  "brake_system_fault": "Brake System Problem",
+  "cooling_system_fault": "Cooling / Overheating Problem",
+  "drivetrain_fault": "Drivetrain Problem",
+  "electrical_system_fault": "Electrical / Starting System Problem",
+  "engine_system_fault": "Engine Problem",
+  "fuel_system_fault": "Fuel System Problem",
+  "steering_system_fault": "Steering System Problem",
+  "transmission_fault": "Transmission Problem",
+  "wheel_tire_fault": "Wheel / Tyre Problem"
+}

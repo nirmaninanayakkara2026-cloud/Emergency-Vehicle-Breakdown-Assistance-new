@@ -1,0 +1,140 @@
+AI 1 PREDICTION SERVICE TEST RESULTS
+
+Battery/electrical
+Input: vehicle does not start dashboard lights are weak clicking sound
+Predicted fault: electrical_system_fault
+User-friendly label: Electrical / Starting System Problem
+Required service: battery_electrical_mechanic
+Confidence: 0.673244
+Prediction margin: 0.615971
+Confidence level: medium
+Ambiguous: false
+Needs more information: false
+Related fault group: none
+Top 3 predictions:
+  1. electrical_system_fault: 0.673244
+  2. fuel_system_fault: 0.057273
+  3. drivetrain_fault: 0.053869
+
+Cooling / overheating
+Input: temperature gauge is very high steam coming from engine area and coolant appears to be leaking
+Predicted fault: engine_system_fault
+User-friendly label: Engine Problem
+Required service: engine_mechanic
+Confidence: 0.488995
+Prediction margin: 0.096353
+Confidence level: medium
+Ambiguous: true
+Needs more information: true
+Related fault group: engine_cooling
+Top 3 predictions:
+  1. engine_system_fault: 0.488995
+  2. cooling_system_fault: 0.392642
+  3. fuel_system_fault: 0.036865
+
+Steering
+Input: steering wheel suddenly became very difficult to turn
+Predicted fault: steering_system_fault
+User-friendly label: Steering System Problem
+Required service: steering_mechanic
+Confidence: 0.995529
+Prediction margin: 0.994044
+Confidence level: high
+Ambiguous: false
+Needs more information: false
+Related fault group: none
+Top 3 predictions:
+  1. steering_system_fault: 0.995529
+  2. wheel_tire_fault: 0.001485
+  3. electrical_system_fault: 0.000967
+
+Brake
+Input: brake pedal feels soft and vehicle takes much longer to stop
+Predicted fault: brake_system_fault
+User-friendly label: Brake System Problem
+Required service: brake_mechanic
+Confidence: 0.866181
+Prediction margin: 0.833141
+Confidence level: high
+Ambiguous: false
+Needs more information: false
+Related fault group: none
+Top 3 predictions:
+  1. brake_system_fault: 0.866181
+  2. drivetrain_fault: 0.033041
+  3. electrical_system_fault: 0.026756
+
+Tyre
+Input: front tyre is completely flat and vehicle is pulling to one side
+Predicted fault: wheel_tire_fault
+User-friendly label: Wheel / Tyre Problem
+Required service: tire_mechanic
+Confidence: 0.209169
+Prediction margin: 0.036280
+Confidence level: low
+Ambiguous: true
+Needs more information: true
+Related fault group: none
+Top 3 predictions:
+  1. wheel_tire_fault: 0.209169
+  2. electrical_system_fault: 0.172889
+  3. drivetrain_fault: 0.118181
+
+Transmission
+Input: vehicle hesitates when changing gears and transmission slips while accelerating
+Predicted fault: drivetrain_fault
+User-friendly label: Drivetrain Problem
+Required service: general_mechanic
+Confidence: 0.879410
+Prediction margin: 0.808985
+Confidence level: high
+Ambiguous: false
+Needs more information: false
+Related fault group: drivetrain_transmission
+Top 3 predictions:
+  1. drivetrain_fault: 0.879410
+  2. transmission_fault: 0.070425
+  3. electrical_system_fault: 0.011028
+
+Fuel
+Input: strong fuel smell vehicle loses power and fuel appears to be leaking
+Predicted fault: fuel_system_fault
+User-friendly label: Fuel System Problem
+Required service: fuel_system_mechanic
+Confidence: 0.960747
+Prediction margin: 0.951786
+Confidence level: high
+Ambiguous: false
+Needs more information: false
+Related fault group: none
+Top 3 predictions:
+  1. fuel_system_fault: 0.960747
+  2. drivetrain_fault: 0.008961
+  3. electrical_system_fault: 0.006454
+
+Ambiguous
+Input: vehicle making strange noise and not working properly
+Predicted fault: electrical_system_fault
+User-friendly label: Electrical / Starting System Problem
+Required service: battery_electrical_mechanic
+Confidence: 0.221934
+Prediction margin: 0.044786
+Confidence level: low
+Ambiguous: true
+Needs more information: true
+Related fault group: none
+Top 3 predictions:
+  1. electrical_system_fault: 0.221934
+  2. drivetrain_fault: 0.177149
+  3. wheel_tire_fault: 0.119555
+
+AI 1 PREDICTION SERVICE PREPARATION COMPLETE
+
+Model: Logistic Regression
+Fault classes: 9
+Fault-to-service mapping: Loaded
+Confidence policy: Loaded
+Test predictions: 8
+Ambiguous predictions: 3
+Low-confidence predictions: 2
+Ready for FastAPI integration: YES

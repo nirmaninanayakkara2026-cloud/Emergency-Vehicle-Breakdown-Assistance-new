@@ -1,0 +1,114 @@
+AI MODULE 1 DATASET AUDIT
+=============================
+Source filename: automotive_faults_aktc_obike_et_al.json
+Top-level structure: array
+Detected record path: $
+Top-level keys: category, diagnosis_steps, subcategory, symptoms
+Total records: 99
+
+Detected fields:
+  - category: str
+  - diagnosis_steps: list
+  - diagnosis_steps[]: dict
+  - diagnosis_steps[].result: list
+  - diagnosis_steps[].step: str
+  - subcategory: str
+  - symptoms: list
+
+Recursively detected semantic candidates:
+  - fault name: subcategory
+  - fault category: category, subcategory
+  - symptoms: symptoms
+  - description: not detected
+  - diagnostic procedure: diagnosis_steps, diagnosis_steps[], diagnosis_steps[].step, diagnosis_steps[].result
+  - resolution: not detected
+  - vehicle/system/component: subcategory
+
+Potential ML input field: symptoms
+Potential ML target field: category
+Potential original fault-name field: subcategory
+Number of target classes: 13
+
+Records per source target class:
+  - Engine Components: 15 (15.2%)
+  - Electrical System: 14 (14.1%)
+  - Drivetrain: 11 (11.1%)
+  - ABS System: 9 (9.1%)
+  - Emissions System: 9 (9.1%)
+  - Air Conditioning System: 8 (8.1%)
+  - Cooling System: 8 (8.1%)
+  - Engine Compartment: 6 (6.1%)
+  - Fuel System: 5 (5.1%)
+  - Liquid Systems: 5 (5.1%)
+  - Transmission: 5 (5.1%)
+  - Wheels & Tires: 3 (3.0%) [VERY FEW EXAMPLES]
+  - Steering: 1 (1.0%) [VERY FEW EXAMPLES]
+
+Missing values:
+  - category: missing=0, null=0, empty=0
+  - diagnosis_steps: missing=0, null=0, empty=0
+  - diagnosis_steps[]: missing=0, null=0, empty=0
+  - diagnosis_steps[].result: missing=0, null=0, empty=0
+  - diagnosis_steps[].step: missing=0, null=0, empty=0
+  - subcategory: missing=0, null=0, empty=0
+  - symptoms: missing=0, null=0, empty=0
+
+Exact duplicate source records: 0
+Duplicate normalized symptom records: 6
+Duplicate symptom + source-target pairs: 2
+Unusable records (missing input or target): 0
+
+Supervised-classification assessment:
+The JSON is structurally suitable for supervised text classification because symptoms and a category target are present. It is not large or balanced enough to support a reliable model assessment.
+
+Application-style input examples:
+  1. Vehicle type: car. Main problem: vehicle not starting. Starting behavior: clicking. Dashboard lights: dim. Observed sound: clicking.
+  2. Vehicle type: van. Main problem: engine overheating. Seen: steam. Temperature warning light is on.
+  3. Vehicle type: car. Main problem: brake problem. Brake pedal feels spongy. Vehicle pulls to one side.
+
+Application input compatibility: MODERATE
+81.0% of the content vocabulary in the application-style examples appears in the dataset. The phrases are broadly automotive and symptom-oriented, but the dataset uses short symptom lists, has no vehicle-type context, and is small compared with the variety of future application input.
+
+Conclusion:
+INSUFFICIENT_DATA_FOR_RELIABLE_MODEL
+
+PROCESSED DATASET RESULTS
+=========================
+Standardized columns: record_id, symptom_text, fault_category, original_fault_name, diagnostic_procedure, resolution
+Original records: 99
+Usable processed records: 96
+Unusable records skipped: 0
+Duplicate symptom + normalized-fault pairs removed: 3
+Explicit diagnosis phrases removed from symptom_text: 0
+Processed fault classes: 12
+
+Records per normalized fault class:
+  - engine_system_fault: 19 (19.8%)
+  - electrical_system_fault: 14 (14.6%)
+  - drivetrain_fault: 11 (11.5%)
+  - brake_system_fault: 10 (10.4%)
+  - cooling_system_fault: 10 (10.4%)
+  - air_conditioning_fault: 8 (8.3%)
+  - emissions_system_fault: 8 (8.3%)
+  - fuel_system_fault: 5 (5.2%)
+  - transmission_fault: 5 (5.2%)
+  - wheel_tire_fault: 3 (3.1%) [VERY FEW EXAMPLES]
+  - steering_system_fault: 2 (2.1%) [VERY FEW EXAMPLES]
+  - visibility_system_fault: 1 (1.0%) [VERY FEW EXAMPLES]
+
+Low-data normalized classes (<5 records): steering_system_fault=2, visibility_system_fault=1, wheel_tire_fault=3
+
+Data leakage check:
+symptom_text is built only from the real source symptoms field. Source category and subcategory values are not appended.
+Only explicit diagnosis constructions such as "diagnosed as X", "faulty X", or "X fault" are removed; ordinary automotive terms are retained.
+
+Category normalization notes:
+The two engine source groups are combined into engine_system_fault. The heterogeneous Liquid Systems source group is split using its actual component name. Unrelated vehicle systems are otherwise kept separate.
+
+Service mapping:
+fault_service_mapping.json is business logic only and is not included in the training CSV.
+
+Final assessment:
+The processed data is structurally usable for experimentation, but 96 records across 12 classes is too small and imbalanced for a reliable classifier. In particular, visibility, steering, and wheel/tire classes have fewer than five examples. Conflicting identical symptom text also occurs across different fault classes.
+
+INSUFFICIENT_DATA_FOR_RELIABLE_MODEL

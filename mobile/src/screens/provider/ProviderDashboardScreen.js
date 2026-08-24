@@ -1,12 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import AppSelect from "../../components/AppSelect";
 import ScreenContainer from "../../components/ScreenContainer";
+import EmptyState from "../../components/ui/EmptyState";
+import ErrorState from "../../components/ui/ErrorState";
+import LoadingState from "../../components/ui/LoadingState";
+import ScreenHeader from "../../components/ui/ScreenHeader";
+import SectionHeader from "../../components/ui/SectionHeader";
+import StatusBadge from "../../components/ui/StatusBadge";
 import { getMyProviderProfile, updateAvailability } from "../../services/providerService";
-import { getAssignedRequests, updateRequestStatus } from "../../services/requestService";
-import { COLORS, REQUEST_STATUS_OPTIONS } from "../../utils/constants";
+import { acceptRequest, getAssignedRequests, rejectRequest } from "../../services/requestService";
+import { COLORS } from "../../utils/constants";
+import { colors, radii, spacing, typography } from "../../theme";
+import { formatDisplayValue, formatFaultLabel, formatRequestStatus, formatServiceType } from "../../utils/displayLabels";
 
 const availabilityOptions = [
   { label: "Online", value: "available" },
@@ -66,11 +75,13 @@ export default function ProviderDashboardScreen({ navigation }) {
     }
   }
 
-  async function handleStatusUpdate(requestId, status) {
-    setUpdatingId(`${requestId}-${status}`);
+  async function handleDecision(requestId, accepted) {
+    setUpdatingId(`${requestId}-${accepted ? "accept" : "reject"}`);
     setError("");
     try {
-      const updatedRequest = await updateRequestStatus(requestId, status);
+      const updatedRequest = accepted
+        ? await acceptRequest(requestId, 30)
+        : await rejectRequest(requestId, "Provider is currently unavailable");
       setRequests((currentRequests) =>
         currentRequests.map((request) => (request._id === requestId ? updatedRequest : request))
       );
@@ -84,31 +95,25 @@ export default function ProviderDashboardScreen({ navigation }) {
   if (loading) {
     return (
       <ScreenContainer>
-        <ActivityIndicator color={COLORS.primary} />
+        <LoadingState message="Loading service dashboard..." />
       </ScreenContainer>
     );
   }
 
   return (
     <ScreenContainer refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Provider Dashboard</Text>
-        <AppButton title="Profile" variant="secondary" compact onPress={() => navigation.navigate("Profile")} />
-      </View>
+      <ScreenHeader eyebrow="Provider workspace" title="Service Dashboard" subtitle="Manage requests and keep drivers updated." right={<AppButton title="Profile" icon="person-outline" variant="ghost" compact onPress={() => navigation.navigate("Profile")} />} />
+      <View style={styles.summaryRow}><Summary icon="mail-unread-outline" value={requests.filter((item) => item.status === "provider_requested").length} label="Incoming" tone="blue" /><Summary icon="construct-outline" value={requests.filter((item) => ["accepted","provider_en_route","arrived","in_progress"].includes(item.status)).length} label="Active Job" tone="teal" /><Summary icon="checkmark-done-outline" value={requests.filter((item) => item.status === "completed" && new Date(item.updatedAt || item.createdAt).toDateString() === new Date().toDateString()).length} label="Today" tone="green" /></View>
 
       {error ? (
         <AppCard>
-          <Text style={styles.error}>{error}</Text>
-          <AppButton title="Retry" onPress={loadDashboard} />
+          <ErrorState message="We couldn't load your service dashboard." onRetry={loadDashboard} />
         </AppCard>
       ) : null}
 
       {profile ? (
         <AppCard>
-          <Text style={styles.providerName}>{profile.businessName}</Text>
-          <Text style={styles.body}>Type: {formatValue(profile.providerType)}</Text>
-          <Text style={styles.body}>Rating: {profile.averageRating} ({profile.totalReviews} reviews)</Text>
-          <Text style={styles.body}>Completed jobs: {profile.completedJobs}</Text>
+          <View style={styles.profileTop}><View style={styles.providerIcon}><Ionicons name="business-outline" size={25} color={colors.primary} /></View><View style={styles.profileCopy}><Text style={styles.providerName}>{profile.businessName}</Text><Text style={styles.body}>{formatDisplayValue(profile.providerType)}</Text><Text style={styles.rating}>★ {profile.averageRating} · {profile.totalReviews} reviews · {profile.completedJobs} completed</Text></View></View>
           <AppSelect
             label="Availability"
             options={availabilityOptions}
@@ -119,42 +124,48 @@ export default function ProviderDashboardScreen({ navigation }) {
         </AppCard>
       ) : null}
 
-      <Text style={styles.sectionTitle}>Assigned Requests</Text>
+      <SectionHeader title="Incoming Requests" subtitle="Review new and active roadside jobs." />
       {requests.length === 0 ? (
         <AppCard>
-          <Text style={styles.body}>No assigned breakdown requests yet.</Text>
+          <EmptyState title="No incoming requests" message="New roadside requests will appear here." icon="notifications-outline" />
         </AppCard>
       ) : null}
       {requests.map((request) => (
         <AppCard key={request._id}>
           <View style={styles.cardHeader}>
-            <Text style={styles.driverName}>{request.driverId?.name || "Driver"}</Text>
-            <Text style={styles.status}>{formatValue(request.status)}</Text>
+            <View style={styles.requestIcon}><Ionicons name="car-outline" size={23} color={colors.primary} /></View><Text style={styles.driverName}>{request.driverId?.name || "Driver Request"}</Text>
+            <StatusBadge status={request.status} tone={request.urgencyLevel === "high" ? "danger" : "info"} />
           </View>
-          <Text style={styles.body}>Vehicle: {formatValue(request.vehicleType)}</Text>
-          <Text style={styles.body}>Breakdown: {formatValue(request.breakdownType)}</Text>
-          <Text style={styles.body}>Required service: {formatValue(request.requiredServiceType)}</Text>
-          <Text style={styles.body}>Urgency: {formatValue(request.urgencyLevel)}</Text>
-          <Text style={styles.body}>Location: {request.location?.address || "Not available"}</Text>
+          <View style={styles.requestMeta}><Meta icon="car-sport-outline" text={formatDisplayValue(request.vehicleType)} /><Meta icon="construct-outline" text={formatServiceType(request.requiredServiceType)} /><Meta icon="alert-circle-outline" text={formatFaultLabel(request.aiPrediction?.predictedFault, request.aiPrediction?.faultLabel || formatDisplayValue(request.breakdownType))} /><Meta icon="location-outline" text={`${request.providerDistanceKm ?? "—"} km · ${request.location?.address || "Location unavailable"}`} /></View>
           <Text style={styles.description}>{request.problemDescription}</Text>
+          {request.symptomCapture?.additionalDescription ? (
+            <Text style={styles.description}>Symptoms: {request.symptomCapture.additionalDescription}</Text>
+          ) : null}
           <AppButton
-            title="View Details"
+            title="View Request Details"
+            icon="arrow-forward"
             variant="secondary"
             compact
             onPress={() => navigation.navigate("ProviderRequestDetails", { requestId: request._id, request })}
           />
-          <View style={styles.actions}>
-            {REQUEST_STATUS_OPTIONS.map((option) => (
+          {request.status === "provider_requested" ? (
+            <View style={styles.actions}>
               <AppButton
-                key={option.value}
-                title={option.label}
+                title="Accept"
                 compact
-                variant={option.value === "completed" ? "success" : "secondary"}
-                loading={updatingId === `${request._id}-${option.value}`}
-                onPress={() => handleStatusUpdate(request._id, option.value)}
+                variant="success"
+                loading={updatingId === `${request._id}-accept`}
+                onPress={() => handleDecision(request._id, true)}
               />
-            ))}
-          </View>
+              <AppButton
+                title="Reject"
+                compact
+                variant="danger"
+                loading={updatingId === `${request._id}-reject`}
+                onPress={() => handleDecision(request._id, false)}
+              />
+            </View>
+          ) : null}
         </AppCard>
       ))}
     </ScreenContainer>
@@ -162,18 +173,9 @@ export default function ProviderDashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12
-  },
-  title: {
-    flex: 1,
-    color: COLORS.primaryDark,
-    fontSize: 26,
-    fontWeight: "900"
-  },
+  summaryRow: { flexDirection: "row", gap: spacing.xs },
+  summary: { flex: 1, minHeight: 104, borderRadius: radii.md, padding: spacing.sm, justifyContent: "space-between" }, summaryValue: { ...typography.pageTitle, color: colors.primaryDark }, summaryLabel: { ...typography.caption, color: colors.textSecondary, fontWeight: "600" },
+  profileTop: { flexDirection: "row", alignItems: "center", gap: spacing.sm }, providerIcon: { width: 52, height: 52, borderRadius: radii.md, backgroundColor: colors.blueLight, alignItems: "center", justifyContent: "center" }, profileCopy: { flex: 1 }, rating: { ...typography.caption, color: colors.textSecondary },
   providerName: {
     color: COLORS.text,
     fontSize: 20,
@@ -190,6 +192,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12
   },
+  requestIcon: { width: 42, height: 42, borderRadius: radii.sm, backgroundColor: colors.blueLight, alignItems: "center", justifyContent: "center" },
   driverName: {
     flex: 1,
     color: COLORS.text,
@@ -209,6 +212,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     lineHeight: 21
   },
+  requestMeta: { gap: spacing.xs }, meta: { flexDirection: "row", alignItems: "center", gap: spacing.xs }, metaText: { ...typography.body, flex: 1, color: colors.textSecondary },
   actions: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -220,3 +224,6 @@ const styles = StyleSheet.create({
     lineHeight: 20
   }
 });
+
+function Summary({ icon, value, label, tone }) { const palette = tone === "green" ? [colors.greenLight, colors.green] : tone === "teal" ? [colors.tealLight, colors.teal] : [colors.blueLight, colors.blue]; return <View style={[styles.summary, { backgroundColor: palette[0] }]}><Ionicons name={icon} size={23} color={palette[1]} /><Text style={styles.summaryValue}>{value}</Text><Text style={styles.summaryLabel}>{label}</Text></View>; }
+function Meta({ icon, text }) { return <View style={styles.meta}><Ionicons name={icon} size={18} color={colors.teal} /><Text style={styles.metaText}>{text}</Text></View>; }

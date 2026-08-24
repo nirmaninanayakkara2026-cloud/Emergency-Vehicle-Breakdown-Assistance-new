@@ -1,0 +1,108 @@
+AI 1 BASELINE MODEL EVALUATION REPORT
+
+Dataset: ai1_final_training_dataset.csv
+Dataset size: 15267
+Train size: 12213
+Test size: 3054
+Fault classes: 9
+Group-aware split: StratifiedGroupKFold, first fold, random_state=42
+Group overlap: 0 (confirmed)
+ML input: symptom_text only
+Target: fault_category
+
+FULL CLASS DISTRIBUTION
+fault_category
+brake_system_fault         2014
+cooling_system_fault        160
+drivetrain_fault           2011
+electrical_system_fault    2020
+engine_system_fault        2023
+fuel_system_fault          2002
+steering_system_fault      2001
+transmission_fault         1035
+wheel_tire_fault           2001
+
+TRAIN CLASS DISTRIBUTION
+fault_category
+brake_system_fault         1611
+cooling_system_fault        128
+drivetrain_fault           1609
+electrical_system_fault    1616
+engine_system_fault        1618
+fuel_system_fault          1601
+steering_system_fault      1601
+transmission_fault          828
+wheel_tire_fault           1601
+
+TEST CLASS DISTRIBUTION
+fault_category
+brake_system_fault         403
+cooling_system_fault        32
+drivetrain_fault           402
+electrical_system_fault    404
+engine_system_fault        405
+fuel_system_fault          401
+steering_system_fault      400
+transmission_fault         207
+wheel_tire_fault           400
+
+LOGISTIC REGRESSION RESULTS
+Accuracy: 0.815652
+Macro Precision: 0.785294
+Macro Recall: 0.791187
+Macro F1: 0.787142
+Weighted F1: 0.817375
+
+LINEAR SVM RESULTS
+Accuracy: 0.822528
+Macro Precision: 0.798180
+Macro Recall: 0.785085
+Macro F1: 0.790775
+Weighted F1: 0.822217
+
+Selected model: Logistic Regression
+Selection reason: Macro F1 scores differ by no more than 0.005; Logistic Regression was preferred because it directly provides probability estimates.
+Weakest-performing class: transmission_fault (F1=0.596950)
+Strongest-performing class: steering_system_fault (F1=0.944238)
+Model assessment: ACCEPTABLE_BASELINE
+
+LIMITATIONS
+- cooling_system_fault has significantly fewer training examples than most other classes.
+- Metrics estimate performance only on the deterministic held-out fold of the current data.
+- Complaint narratives can be vague, incomplete, or mention symptoms from multiple systems.
+- A classifier prediction is not a mechanical diagnosis or a safety guarantee.
+- Low-confidence and out-of-scope handling must be designed before production use.
+
+AI 1 APPLICATION-STYLE PREDICTIONS
+
+Example 1
+Input: vehicle does not start dashboard lights are weak clicking sound
+Predicted fault: electrical_system_fault
+Confidence: 0.673244
+
+Example 2
+Input: engine temperature warning came on vehicle overheating and fluid appears to be leaking
+Predicted fault: engine_system_fault
+Confidence: 0.462812
+
+Example 3
+Input: steering suddenly became difficult while driving
+Predicted fault: steering_system_fault
+Confidence: 0.940829
+
+Example 4
+Input: brake pedal feels soft and vehicle takes longer to stop
+Predicted fault: brake_system_fault
+Confidence: 0.866181
+
+Example 5
+Input: tyre is completely flat and vehicle pulls to one side
+Predicted fault: wheel_tire_fault
+Confidence: 0.200788
+
+Example 6 (ambiguous)
+Input: vehicle making strange noise and not working properly
+Predicted fault: electrical_system_fault
+Confidence: 0.221934
+Note: This input lacks specific symptoms; the prediction is uncertain and should not be treated as definitely correct.
+

@@ -1,0 +1,17 @@
+{
+  "mapping": {
+    "Battery": "electrical_system_fault",
+    "Brakes": "brake_system_fault",
+    "Electrical": "electrical_system_fault",
+    "Engine": "engine_system_fault",
+    "Transmission": "transmission_fault"
+  },
+  "mapping_notes": {
+    "Battery": "Battery, starter, alternator, and charging diagnoses belong to the shared electrical-system class.",
+    "Brakes": "Descriptions and diagnoses concern brake pedals, pads, rotors, fluid, and master cylinders.",
+    "Electrical": "Descriptions and diagnoses concern wiring, lighting, windows, starting, batteries, and alternators.",
+    "Engine": "The source uses one broad engine classification for engine symptoms and diagnoses; it is retained as engine_system_fault rather than forcing individual rows into narrower classes.",
+    "Transmission": "Descriptions and diagnoses concern shifting, gears, clutches, solenoids, and transmission fluid."
+  },
+  "unmapped": []
+}

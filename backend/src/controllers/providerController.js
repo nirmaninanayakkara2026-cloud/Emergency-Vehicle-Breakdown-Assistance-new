@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 const ProviderProfile = require("../models/ProviderProfile");
+const BreakdownRequest = require("../models/BreakdownRequest");
+const {
+  getRecommendationsForRequest,
+  toPublicRecommendationResult
+} = require("../services/providerRecommendationService");
 const { PROVIDER_ROLES } = require("../utils/domainConstants");
 const { validateProviderProfileInput } = require("../utils/providerValidation");
 
@@ -13,6 +18,7 @@ function buildProviderPayload(body) {
     "businessName",
     "phone",
     "specializations",
+    "serviceCategories",
     "supportedVehicleTypes",
     "location",
     "availabilityStatus",
@@ -155,7 +161,7 @@ async function updateAvailability(req, res, next) {
 async function getProviders(req, res, next) {
   try {
     const { providerType, vehicleType, availabilityStatus } = req.query;
-    const filter = { isApproved: true };
+    const filter = { isApproved: true, isActive: { $ne: false } };
 
     if (providerType) filter.providerType = providerType;
     if (availabilityStatus) filter.availabilityStatus = availabilityStatus;
@@ -173,6 +179,29 @@ async function getProviders(req, res, next) {
   }
 }
 
+async function getProviderRecommendations(req, res, next) {
+  try {
+    const { requestId } = req.query;
+    if (!requestId || !mongoose.Types.ObjectId.isValid(requestId)) {
+      res.status(400);
+      throw new Error("A valid requestId query parameter is required");
+    }
+    const request = await BreakdownRequest.findById(requestId);
+    if (!request) {
+      res.status(404);
+      throw new Error("Breakdown request not found");
+    }
+    if (String(request.driverId) !== String(req.user._id)) {
+      res.status(403);
+      throw new Error("Only the driver who created the request can view recommendations");
+    }
+    const result = toPublicRecommendationResult(await getRecommendationsForRequest(request));
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function getProviderById(req, res, next) {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -182,7 +211,8 @@ async function getProviderById(req, res, next) {
 
     const provider = await ProviderProfile.findOne({
       _id: req.params.id,
-      isApproved: true
+      isApproved: true,
+      isActive: { $ne: false }
     });
 
     if (!provider) {
@@ -203,6 +233,7 @@ async function getProviderById(req, res, next) {
 module.exports = {
   createProviderProfile,
   getMyProviderProfile,
+  getProviderRecommendations,
   getProviderById,
   getProviders,
   updateAvailability,

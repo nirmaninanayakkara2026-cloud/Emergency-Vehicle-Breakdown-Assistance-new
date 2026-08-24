@@ -1,0 +1,14 @@
+{
+  "engine_cooling": [
+    "engine_system_fault",
+    "cooling_system_fault"
+  ],
+  "drivetrain_transmission": [
+    "drivetrain_fault",
+    "transmission_fault"
+  ],
+  "starting_electrical": [
+    "electrical_system_fault",
+    "engine_system_fault"
+  ]
+}

@@ -1,0 +1,33 @@
+AI 1 APPLICATION-STYLE PREDICTIONS
+
+Example 1
+Input: vehicle does not start dashboard lights are weak clicking sound
+Predicted fault: electrical_system_fault
+Confidence: 0.673244
+
+Example 2
+Input: engine temperature warning came on vehicle overheating and fluid appears to be leaking
+Predicted fault: engine_system_fault
+Confidence: 0.462812
+
+Example 3
+Input: steering suddenly became difficult while driving
+Predicted fault: steering_system_fault
+Confidence: 0.940829
+
+Example 4
+Input: brake pedal feels soft and vehicle takes longer to stop
+Predicted fault: brake_system_fault
+Confidence: 0.866181
+
+Example 5
+Input: tyre is completely flat and vehicle pulls to one side
+Predicted fault: wheel_tire_fault
+Confidence: 0.200788
+
+Example 6 (ambiguous)
+Input: vehicle making strange noise and not working properly
+Predicted fault: electrical_system_fault
+Confidence: 0.221934
+Note: This input lacks specific symptoms; the prediction is uncertain and should not be treated as definitely correct.
+

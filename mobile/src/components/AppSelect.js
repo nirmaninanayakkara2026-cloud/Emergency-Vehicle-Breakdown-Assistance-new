@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { COLORS } from "../utils/constants";
+import { Ionicons } from "@expo/vector-icons";
+import { colors, radii, spacing, typography } from "../theme";
 
 export default function AppSelect({ label, options, value, onChange }) {
   return (
@@ -12,10 +13,14 @@ export default function AppSelect({ label, options, value, onChange }) {
           return (
             <Pressable
               key={option.value}
+              accessibilityRole="radio"
+              accessibilityLabel={option.label}
+              accessibilityState={{ selected }}
               onPress={() => onChange(option.value)}
               style={[styles.option, selected && styles.selectedOption]}
             >
               <Text style={[styles.optionText, selected && styles.selectedText]}>{option.label}</Text>
+              {selected ? <Ionicons name="checkmark-circle" size={18} color={colors.teal} /> : null}
             </Pressable>
           );
         })}
@@ -26,35 +31,40 @@ export default function AppSelect({ label, options, value, onChange }) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    gap: 8
+    gap: spacing.xs
   },
   label: {
-    color: COLORS.text,
-    fontWeight: "700"
+    ...typography.caption,
+    color: colors.textPrimary,
+    fontWeight: "600"
   },
   options: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8
+    gap: spacing.xs
   },
   option: {
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 8,
+    minHeight: 46,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 10,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.surface
+    borderColor: colors.border,
+    backgroundColor: colors.surface
   },
   selectedOption: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary
+    backgroundColor: colors.tealLight,
+    borderColor: colors.teal
   },
   optionText: {
-    color: COLORS.text,
-    textTransform: "capitalize"
+    ...typography.body,
+    color: colors.textPrimary
   },
   selectedText: {
-    color: COLORS.surface,
-    fontWeight: "700"
+    color: colors.primaryDark,
+    fontWeight: "600"
   }
 });

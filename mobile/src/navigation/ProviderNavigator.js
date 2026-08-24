@@ -5,18 +5,14 @@ import ProviderDashboardScreen from "../screens/provider/ProviderDashboardScreen
 import ProviderProfileScreen from "../screens/provider/ProviderProfileScreen";
 import ProviderRequestDetailsScreen from "../screens/provider/ProviderRequestDetailsScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
-import { COLORS } from "../utils/constants";
+import { stackScreenOptions } from "./navigationTheme";
 
 const Stack = createNativeStackNavigator();
 
 export default function ProviderNavigator() {
   return (
     <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: COLORS.primary },
-        headerTintColor: COLORS.surface,
-        headerTitleStyle: { fontWeight: "700" }
-      }}
+      screenOptions={stackScreenOptions}
     >
       <Stack.Screen name="ProviderEntry" component={ProviderEntryScreen} options={{ headerShown: false }} />
       <Stack.Screen name="ProviderProfile" component={ProviderProfileScreen} options={{ title: "Provider Profile" }} />

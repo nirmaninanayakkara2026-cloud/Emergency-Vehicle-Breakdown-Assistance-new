@@ -1,0 +1,14 @@
+{
+  "air_conditioning_fault": "general_mechanic",
+  "brake_system_fault": "brake_mechanic",
+  "cooling_system_fault": "engine_mechanic",
+  "drivetrain_fault": "general_mechanic",
+  "electrical_system_fault": "battery_electrical_mechanic",
+  "emissions_system_fault": "engine_mechanic",
+  "engine_system_fault": "engine_mechanic",
+  "fuel_system_fault": "fuel_system_mechanic",
+  "steering_system_fault": "steering_mechanic",
+  "transmission_fault": "transmission_mechanic",
+  "visibility_system_fault": "general_mechanic",
+  "wheel_tire_fault": "tire_mechanic"
+}

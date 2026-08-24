@@ -1,10 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import AppInput from "../../components/AppInput";
 import AppSelect from "../../components/AppSelect";
 import ScreenContainer from "../../components/ScreenContainer";
+import LocationPicker from "../../components/location/LocationPicker";
+import InfoBanner from "../../components/ui/InfoBanner";
+import LoadingState from "../../components/ui/LoadingState";
+import ScreenHeader from "../../components/ui/ScreenHeader";
+import SectionHeader from "../../components/ui/SectionHeader";
 import { useAuth } from "../../context/AuthContext";
 import {
   createProviderProfile,
@@ -18,6 +24,8 @@ import {
   PROVIDER_SPECIALIZATIONS,
   VEHICLE_TYPES
 } from "../../utils/constants";
+import { colors, radii, spacing, typography } from "../../theme";
+import { isValidLocation, normalizeLocation } from "../../utils/locationPicker";
 
 const providerTypeOptions = PROVIDER_ROLES.map((role) => ({
   label: role.replaceAll("_", " "),
@@ -43,8 +51,7 @@ export default function ProviderProfileScreen({ navigation }) {
   const [specializations, setSpecializations] = useState([]);
   const [supportedVehicleTypes, setSupportedVehicleTypes] = useState(["car"]);
   const [address, setAddress] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [serviceRadiusKm, setServiceRadiusKm] = useState("");
   const [averageResponseTimeMinutes, setAverageResponseTimeMinutes] = useState("");
   const [minimumEstimatedPrice, setMinimumEstimatedPrice] = useState("");
@@ -68,8 +75,7 @@ export default function ProviderProfileScreen({ navigation }) {
       setSpecializations(profile.specializations || []);
       setSupportedVehicleTypes(profile.supportedVehicleTypes || []);
       setAddress(profile.location?.address || "");
-      setLatitude(profile.location?.latitude?.toString() || "");
-      setLongitude(profile.location?.longitude?.toString() || "");
+      setSelectedLocation(normalizeLocation(profile.location));
       setServiceRadiusKm(profile.serviceRadiusKm?.toString() || "");
       setAverageResponseTimeMinutes(profile.averageResponseTimeMinutes?.toString() || "");
       setMinimumEstimatedPrice(profile.estimatedPriceRange?.minimum?.toString() || "");
@@ -95,10 +101,11 @@ export default function ProviderProfileScreen({ navigation }) {
       businessName: businessName.trim(),
       phone: phone.trim(),
       specializations,
+      serviceCategories: specializations,
       supportedVehicleTypes,
       location: {
-        latitude: Number(latitude),
-        longitude: Number(longitude),
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
         address: address.trim()
       },
       availabilityStatus,
@@ -114,8 +121,9 @@ export default function ProviderProfileScreen({ navigation }) {
 
   function validateForm() {
     if (!businessName.trim() || !phone.trim() || !address.trim()) return "Business name, phone, and address are required.";
-    if (!latitude || Number.isNaN(Number(latitude))) return "Latitude must be a valid number.";
-    if (!longitude || Number.isNaN(Number(longitude))) return "Longitude must be a valid number.";
+    if (!isValidLocation(selectedLocation)) {
+      return "Please select your service location on the map or use your current location.";
+    }
     if (!serviceRadiusKm || Number.isNaN(Number(serviceRadiusKm))) return "Service radius must be a valid number.";
     if (supportedVehicleTypes.length === 0) return "Select at least one supported vehicle type.";
     return "";
@@ -163,16 +171,18 @@ export default function ProviderProfileScreen({ navigation }) {
   if (loading) {
     return (
       <ScreenContainer>
-        <ActivityIndicator color={COLORS.primary} />
+        <LoadingState message="Loading provider profile..." />
       </ScreenContainer>
     );
   }
 
   return (
     <ScreenContainer>
-      <Text style={styles.title}>{profileId ? "Provider Profile" : "Create Provider Profile"}</Text>
+      <ScreenHeader eyebrow="Service provider" title={profileId ? "Provider Profile" : "Create Provider Profile"} subtitle="Keep service details accurate so drivers can choose with confidence." />
+      <View style={styles.profileHero}><View style={styles.profileIcon}><Ionicons name="business" size={32} color={colors.primary} /></View><Text style={styles.heroText}>{businessName || "Your service business"}</Text></View>
 
       <AppCard>
+        <SectionHeader title="Business details" subtitle="Shown to drivers in recommendations." />
         <AppInput label="Business name" value={businessName} onChangeText={setBusinessName} />
         <AppSelect label="Provider type" options={providerTypeOptions} value={providerType} onChange={setProviderType} />
         <AppInput label="Phone" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
@@ -202,16 +212,20 @@ export default function ProviderProfileScreen({ navigation }) {
             </Pressable>
           ))}
         </View>
+      </AppCard>
 
-        <AppInput label="Address" value={address} onChangeText={setAddress} multiline />
-        <View style={styles.row}>
-          <View style={styles.flex}>
-            <AppInput label="Latitude" value={latitude} onChangeText={setLatitude} keyboardType="numeric" />
-          </View>
-          <View style={styles.flex}>
-            <AppInput label="Longitude" value={longitude} onChangeText={setLongitude} keyboardType="numeric" />
-          </View>
-        </View>
+      <AppCard>
+        <SectionHeader title="Service Location" subtitle="Set the static location drivers use to find your service." />
+        <LocationPicker
+          initialLocation={selectedLocation}
+          address={address}
+          onLocationChange={setSelectedLocation}
+          onAddressChange={setAddress}
+        />
+      </AppCard>
+
+      <AppCard>
+        <SectionHeader title="Service details" subtitle="Set your coverage, pricing, and availability." />
         <AppInput label="Service radius (km)" value={serviceRadiusKm} onChangeText={setServiceRadiusKm} keyboardType="numeric" />
         <AppInput label="Average response time (minutes)" value={averageResponseTimeMinutes} onChangeText={setAverageResponseTimeMinutes} keyboardType="numeric" />
         <View style={styles.row}>
@@ -225,8 +239,8 @@ export default function ProviderProfileScreen({ navigation }) {
         <AppInput label="Opening hours (optional)" value={openingHours} onChangeText={setOpeningHours} />
         <AppSelect label="Availability" options={availabilityOptions} value={availabilityStatus} onChange={handleAvailabilityChange} />
 
-        {message ? <Text style={styles.success}>{message}</Text> : null}
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {message ? <InfoBanner tone="success" message={message} /> : null}
+        {error ? <InfoBanner tone="danger" message={error} /> : null}
         <AppButton title={profileId ? "Save Profile" : "Create Profile"} onPress={handleSave} loading={saving} />
       </AppCard>
     </ScreenContainer>
@@ -234,6 +248,7 @@ export default function ProviderProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  profileHero: { alignItems: "center", gap: spacing.sm }, profileIcon: { width: 72, height: 72, borderRadius: radii.lg, backgroundColor: colors.blueLight, alignItems: "center", justifyContent: "center" }, heroText: { ...typography.sectionTitle, color: colors.primaryDark, textAlign: "center" },
   title: {
     color: COLORS.primaryDark,
     fontSize: 24,

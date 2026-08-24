@@ -11,6 +11,14 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Breakdown Assist to use your location to set your service location."
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true
     },

@@ -7,6 +7,7 @@ import AuthNavigator from "./AuthNavigator";
 import DriverNavigator from "./DriverNavigator";
 import ProviderNavigator from "./ProviderNavigator";
 import { COLORS, PROVIDER_ROLES } from "../utils/constants";
+import { navigationTheme } from "./navigationTheme";
 
 function SplashScreen() {
   return (
@@ -32,7 +33,7 @@ export default function AppNavigator() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navigationTheme}>
       {renderRoleNavigator()}
     </NavigationContainer>
   );

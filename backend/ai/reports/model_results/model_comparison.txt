@@ -1,0 +1,23 @@
+AI 1 BASELINE MODEL COMPARISON
+
+Logistic Regression
+
+Accuracy: 0.815652
+Macro Precision: 0.785294
+Macro Recall: 0.791187
+Macro F1: 0.787142
+Weighted F1: 0.817375
+
+Linear SVM
+
+Accuracy: 0.822528
+Macro Precision: 0.798180
+Macro Recall: 0.785085
+Macro F1: 0.790775
+Weighted F1: 0.822217
+
+BEST MODEL:
+Logistic Regression
+
+SELECTION REASON:
+Macro F1 scores differ by no more than 0.005; Logistic Regression was preferred because it directly provides probability estimates.

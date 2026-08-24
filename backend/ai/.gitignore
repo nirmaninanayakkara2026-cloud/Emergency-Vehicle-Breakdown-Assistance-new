@@ -1,0 +1,4 @@
+venv/
+/dataset/
+scripts/__pycache__/
+*.py[cod]

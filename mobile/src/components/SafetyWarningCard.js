@@ -1,0 +1,12 @@
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import AppButton from "./AppButton";
+import AppCard from "./AppCard";
+import { colors, radii, spacing, typography } from "../theme";
+
+const ITEMS = ["Park safely", "Apply the parking brake", "Stay away from traffic", "Stop if anything feels unsafe"];
+export default function SafetyWarningCard({ confirmed, onConfirmChange, onContinue }) {
+  return <AppCard style={styles.card}><View style={styles.heading}><Ionicons name="warning" size={28} color={colors.amber} /><Text style={styles.title}>Continue With Care</Text></View><Text style={styles.body}>Follow only the displayed guidance and stop immediately if you feel unsure.</Text>{ITEMS.map((item) => <View key={item} style={styles.item}><Ionicons name="checkmark-circle" size={20} color={colors.green} /><Text style={styles.itemText}>{item}</Text></View>)}<Pressable accessibilityRole="checkbox" accessibilityState={{ checked: confirmed }} style={[styles.checkRow, confirmed && styles.confirmed]} onPress={() => onConfirmChange(!confirmed)}><View style={[styles.checkbox, confirmed && styles.checked]}>{confirmed ? <Ionicons name="checkmark" size={17} color={colors.surface} /> : null}</View><Text style={styles.checkLabel}>I have read and understood the safety warning.</Text></Pressable><AppButton title="I Understand — Continue" onPress={onContinue} disabled={!confirmed} /></AppCard>;
+}
+const styles = StyleSheet.create({ card: { borderColor: "#F5D69D", backgroundColor: colors.amberLight }, heading: { flexDirection: "row", alignItems: "center", gap: spacing.sm }, title: { ...typography.sectionTitle, color: "#9A650C" }, body: { ...typography.bodyStrong, color: colors.textPrimary }, item: { flexDirection: "row", alignItems: "center", gap: spacing.sm }, itemText: { ...typography.body, flex: 1, color: colors.textPrimary }, checkRow: { minHeight: 64, flexDirection: "row", alignItems: "center", gap: spacing.sm, borderRadius: radii.md, padding: spacing.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }, confirmed: { borderColor: colors.teal }, checkbox: { width: 26, height: 26, borderRadius: 7, borderWidth: 2, borderColor: colors.teal, alignItems: "center", justifyContent: "center" }, checked: { backgroundColor: colors.teal }, checkLabel: { ...typography.body, flex: 1, color: colors.textPrimary } });

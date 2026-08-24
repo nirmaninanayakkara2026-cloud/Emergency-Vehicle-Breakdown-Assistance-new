@@ -6,6 +6,7 @@ const authRoutes = require("./src/routes/authRoutes");
 const breakdownRequestRoutes = require("./src/routes/breakdownRequestRoutes");
 const healthRoutes = require("./src/routes/healthRoutes");
 const providerRoutes = require("./src/routes/providerRoutes");
+const selfAssistantRoutes = require("./src/routes/selfAssistantRoutes");
 const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/providers", providerRoutes);
 app.use("/api/breakdown-requests", breakdownRequestRoutes);
+app.use("/api/self-assistant", selfAssistantRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

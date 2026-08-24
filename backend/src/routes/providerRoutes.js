@@ -3,6 +3,7 @@ const {
   createProviderProfile,
   getMyProviderProfile,
   getProviderById,
+  getProviderRecommendations,
   getProviders,
   updateAvailability,
   updateMyProviderProfile
@@ -16,6 +17,7 @@ router.post("/profile", protect, authorizeRoles(...PROVIDER_ROLES), createProvid
 router.get("/profile/me", protect, authorizeRoles(...PROVIDER_ROLES), getMyProviderProfile);
 router.patch("/profile/me", protect, authorizeRoles(...PROVIDER_ROLES), updateMyProviderProfile);
 router.patch("/availability", protect, authorizeRoles(...PROVIDER_ROLES), updateAvailability);
+router.get("/recommendations", protect, authorizeRoles("driver"), getProviderRecommendations);
 router.get("/", getProviders);
 router.get("/:id", getProviderById);
 

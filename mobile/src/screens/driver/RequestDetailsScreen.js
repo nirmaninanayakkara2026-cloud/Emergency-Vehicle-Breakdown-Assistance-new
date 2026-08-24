@@ -1,11 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, RefreshControl, StyleSheet, Text } from "react-native";
+import { RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
+import PredictionSummaryCard from "../../components/PredictionSummaryCard";
 import ScreenContainer from "../../components/ScreenContainer";
-import { getProviders } from "../../services/providerService";
-import { cancelRequest, getRequestById, selectProvider } from "../../services/requestService";
+import ErrorState from "../../components/ui/ErrorState";
+import LoadingState from "../../components/ui/LoadingState";
+import ScreenHeader from "../../components/ui/ScreenHeader";
+import StatusBadge from "../../components/ui/StatusBadge";
+import { cancelRequest, getRequestById } from "../../services/requestService";
 import { COLORS } from "../../utils/constants";
+import { colors, radii, spacing, typography } from "../../theme";
+import { formatDisplayValue, formatServiceType } from "../../utils/displayLabels";
 
 function formatValue(value) {
   return value ? value.replaceAll("_", " ") : "Not available";
@@ -13,7 +20,6 @@ function formatValue(value) {
 
 export default function RequestDetailsScreen({ navigation, route }) {
   const [request, setRequest] = useState(route.params?.request || null);
-  const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(!route.params?.request);
   const [refreshing, setRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -24,12 +30,8 @@ export default function RequestDetailsScreen({ navigation, route }) {
   const loadDetails = useCallback(async () => {
     setError("");
     try {
-      const [requestData, providerData] = await Promise.all([
-        requestId ? getRequestById(requestId) : Promise.resolve(request),
-        getProviders()
-      ]);
+      const requestData = await (requestId ? getRequestById(requestId) : Promise.resolve(request));
       setRequest(requestData);
-      setProviders(providerData);
     } catch (detailsError) {
       setError(detailsError.message);
     } finally {
@@ -45,19 +47,6 @@ export default function RequestDetailsScreen({ navigation, route }) {
   async function handleRefresh() {
     setRefreshing(true);
     await loadDetails();
-  }
-
-  async function handleSelectProvider(providerId) {
-    setActionLoading(true);
-    setError("");
-    try {
-      const updatedRequest = await selectProvider(request._id, providerId);
-      setRequest(updatedRequest);
-    } catch (selectError) {
-      setError(selectError.message);
-    } finally {
-      setActionLoading(false);
-    }
   }
 
   async function handleCancel() {
@@ -76,7 +65,7 @@ export default function RequestDetailsScreen({ navigation, route }) {
   if (loading || !request) {
     return (
       <ScreenContainer>
-        <ActivityIndicator color={COLORS.primary} />
+        <LoadingState message="Loading request details..." />
       </ScreenContainer>
     );
   }
@@ -85,16 +74,32 @@ export default function RequestDetailsScreen({ navigation, route }) {
 
   return (
     <ScreenContainer refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
-      <Text style={styles.title}>Request Details</Text>
+      <ScreenHeader eyebrow="Roadside request" title="Request Details" subtitle="Review the assistance details and next actions." right={<StatusBadge status={request.status} tone={request.status === "completed" ? "success" : "info"} />} />
       {error ? (
         <AppCard>
-          <Text style={styles.error}>{error}</Text>
-          <AppButton title="Retry" onPress={loadDetails} />
+          <ErrorState message="We couldn't load this request." onRetry={loadDetails} />
         </AppCard>
       ) : null}
 
+      <PredictionSummaryCard prediction={request.aiPrediction} />
+
+      {request.aiPrediction?.needsMoreInformation &&
+      Number(request.clarificationAttempts || 0) < 1 &&
+      request.status !== "cancelled" ? (
+        <AppButton
+          title="Answer Quick Questions"
+          onPress={() =>
+            navigation.navigate("AIClarification", {
+              requestId: request._id,
+              request,
+              aiPrediction: request.aiPrediction
+            })
+          }
+        />
+      ) : null}
+
       <AppCard>
-        <Text style={styles.cardTitle}>{request._id}</Text>
+        <View style={styles.cardHeader}><View style={styles.icon}><Ionicons name="car-sport-outline" size={24} color={colors.primary} /></View><Text style={styles.cardTitle}>{formatDisplayValue(request.vehicleType)} assistance</Text></View>
         <Text style={styles.label}>Vehicle type</Text>
         <Text style={styles.body}>{formatValue(request.vehicleType)}</Text>
         {request.vehicleModel ? (
@@ -106,11 +111,11 @@ export default function RequestDetailsScreen({ navigation, route }) {
         <Text style={styles.label}>Breakdown type</Text>
         <Text style={styles.body}>{formatValue(request.breakdownType)}</Text>
         <Text style={styles.label}>Required service type</Text>
-        <Text style={styles.body}>{formatValue(request.requiredServiceType)}</Text>
+        <Text style={styles.body}>{formatServiceType(request.requiredServiceType)}</Text>
         <Text style={styles.label}>Urgency</Text>
         <Text style={styles.body}>{formatValue(request.urgencyLevel)}</Text>
         <Text style={styles.label}>Status</Text>
-        <Text style={styles.status}>{formatValue(request.status)}</Text>
+        <StatusBadge status={request.status} tone={request.status === "completed" ? "success" : "info"} />
         <Text style={styles.label}>Location</Text>
         <Text style={styles.body}>{request.location?.address}</Text>
         <Text style={styles.label}>Description</Text>
@@ -119,6 +124,7 @@ export default function RequestDetailsScreen({ navigation, route }) {
           <>
             <Text style={styles.label}>Selected provider</Text>
             <Text style={styles.body}>{selectedProvider.businessName || selectedProvider}</Text>
+            <AppButton title="Track Request" onPress={() => navigation.navigate("RequestTracking", { requestId: request._id, request })} />
           </>
         ) : null}
         {!selectedProvider && request.status !== "cancelled" ? (
@@ -132,28 +138,13 @@ export default function RequestDetailsScreen({ navigation, route }) {
         ) : null}
       </AppCard>
 
-      {!selectedProvider && request.status !== "cancelled" ? (
-        <AppCard>
-          <Text style={styles.cardTitle}>Select Provider</Text>
-          {providers.length === 0 ? <Text style={styles.body}>No approved providers available yet.</Text> : null}
-          {providers.map((provider) => (
-            <AppCard key={provider._id} style={styles.providerCard}>
-              <Text style={styles.providerName}>{provider.businessName}</Text>
-              <Text style={styles.body}>{formatValue(provider.providerType)} - {provider.availabilityStatus}</Text>
-              <Text style={styles.body}>Service radius: {provider.serviceRadiusKm} km</Text>
-              <Text style={styles.body}>Price: {provider.estimatedPriceRange?.minimum || 0} - {provider.estimatedPriceRange?.maximum || 0}</Text>
-              <AppButton title="Select Provider" onPress={() => handleSelectProvider(provider._id)} loading={actionLoading} />
-            </AppCard>
-          ))}
-        </AppCard>
-      ) : null}
-
       <AppButton title="Back to My Requests" variant="secondary" onPress={() => navigation.navigate("MyRequests")} />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  cardHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm }, icon: { width: 46, height: 46, borderRadius: radii.md, backgroundColor: colors.blueLight, alignItems: "center", justifyContent: "center" },
   title: {
     color: COLORS.primaryDark,
     fontSize: 24,
@@ -177,14 +168,6 @@ const styles = StyleSheet.create({
     color: COLORS.success,
     fontWeight: "900",
     textTransform: "capitalize"
-  },
-  providerCard: {
-    backgroundColor: COLORS.softSurface
-  },
-  providerName: {
-    color: COLORS.text,
-    fontSize: 16,
-    fontWeight: "800"
   },
   error: {
     color: COLORS.danger,

@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text } from "react-native";
-import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import ScreenContainer from "../../components/ScreenContainer";
+import ErrorState from "../../components/ui/ErrorState";
+import LoadingState from "../../components/ui/LoadingState";
 import { getMyProviderProfile } from "../../services/providerService";
-import { COLORS } from "../../utils/constants";
 
 export default function ProviderEntryScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -34,24 +33,9 @@ export default function ProviderEntryScreen({ navigation }) {
   return (
     <ScreenContainer>
       <AppCard>
-        <Text style={styles.title}>Checking provider profile</Text>
-        {loading ? <ActivityIndicator color={COLORS.primary} /> : null}
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        {!loading ? <AppButton title="Retry" onPress={checkProfile} /> : null}
+        {loading ? <LoadingState message="Preparing your service dashboard..." /> : null}
+        {!loading && error ? <ErrorState message="We couldn't load your provider profile." onRetry={checkProfile} /> : null}
       </AppCard>
     </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    color: COLORS.primaryDark,
-    fontSize: 20,
-    fontWeight: "900"
-  },
-  error: {
-    color: COLORS.danger,
-    lineHeight: 20,
-    fontWeight: "700"
-  }
-});

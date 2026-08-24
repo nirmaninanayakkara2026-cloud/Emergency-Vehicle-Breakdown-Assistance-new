@@ -2,7 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { STORAGE_KEYS } from "../utils/constants";
 
-export const API_BASE_URL = "http://192.168.1.2:5001/api";
+const configuredApiUrl =
+  process.env.EXPO_PUBLIC_API_BASE_URL || process.env.EXPO_PUBLIC_API_URL || "";
+
+export const API_BASE_URL = configuredApiUrl.replace(/\/$/, "");
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,6 +13,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
+  if (!API_BASE_URL) {
+    return Promise.reject(new Error("The service connection is not configured."));
+  }
   const token = await AsyncStorage.getItem(STORAGE_KEYS.token);
 
   if (token) {

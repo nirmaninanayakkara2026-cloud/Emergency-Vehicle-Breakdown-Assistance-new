@@ -1,0 +1,60 @@
+AI MODULE 1 FINAL THREE-SOURCE DATASET AUDIT
+============================================
+Total records: 15267
+Fault classes: 9
+Minimum examples in a class: 160
+Median examples per class: 2002
+Maximum examples in a class: 2023
+Smallest class: cooling_system_fault - 160
+
+Input records by source before final deduplication:
+  - primary_automotive_fault_dataset: 79
+  - secondary_diagnostic_dataset: 22
+  - nhtsa_consumer_complaints: 15175
+
+Retained records by source:
+  - nhtsa_consumer_complaints: 15169
+  - primary_automotive_fault_dataset: 76
+  - secondary_diagnostic_dataset: 22
+
+Retention summary:
+  - Primary retained: 76
+  - Secondary retained: 22
+  - NHTSA retained: 15169
+  - Cross-source duplicates removed: 0
+  - Final records: 15267
+
+Records by class:
+  - engine_system_fault: 2023 (13.3%)
+  - electrical_system_fault: 2020 (13.2%)
+  - brake_system_fault: 2014 (13.2%)
+  - drivetrain_fault: 2011 (13.2%)
+  - fuel_system_fault: 2002 (13.1%)
+  - steering_system_fault: 2001 (13.1%)
+  - wheel_tire_fault: 2001 (13.1%)
+  - transmission_fault: 1035 (6.8%)
+  - cooling_system_fault: 160 (1.0%)
+
+Final deduplication and conflict handling:
+  - Invalid records excluded: 0
+  - Exact/clearly identical duplicate records removed: 6
+  - Cross-source duplicates removed: 0
+  - Conflicting normalized-text groups excluded: 1
+  - Records excluded from conflicting groups: 3
+
+Group-aware split preparation:
+NHTSA source_group_id is ODINO. Primary and secondary source_group_id use their original record IDs.
+Future train/test splitting must group on source_group_id so one original complaint cannot cross split boundaries.
+
+Privacy and target leakage:
+The final dataset contains no VIN, city, state, contact, identity, make, model, year, component-label, or repair fields.
+NHTSA symptom_text comes only from privacy-minimized CDESCR; COMPDESC is never prepended to model input.
+
+Classes below 100 examples: []
+Recommended model classes: ["brake_system_fault", "cooling_system_fault", "drivetrain_fault", "electrical_system_fault", "engine_system_fault", "fuel_system_fault", "steering_system_fault", "transmission_fault", "wheel_tire_fault"]
+
+Assessment rule:
+SUITABLE only when all nine retained roadside classes have at least 100 unique real examples after deduplication and conflict exclusion.
+
+Dataset assessment:
+SUITABLE_FOR_BASELINE_MODEL

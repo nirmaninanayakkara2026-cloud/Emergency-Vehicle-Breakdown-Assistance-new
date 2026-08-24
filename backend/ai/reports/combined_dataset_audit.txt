@@ -1,0 +1,65 @@
+AI MODULE 1 COMBINED DATASET AUDIT
+==================================
+Dataset 1 usable records: 96
+Dataset 2 original records: 10000
+Dataset 2 usable records before deduplication: 10000
+Dataset 2 unique rows retained in combination: 22
+Combined records: 118
+Roadside-training records: 101
+Number of roadside fault classes: 9
+Unmapped Dataset 2 records: 0
+Excluded non-roadside records: 17
+
+Duplicate audit:
+  - Dataset 1 exact symptom repetitions: 3
+  - Dataset 1 symptom + fault duplicates removed: 0
+  - Dataset 2 exact symptom repetitions: 9978
+  - Dataset 2 symptom + fault duplicates removed: 9978
+  - Cross-dataset exact symptom overlaps: 0
+  - Cross-dataset symptom + fault duplicates removed: 0
+  - Conflicting identical symptom texts retained with different targets: 2
+  - Secondary unique pairs with multiple diagnosis values: 22
+  - Secondary unique pairs with multiple repair procedures: 22
+
+Combined class distribution:
+  - engine_system_fault: 24 (20.3%) [LOW DATA]
+  - electrical_system_fault: 21 (17.8%) [LOW DATA]
+  - brake_system_fault: 15 (12.7%) [VERY LOW DATA]
+  - drivetrain_fault: 11 (9.3%) [VERY LOW DATA]
+  - cooling_system_fault: 10 (8.5%) [VERY LOW DATA]
+  - transmission_fault: 10 (8.5%) [VERY LOW DATA]
+  - air_conditioning_fault: 8 (6.8%) [VERY LOW DATA]
+  - emissions_system_fault: 8 (6.8%) [VERY LOW DATA]
+  - fuel_system_fault: 5 (4.2%) [VERY LOW DATA]
+  - wheel_tire_fault: 3 (2.5%) [VERY LOW DATA]
+  - steering_system_fault: 2 (1.7%) [VERY LOW DATA]
+  - visibility_system_fault: 1 (0.8%) [VERY LOW DATA]
+
+Roadside class distribution:
+  - engine_system_fault: 24 (23.8%) [LOW DATA]
+  - electrical_system_fault: 21 (20.8%) [LOW DATA]
+  - brake_system_fault: 15 (14.9%) [VERY LOW DATA]
+  - drivetrain_fault: 11 (10.9%) [VERY LOW DATA]
+  - cooling_system_fault: 10 (9.9%) [VERY LOW DATA]
+  - transmission_fault: 10 (9.9%) [VERY LOW DATA]
+  - fuel_system_fault: 5 (5.0%) [VERY LOW DATA]
+  - wheel_tire_fault: 3 (3.0%) [VERY LOW DATA]
+  - steering_system_fault: 2 (2.0%) [VERY LOW DATA]
+
+Roadside taxonomy classes:
+brake_system_fault, cooling_system_fault, drivetrain_fault, electrical_system_fault, engine_system_fault, fuel_system_fault, steering_system_fault, transmission_fault, wheel_tire_fault
+
+Excluded non-roadside/low-priority classes:
+air_conditioning_fault, emissions_system_fault, visibility_system_fault
+
+Target leakage controls:
+The secondary symptom_text uses only Problem Description. Diagnosis, repair procedure, severity, repair status, results, cost-like fields, and vehicle brand are not added to model input. Diagnosis and repair procedure remain archive/provenance columns only.
+
+Data quality assessment:
+Although Dataset 2 has 10,000 complete source rows, it contains only 22 distinct symptom + mapped-fault pairs. Deduplication therefore removes 9,978 repeated training pairs. All 22 pairs are associated with multiple diagnosis and repair-procedure values, so those fields must not be treated as unique ground truth for the symptom phrase. The combined file retains one traceable source example while the full secondary processed file preserves every variant. No roadside class reaches the project-level 50-record threshold for an acceptable simple baseline. The real combined data remains insufficient for a reliable multi-class classifier.
+
+Recommended model classes: []
+Exploratory classes with at least 20 real rows: ["electrical_system_fault", "engine_system_fault"]
+
+Dataset assessment:
+INSUFFICIENT_DATA_FOR_RELIABLE_MODEL

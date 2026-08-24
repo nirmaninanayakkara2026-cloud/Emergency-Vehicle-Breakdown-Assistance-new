@@ -1,27 +1,77 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import * as Location from "expo-location";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import AppInput from "../../components/AppInput";
 import AppSelect from "../../components/AppSelect";
 import ScreenContainer from "../../components/ScreenContainer";
+import SymptomSummaryCard from "../../components/symptom/SymptomSummaryCard";
+import MainProblemGrid from "../../components/symptom/MainProblemGrid";
+import InfoBanner from "../../components/ui/InfoBanner";
+import ScreenHeader from "../../components/ui/ScreenHeader";
+import SectionHeader from "../../components/ui/SectionHeader";
 import { createBreakdownRequest } from "../../services/requestService";
-import { BREAKDOWN_TYPES, COLORS, MOCK_LOCATION, URGENCY_LEVELS, VEHICLE_TYPES } from "../../utils/constants";
+import {
+  buildSymptomDescription,
+  buildSymptomSummary,
+  mapRequestTypeToSymptomType,
+  mapSymptomTypeToRequestType
+} from "../../services/symptomCaptureService";
+import { BREAKDOWN_TYPES, MOCK_LOCATION, URGENCY_LEVELS, VEHICLE_TYPES } from "../../utils/constants";
+import { spacing } from "../../theme";
 
 export default function RequestMechanicScreen({ navigation, route }) {
   const prefill = route.params?.prefill || {};
   const [vehicleType, setVehicleType] = useState(prefill.vehicleType || "car");
   const [vehicleModel, setVehicleModel] = useState(prefill.vehicleModel || "");
-  const [breakdownType, setBreakdownType] = useState(prefill.breakdownType || "flat_tyre");
-  const [urgencyLevel, setUrgencyLevel] = useState("medium");
+  const [breakdownType, setBreakdownType] = useState(
+    mapRequestTypeToSymptomType(prefill.breakdownType || "flat_tyre")
+  );
+  const [urgencyLevel, setUrgencyLevel] = useState(prefill.urgencyLevel || "medium");
   const [problemDescription, setProblemDescription] = useState(prefill.problemDescription || "");
-  const [address, setAddress] = useState(prefill.currentLocation?.address || "");
-  const [latitude, setLatitude] = useState(prefill.currentLocation?.latitude?.toString() || "");
-  const [longitude, setLongitude] = useState(prefill.currentLocation?.longitude?.toString() || "");
+  const [guidedSymptoms, setGuidedSymptoms] = useState(prefill.guidedSymptoms || null);
+  const initialLocation = prefill.location || prefill.currentLocation || {};
+  const [address, setAddress] = useState(initialLocation.address || "");
+  const [latitude, setLatitude] = useState(initialLocation.latitude?.toString() || "");
+  const [longitude, setLongitude] = useState(initialLocation.longitude?.toString() || "");
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const guidedSummary = useMemo(
+    () => (guidedSymptoms ? buildSymptomSummary(guidedSymptoms) : null),
+    [guidedSymptoms]
+  );
+
+  useEffect(() => {
+    const capturedSymptoms = route.params?.guidedSymptoms;
+    if (!capturedSymptoms) return;
+    setGuidedSymptoms(capturedSymptoms);
+    setVehicleType(capturedSymptoms.vehicleType);
+    setBreakdownType(capturedSymptoms.breakdownType);
+  }, [route.params?.guidedSymptoms]);
+
+  function changeVehicleType(nextVehicleType) {
+    if (guidedSymptoms && guidedSymptoms.vehicleType !== nextVehicleType) setGuidedSymptoms(null);
+    setVehicleType(nextVehicleType);
+  }
+
+  function changeBreakdownType(nextBreakdownType) {
+    if (guidedSymptoms && guidedSymptoms.breakdownType !== nextBreakdownType) {
+      setGuidedSymptoms(null);
+    }
+    setBreakdownType(nextBreakdownType);
+  }
+
+  function openGuidedSymptoms() {
+    navigation.navigate("GuidedSymptomCapture", {
+      sourceRoute: "RequestMechanic",
+      vehicleType,
+      breakdownType,
+      initialData: guidedSymptoms || undefined
+    });
+  }
 
   async function handleUseLocation() {
     setError("");
@@ -61,8 +111,6 @@ export default function RequestMechanicScreen({ navigation, route }) {
   }
 
   function validateForm() {
-    if (!problemDescription.trim()) return "Problem description is required.";
-    if (!address.trim()) return "Address is required. Use current location or enter it manually.";
     if (!latitude || Number.isNaN(Number(latitude))) return "Latitude must be valid.";
     if (!longitude || Number.isNaN(Number(longitude))) return "Longitude must be valid.";
     return "";
@@ -78,19 +126,48 @@ export default function RequestMechanicScreen({ navigation, route }) {
 
     setSubmitting(true);
     try {
-      const request = await createBreakdownRequest({
+      const requestDraft = {
         vehicleType,
         vehicleModel: vehicleModel.trim() || undefined,
-        breakdownType,
+        breakdownType: mapSymptomTypeToRequestType(breakdownType),
         urgencyLevel,
-        problemDescription: problemDescription.trim(),
+        problemDescription: problemDescription.trim() || undefined,
         location: {
           latitude: Number(latitude),
           longitude: Number(longitude),
-          address: address.trim()
-        }
-      });
-      navigation.replace("RequestDetails", { requestId: request._id, request });
+          address: address.trim() || undefined
+        },
+        troubleshootingSessionId: prefill.troubleshootingSessionId,
+        diagnosticInputText: prefill.diagnosticInputText || (guidedSymptoms
+          ? buildSymptomDescription(guidedSymptoms)
+          : undefined),
+        predictedFault: prefill.predictedFault,
+        requiredService: prefill.requiredService || prefill.requiredServiceType,
+        guidedSymptoms,
+        symptomCapture: prefill.symptomCapture || (guidedSymptoms
+          ? {
+              symptoms: guidedSymptoms.symptoms || {},
+              observedSymptoms: guidedSymptoms.observedSymptoms || {},
+              additionalDescription: guidedSymptoms.description || "",
+              guidedCaptureUsed: true
+            }
+          : undefined)
+      };
+      const request = await createBreakdownRequest(requestDraft);
+      if (request.aiPrediction?.needsMoreInformation) {
+        navigation.replace("AIClarification", {
+          requestId: request._id,
+          request,
+          aiPrediction: request.aiPrediction,
+          requestDraft
+        });
+      } else {
+        navigation.replace("Recommendation", {
+          requestId: request._id,
+          request,
+          aiPrediction: request.aiPrediction
+        });
+      }
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -99,34 +176,43 @@ export default function RequestMechanicScreen({ navigation, route }) {
   }
 
   return (
-    <ScreenContainer>
-      <AppCard>
-        <Text style={styles.title}>Request Mechanic</Text>
-        <AppSelect label="Vehicle type" options={VEHICLE_TYPES} value={vehicleType} onChange={setVehicleType} />
-        <AppInput label="Vehicle model/name (optional)" value={vehicleModel} onChangeText={setVehicleModel} />
-        <AppSelect label="Breakdown type" options={BREAKDOWN_TYPES} value={breakdownType} onChange={setBreakdownType} />
-        <AppSelect label="Urgency level" options={URGENCY_LEVELS} value={urgencyLevel} onChange={setUrgencyLevel} />
-        <AppInput label="Problem description" value={problemDescription} onChangeText={setProblemDescription} multiline />
-        <AppButton title="Use Current Location" variant="secondary" onPress={handleUseLocation} loading={loadingLocation} />
-        <AppInput label="Address" value={address} onChangeText={setAddress} multiline />
-        <AppInput label="Latitude" value={latitude} onChangeText={setLatitude} keyboardType="numeric" />
-        <AppInput label="Longitude" value={longitude} onChangeText={setLongitude} keyboardType="numeric" />
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <AppButton title="Submit Request" onPress={handleSubmit} loading={submitting} />
+    <ScreenContainer keyboard>
+      <ScreenHeader eyebrow="Roadside assistance" title="Request a mechanic" subtitle="Tell us what happened and we'll find suitable nearby help." />
+      <AppCard><SectionHeader title="1. Vehicle" subtitle="What are you driving?" />
+        <AppSelect label="Vehicle type" options={VEHICLE_TYPES} value={vehicleType} onChange={changeVehicleType} />
+        <AppInput label="Vehicle model or name (optional)" icon="car-outline" value={vehicleModel} onChangeText={setVehicleModel} />
       </AppCard>
+      <AppCard><SectionHeader title="2. Main Problem" subtitle="Choose the closest match." />
+        <MainProblemGrid options={BREAKDOWN_TYPES} value={breakdownType} onChange={changeBreakdownType} />
+      </AppCard>
+      <AppCard><SectionHeader title="3. Symptoms" subtitle="Guided details improve the service match." />
+        <AppButton
+          title={guidedSymptoms ? "Edit Symptoms" : "Help Me Describe the Problem"}
+          variant="secondary"
+          icon="chatbubbles-outline"
+          onPress={openGuidedSymptoms}
+        />
+        {guidedSymptoms ? <InfoBanner tone="success" message="Symptoms added to this request." /> : null}
+        <AppInput
+          label="Problem description (optional)"
+          value={problemDescription}
+          onChangeText={setProblemDescription}
+          multiline
+        />
+      </AppCard>
+      {guidedSummary ? <SymptomSummaryCard summary={guidedSummary} compact /> : null}
+      <AppCard><SectionHeader title="4. Location" subtitle="Your position is used to find nearby providers." />
+        <AppButton title="Use Current Location" icon="locate-outline" variant="secondary" onPress={handleUseLocation} loading={loadingLocation} />
+        <AppInput label="Address (optional)" icon="location-outline" value={address} onChangeText={setAddress} multiline />
+        <View style={styles.coordinateRow}><View style={styles.coordinate}><AppInput label="Latitude" value={latitude} onChangeText={setLatitude} keyboardType="numeric" /></View><View style={styles.coordinate}><AppInput label="Longitude" value={longitude} onChangeText={setLongitude} keyboardType="numeric" /></View></View>
+      </AppCard>
+      <AppCard><SectionHeader title="5. Urgency" subtitle="How quickly do you need assistance?" /><AppSelect label="Urgency level" options={URGENCY_LEVELS} value={urgencyLevel} onChange={setUrgencyLevel} /></AppCard>
+      {error ? <InfoBanner tone="danger" message={error} /> : null}
+      <AppButton title="Find Suitable Mechanics" icon="search-outline" onPress={handleSubmit} loading={submitting} />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    color: COLORS.primaryDark,
-    fontSize: 22,
-    fontWeight: "900"
-  },
-  error: {
-    color: COLORS.danger,
-    fontWeight: "700",
-    lineHeight: 20
-  }
+  coordinateRow: { flexDirection: "row", gap: spacing.sm }, coordinate: { flex: 1 }
 });

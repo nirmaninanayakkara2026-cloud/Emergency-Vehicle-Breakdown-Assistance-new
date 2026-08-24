@@ -1,0 +1,16 @@
+{
+  "description": "Application-level heuristic thresholds for prediction handling; confidence levels are not claims of statistical certainty.",
+  "high": {
+    "minimum_top_probability": 0.7,
+    "minimum_prediction_margin": 0.25,
+    "rule": "both"
+  },
+  "medium": {
+    "minimum_top_probability": 0.4,
+    "minimum_prediction_margin": 0.15,
+    "rule": "either"
+  },
+  "ambiguous": {
+    "prediction_margin_below": 0.1
+  }
+}

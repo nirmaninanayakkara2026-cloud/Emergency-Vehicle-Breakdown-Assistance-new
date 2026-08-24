@@ -1,0 +1,136 @@
+{
+  "description": "Deterministic project safety rules for AI Module 2. Risk is based on the approved procedure and hazard type, never on AI 1 model confidence.",
+  "valid_risk_levels": [
+    "LOW",
+    "CAUTION",
+    "HIGH"
+  ],
+  "valid_actions": [
+    "continue",
+    "resolved",
+    "request_mechanic",
+    "request_towing",
+    "stop"
+  ],
+  "always_high_fault_categories": [
+    "brake_system_fault",
+    "drivetrain_fault",
+    "emissions_system_fault",
+    "fuel_system_fault",
+    "steering_system_fault",
+    "transmission_fault"
+  ],
+  "high_title_keywords": [
+    "catalytic converter",
+    "exhaust manifold",
+    "fuel tank pressure",
+    "diesel injection pump",
+    "fuel injector",
+    "fuel filter",
+    "oil pump",
+    "piston rings",
+    "timing belt",
+    "valve",
+    "water pump",
+    "wheel bearing",
+    "wheel hub",
+    "starter motor",
+    "ignition distributor",
+    "ignition wire",
+    "engine control unit",
+    "ac recharge"
+  ],
+  "high_procedure_keywords": [
+    "pressure test",
+    "test fuel pressure",
+    "test diesel",
+    "compression test",
+    "spray pattern",
+    "measure brake",
+    "check valve clearance",
+    "check timing marks",
+    "inspect piston",
+    "inspect bearing",
+    "adjust clutch",
+    "check mounting bolts",
+    "check manifold bolts",
+    "electrical continuity",
+    "inspect starter motor brushes"
+  ],
+  "low_title_overrides": [
+    "Cabin Air Filter",
+    "Check Engine Light Diagnosis",
+    "Door Window Motor",
+    "Door Window Regulator",
+    "Headlamp Bulb",
+    "Horn",
+    "Power Door Lock Actuator",
+    "Windshield Washer Pump",
+    "Wiper Motor",
+    "Tire Pressure Monitoring System (TPMS)",
+    "Windshield Washer Fluid"
+  ],
+  "caution_title_overrides": [
+    "Battery Replacement",
+    "Battery Charging",
+    "Charging System",
+    "Air Filter",
+    "Engine Oil",
+    "Fan Belt",
+    "Engine Belt",
+    "Coolant/Antifreeze",
+    "Coolant Reservoir",
+    "Coolant Leak Diagnosis",
+    "Heater Hose",
+    "Radiator Hose",
+    "Radiator/Cooling Fan"
+  ],
+  "caution_fault_categories": [
+    "air_conditioning_fault",
+    "cooling_system_fault",
+    "electrical_system_fault",
+    "engine_system_fault"
+  ],
+  "caution_keywords": [
+    "battery",
+    "coolant",
+    "radiator",
+    "hose",
+    "belt",
+    "fluid",
+    "fuse",
+    "wiring",
+    "electrical"
+  ],
+  "global_stop_conditions": [
+    "smoke",
+    "fire",
+    "strong fuel smell",
+    "visible fuel leak",
+    "burning smell",
+    "exposed damaged wiring",
+    "severe overheating",
+    "uncontrolled fluid leak",
+    "brake failure",
+    "steering failure",
+    "vehicle instability",
+    "user unsure",
+    "unexpected dangerous condition"
+  ],
+  "low_before_you_begin": [
+    "Park the vehicle safely away from moving traffic.",
+    "Apply the parking brake and keep the vehicle stationary.",
+    "Stop if you feel unsure or notice anything unsafe."
+  ],
+  "caution_before_you_begin": [
+    "Park the vehicle safely away from moving traffic.",
+    "Apply the parking brake.",
+    "Switch off the engine unless the approved step only asks you to observe an existing dashboard indication.",
+    "Keep away from traffic and moving vehicle parts.",
+    "Continue only if you understand the step.",
+    "Stop immediately if you feel unsure."
+  ],
+  "caution_warning": "This check requires additional care. Stop immediately if you notice smoke, a fuel or burning smell, leakage, excessive heat, exposed wiring, or anything unsafe.",
+  "high_warning": "Do not attempt further inspection or repair. Keep a safe distance from the vehicle when necessary and request professional assistance.",
+  "incomplete_branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+}

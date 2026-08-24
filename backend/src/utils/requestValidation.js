@@ -6,12 +6,16 @@ const {
 } = require("./domainConstants");
 
 function hasLocation(location) {
+  const hasNumericCoordinate = (value) =>
+    value !== undefined &&
+    value !== null &&
+    !(typeof value === "string" && !value.trim()) &&
+    Number.isFinite(Number(value));
+
   return (
     location &&
-    location.latitude !== undefined &&
-    location.longitude !== undefined &&
-    location.address &&
-    String(location.address).trim()
+    hasNumericCoordinate(location.latitude) &&
+    hasNumericCoordinate(location.longitude)
   );
 }
 
@@ -21,7 +25,6 @@ function validateBreakdownRequestInput(payload) {
     vehicleType,
     breakdownType,
     urgencyLevel,
-    problemDescription,
     location
   } = payload;
 
@@ -40,12 +43,8 @@ function validateBreakdownRequestInput(payload) {
     errors.push(`Urgency level must be one of: ${URGENCY_LEVELS.join(", ")}`);
   }
 
-  if (!problemDescription || !String(problemDescription).trim()) {
-    errors.push("Problem description is required");
-  }
-
   if (!hasLocation(location)) {
-    errors.push("Location with latitude, longitude, and address is required");
+    errors.push("Location with latitude and longitude is required");
   }
 
   return errors;

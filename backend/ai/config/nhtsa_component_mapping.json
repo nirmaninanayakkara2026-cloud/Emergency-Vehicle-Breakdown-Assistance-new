@@ -1,0 +1,66 @@
+{
+  "description": "Ordered conservative mapping rules for actual NHTSA COMPDESC values observed in COMPLAINTS_RECEIVED_2020-2024.txt. Unmatched components remain unmapped.",
+  "rules": [
+    {
+      "match_type": "prefix",
+      "values": ["ENGINE AND ENGINE COOLING:EXHAUST SYSTEM:EMISSION CONTROL"],
+      "fault_category": "unmapped",
+      "reason": "Emissions-only subcomponents are outside the initial roadside model."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["ENGINE AND ENGINE COOLING:COOLING SYSTEM"],
+      "fault_category": "cooling_system_fault",
+      "reason": "These subcomponents explicitly identify the engine cooling system."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["POWER TRAIN:AUTOMATIC TRANSMISSION", "POWER TRAIN:MANUAL TRANSMISSION", "POWER TRAIN:TRANSMISSION", "POWER TRAIN:CLUTCH ASSEMBLY"],
+      "fault_category": "transmission_fault",
+      "reason": "These power-train subcomponents explicitly identify a transmission or clutch assembly."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["SERVICE BRAKES", "PARKING BRAKE"],
+      "fault_category": "brake_system_fault",
+      "reason": "NHTSA brake, hydraulic, air, electric, ABS, and parking-brake components map directly to the project brake class."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["ELECTRICAL SYSTEM"],
+      "fault_category": "electrical_system_fault",
+      "reason": "The NHTSA component explicitly identifies the vehicle electrical system."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["ENGINE"],
+      "fault_category": "engine_system_fault",
+      "reason": "Broad ENGINE and legacy ENGINE AND ENGINE COOLING components are retained as engine faults unless a preceding cooling or emissions rule applies."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["FUEL SYSTEM", "FUEL/PROPULSION SYSTEM"],
+      "fault_category": "fuel_system_fault",
+      "reason": "These components identify fuel storage, delivery, injection, or propulsion-system complaints."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["TIRES", "WHEELS"],
+      "fault_category": "wheel_tire_fault",
+      "reason": "Tyre and wheel components map directly to the project wheel/tyre class."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["STEERING"],
+      "fault_category": "steering_system_fault",
+      "reason": "The NHTSA component explicitly identifies the steering system."
+    },
+    {
+      "match_type": "prefix",
+      "values": ["POWER TRAIN"],
+      "fault_category": "drivetrain_fault",
+      "reason": "Non-transmission power-train components map to the project drivetrain class."
+    }
+  ],
+  "unmapped_by_default": true
+}

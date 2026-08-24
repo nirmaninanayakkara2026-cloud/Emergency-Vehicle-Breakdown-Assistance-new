@@ -18,6 +18,7 @@ const VEHICLE_TYPES = [
 const BREAKDOWN_TYPES = [
   "flat_tyre",
   "battery_issue",
+  "engine_problem",
   "engine_overheating",
   "brake_problem",
   "fuel_issue",
@@ -31,25 +32,42 @@ const URGENCY_LEVELS = ["low", "medium", "high"];
 const REQUEST_STATUSES = [
   "pending",
   "recommended",
+  "created",
+  "awaiting_clarification",
+  "provider_selection",
+  "provider_requested",
   "accepted",
   "on_the_way",
+  "provider_en_route",
+  "arrived",
   "in_progress",
   "completed",
-  "cancelled"
+  "cancelled",
+  "provider_rejected"
 ];
 
 const PROVIDER_UPDATE_STATUSES = [
-  "accepted",
   "on_the_way",
+  "provider_en_route",
+  "arrived",
   "in_progress",
   "completed"
 ];
+
+const PROVIDER_STATUS_TRANSITIONS = {
+  accepted: ["provider_en_route", "on_the_way"],
+  provider_en_route: ["arrived"],
+  on_the_way: ["arrived", "in_progress"],
+  arrived: ["in_progress"],
+  in_progress: ["completed"]
+};
 
 const AVAILABILITY_STATUSES = ["available", "busy", "offline"];
 
 const SERVICE_TYPE_MAP = {
   flat_tyre: "tire_mechanic",
   battery_issue: "battery_electrical_mechanic",
+  engine_problem: "engine_mechanic",
   engine_overheating: "engine_mechanic",
   brake_problem: "brake_mechanic",
   fuel_issue: "roadside_fuel_support",
@@ -68,6 +86,7 @@ module.exports = {
   PROVIDER_ROLES,
   PROVIDER_TYPES,
   PROVIDER_UPDATE_STATUSES,
+  PROVIDER_STATUS_TRANSITIONS,
   REQUEST_STATUSES,
   URGENCY_LEVELS,
   VEHICLE_TYPES,

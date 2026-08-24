@@ -68,6 +68,10 @@ const providerProfileSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
+    serviceCategories: {
+      type: [String],
+      default: []
+    },
     supportedVehicleTypes: {
       type: [
         {
@@ -121,6 +125,10 @@ const providerProfileSchema = new mongoose.Schema(
     isApproved: {
       type: Boolean,
       default: false
+    },
+    isActive: {
+      type: Boolean,
+      default: true
     }
   },
   {

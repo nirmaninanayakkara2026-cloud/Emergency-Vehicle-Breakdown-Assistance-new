@@ -1,0 +1,26 @@
+{
+  "model_name": "Logistic Regression",
+  "algorithm": "LogisticRegression",
+  "input": "symptom_text",
+  "target": "fault_category",
+  "classes": [
+    "brake_system_fault",
+    "cooling_system_fault",
+    "drivetrain_fault",
+    "electrical_system_fault",
+    "engine_system_fault",
+    "fuel_system_fault",
+    "steering_system_fault",
+    "transmission_fault",
+    "wheel_tire_fault"
+  ],
+  "training_records": 12213,
+  "testing_records": 3054,
+  "accuracy": 0.8156516044531762,
+  "macro_f1": 0.7871423630140393,
+  "weighted_f1": 0.8173745176778907,
+  "random_state": 42,
+  "dataset": "ai1_final_training_dataset.csv",
+  "selection_reason": "Macro F1 scores differ by no more than 0.005; Logistic Regression was preferred because it directly provides probability estimates.",
+  "model_assessment": "ACCEPTABLE_BASELINE"
+}

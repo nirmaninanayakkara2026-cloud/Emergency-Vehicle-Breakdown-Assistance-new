@@ -1,0 +1,33 @@
+{
+  "description": "Common vehicle-fault taxonomy shared by AI Module 1 datasets. The model predicts these faults; service/provider mapping remains separate business logic.",
+  "ROADSIDE_MODEL_CLASSES": [
+    "brake_system_fault",
+    "cooling_system_fault",
+    "electrical_system_fault",
+    "engine_system_fault",
+    "fuel_system_fault",
+    "transmission_fault",
+    "wheel_tire_fault",
+    "steering_system_fault",
+    "drivetrain_fault"
+  ],
+  "NON_ROADSIDE_OR_LOW_PRIORITY": {
+    "air_conditioning_fault": "Usually a comfort issue rather than an immobilizing roadside breakdown.",
+    "emissions_system_fault": "Many emissions-only faults do not require immediate roadside assistance.",
+    "visibility_system_fault": "Retained in the complete data, but the current source record is washer-fluid maintenance rather than a core breakdown class."
+  },
+  "class_definitions": {
+    "air_conditioning_fault": "Cabin heating, ventilation, or air-conditioning system fault.",
+    "brake_system_fault": "Brake, ABS, hydraulic brake, pad, rotor, or related stopping-system fault.",
+    "cooling_system_fault": "Coolant, radiator, water-pump, cooling-fan, or overheating-control system fault.",
+    "drivetrain_fault": "Axle, differential, shaft, joint, or power-transfer drivetrain fault.",
+    "electrical_system_fault": "Battery, charging, starting, wiring, lighting, or vehicle electrical fault.",
+    "emissions_system_fault": "Exhaust emissions, catalyst, purge, or emissions-sensor fault.",
+    "engine_system_fault": "Engine mechanical, ignition, lubrication, air-intake, or engine-control fault.",
+    "fuel_system_fault": "Fuel delivery, pressure, tank, pump, injector, or related fuel-system fault.",
+    "steering_system_fault": "Steering control, steering fluid, or steering-assistance fault.",
+    "transmission_fault": "Gearbox, clutch, torque-converter, fluid, filter, or transmission-control fault.",
+    "visibility_system_fault": "Wiper, washer, or other visibility-support system fault.",
+    "wheel_tire_fault": "Tyre, wheel, hub, bearing, or tyre-pressure monitoring fault."
+  }
+}

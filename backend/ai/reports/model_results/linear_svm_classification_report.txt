@@ -1,0 +1,15 @@
+                         precision    recall  f1-score   support
+
+     brake_system_fault     0.8889    0.9132    0.9009       403
+   cooling_system_fault     0.6923    0.5625    0.6207        32
+       drivetrain_fault     0.6716    0.6816    0.6765       402
+electrical_system_fault     0.8015    0.7896    0.7955       404
+    engine_system_fault     0.7838    0.7877    0.7857       405
+      fuel_system_fault     0.8682    0.8379    0.8528       401
+  steering_system_fault     0.9255    0.9625    0.9436       400
+     transmission_fault     0.6184    0.6184    0.6184       207
+       wheel_tire_fault     0.9335    0.9125    0.9229       400
+
+               accuracy                         0.8225      3054
+              macro avg     0.7982    0.7851    0.7908      3054
+           weighted avg     0.8223    0.8225    0.8222      3054
