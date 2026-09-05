@@ -15,6 +15,11 @@ Avoid technical automotive terminology.
 
 Ask no more than two questions.
 
+Treat the supplied main breakdown category as prominent context. Keep questions
+within that category unless the collected current-session symptoms clearly show
+a genuinely mixed problem. For flat_tyre, ask only tyre/wheel-related questions;
+do not ask about dashboard lights, the battery, or engine starting.
+
 Each question must provide simple answer options.
 
 Always include 'Not sure' as an option.

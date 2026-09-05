@@ -113,15 +113,58 @@ test("main problem selectors expose the requested stable values in display order
   assert.deepEqual(SYMPTOM_BREAKDOWN_TYPES.map(({ value }) => value), expected);
 });
 
-test("new mobile problem values map to existing request API categories", () => {
-  assert.equal(mapSymptomTypeToRequestType("vehicle_not_starting"), "battery_issue");
-  assert.equal(mapSymptomTypeToRequestType("electrical_problem"), "battery_issue");
-  assert.equal(mapSymptomTypeToRequestType("fuel_problem"), "fuel_issue");
-  assert.equal(mapSymptomTypeToRequestType("steering_problem"), "other");
-  assert.equal(mapSymptomTypeToRequestType("transmission_problem"), "other");
-  assert.equal(mapSymptomTypeToRequestType("strange_noise"), "other");
+test("main problem values remain intact for structured backend routing", () => {
+  assert.equal(mapSymptomTypeToRequestType("vehicle_not_starting"), "vehicle_not_starting");
+  assert.equal(mapSymptomTypeToRequestType("electrical_problem"), "electrical_problem");
+  assert.equal(mapSymptomTypeToRequestType("fuel_problem"), "fuel_problem");
+  assert.equal(mapSymptomTypeToRequestType("steering_problem"), "steering_problem");
+  assert.equal(mapSymptomTypeToRequestType("transmission_problem"), "transmission_problem");
+  assert.equal(mapSymptomTypeToRequestType("strange_noise"), "strange_noise");
   assert.equal(mapRequestTypeToSymptomType("battery_issue"), "vehicle_not_starting");
   assert.equal(mapRequestTypeToSymptomType("fuel_issue"), "fuel_problem");
+});
+
+test("flat tyre capture contains only tyre-specific guided questions", () => {
+  const questions = getQuestionsForProblem("flat_tyre");
+  assert.deepEqual(questions[0].options.map(({ value }) => value), [
+    "front_left", "front_right", "rear_left", "rear_right", "not_sure"
+  ]);
+  assert.equal(questions[1].type, "multi_choice");
+  assert.deepEqual(questions[1].options.map(({ value }) => value), [
+    "completely_flat", "low_pressure", "visible_damage", "pulling_side", "not_sure"
+  ]);
+  assert.equal(questions[2].optional, true);
+  assert.deepEqual(questions[2].options.map(({ value }) => value), [
+    "puncture_visible", "sidewall_damage", "unusual_vibration", "none", "not_sure"
+  ]);
+  assert.doesNotMatch(JSON.stringify(questions), /starting_behavior|light_condition|dashboard|battery/i);
+});
+
+test("flat tyre diagnostic text contains current tyre answers and no stale starting answers", () => {
+  const diagnosticInputText = buildSymptomDescription({
+    vehicleType: "car",
+    breakdownType: "flat_tyre",
+    symptoms: {
+      affected_tyre: "front_left",
+      tyre_condition: ["completely_flat", "pulling_side"]
+    },
+    observedSymptoms: { see: [], hear: [], smell: [], feel: [] },
+    description: ""
+  });
+  assert.match(diagnosticInputText, /Guided symptoms - Flat Tyre/);
+  assert.match(diagnosticInputText, /Front left/);
+  assert.match(diagnosticInputText, /Completely flat/);
+  assert.match(diagnosticInputText, /Vehicle pulling to one side/);
+  assert.doesNotMatch(diagnosticInputText, /dashboard|clicking|starting behavior/i);
+});
+
+test("guided screens reject initial symptom data from a different main problem", () => {
+  const guidedScreen = fs.readFileSync(path.join(sourceRoot, "screens/driver/GuidedSymptomCaptureScreen.js"), "utf8");
+  const requestScreen = fs.readFileSync(path.join(sourceRoot, "screens/driver/RequestMechanicScreen.js"), "utf8");
+  const selfScreen = fs.readFileSync(path.join(sourceRoot, "screens/driver/SelfBreakdownAssistantScreen.js"), "utf8");
+  assert.match(guidedScreen, /initialDataMatches/);
+  assert.match(requestScreen, /guidedSymptoms\?\.breakdownType === breakdownType/);
+  assert.match(selfScreen, /guidedSymptoms\?\.breakdownType === breakdownType/);
 });
 
 test("both problem selectors use the shared responsive accessible grid", () => {
@@ -275,7 +318,7 @@ test("request mechanic prefill preserves symptoms, diagnosis text, fault, and se
   };
   const prefill = buildSelfAssistantMechanicPrefill(payload, response);
   assert.equal(prefill.vehicleType, payload.vehicleType);
-  assert.equal(prefill.breakdownType, "battery_issue");
+  assert.equal(prefill.breakdownType, "vehicle_not_starting");
   assert.deepEqual(prefill.symptomCapture, payload.symptomCapture);
   assert.equal(prefill.diagnosticInputText, payload.diagnosticInputText);
   assert.equal(prefill.predictedFault, "electrical_system_fault");

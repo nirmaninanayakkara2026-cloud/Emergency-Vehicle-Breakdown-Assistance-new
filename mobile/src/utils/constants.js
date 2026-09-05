@@ -51,6 +51,11 @@ export const PROVIDER_SPECIALIZATIONS = [
   { label: "Spare parts", value: "spare_parts" }
 ];
 
+export const SPARE_PART_CATEGORIES = [
+  "Battery", "Tyres", "Brake Parts", "Engine Parts", "Electrical Parts",
+  "Filters", "Belts", "Bulbs / Lights", "Fluids", "Fuses", "Wipers", "Other"
+].map((value) => ({ label: value, value }));
+
 export const REQUEST_STATUS_OPTIONS = [
   { label: "On the way", value: "provider_en_route" },
   { label: "Arrived", value: "arrived" },

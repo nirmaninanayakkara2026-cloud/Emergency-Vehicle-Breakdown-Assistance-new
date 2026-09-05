@@ -42,6 +42,11 @@ const troubleshootingSessionSchema = new mongoose.Schema(
       required: true,
       index: true
     },
+    breakdownRequestId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "BreakdownRequest",
+      default: null
+    },
     vehicleType: { type: String, enum: VEHICLE_TYPES, required: true },
     breakdownType: { type: String, required: true, trim: true, maxlength: 100 },
     symptomCapture: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },

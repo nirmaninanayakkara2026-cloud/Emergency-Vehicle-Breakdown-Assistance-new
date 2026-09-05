@@ -16,12 +16,18 @@ const VEHICLE_TYPES = [
 ];
 
 const BREAKDOWN_TYPES = [
+  "vehicle_not_starting",
   "flat_tyre",
   "battery_issue",
   "engine_problem",
   "engine_overheating",
   "brake_problem",
+  "electrical_problem",
+  "fuel_problem",
   "fuel_issue",
+  "steering_problem",
+  "transmission_problem",
+  "strange_noise",
   "accident",
   "towing_needed",
   "other"
@@ -62,15 +68,21 @@ const PROVIDER_STATUS_TRANSITIONS = {
   in_progress: ["completed"]
 };
 
-const AVAILABILITY_STATUSES = ["available", "busy", "offline"];
+const AVAILABILITY_STATUSES = ["available", "online", "busy", "offline"];
 
 const SERVICE_TYPE_MAP = {
+  vehicle_not_starting: "battery_electrical_mechanic",
   flat_tyre: "tire_mechanic",
   battery_issue: "battery_electrical_mechanic",
   engine_problem: "engine_mechanic",
   engine_overheating: "engine_mechanic",
   brake_problem: "brake_mechanic",
+  electrical_problem: "battery_electrical_mechanic",
+  fuel_problem: "fuel_system_mechanic",
   fuel_issue: "roadside_fuel_support",
+  steering_problem: "steering_mechanic",
+  transmission_problem: "transmission_mechanic",
+  strange_noise: "general_mechanic",
   accident: "towing_service",
   towing_needed: "towing_service",
   other: "general_mechanic"

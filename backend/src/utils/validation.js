@@ -1,4 +1,5 @@
 const { USER_ROLES } = require("../models/User");
+const PUBLIC_REGISTRATION_ROLES = USER_ROLES.filter((role) => role !== "admin");
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -16,7 +17,7 @@ function validateRegisterInput({ name, email, phone, password, role }) {
   if (!password) errors.push("Password is required");
   if (password && password.length < 6) errors.push("Password must be at least 6 characters");
   if (!role) errors.push("Role is required");
-  if (role && !USER_ROLES.includes(role)) errors.push(`Role must be one of: ${USER_ROLES.join(", ")}`);
+  if (role && !PUBLIC_REGISTRATION_ROLES.includes(role)) errors.push(`Role must be one of: ${PUBLIC_REGISTRATION_ROLES.join(", ")}`);
 
   return errors;
 }

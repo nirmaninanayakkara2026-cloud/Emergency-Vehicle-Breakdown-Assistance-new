@@ -40,6 +40,15 @@ export async function updateAvailability(availabilityStatus) {
   }
 }
 
+export async function resubmitProviderProfile() {
+  try {
+    const response = await api.post("/provider-profile/resubmit");
+    return response.data.data.profile;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
 export async function getProviders(params = {}) {
   try {
     const response = await api.get("/providers", { params });

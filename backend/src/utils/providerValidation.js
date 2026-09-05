@@ -78,8 +78,10 @@ function validateProviderProfileInput(payload, partial = false) {
     errors.push(`Availability status must be one of: ${AVAILABILITY_STATUSES.join(", ")}`);
   }
 
-  const serviceRadiusError = validateNumber(serviceRadiusKm, "Service radius", !partial);
-  if (serviceRadiusError) errors.push(serviceRadiusError);
+  if (providerType !== "spare_parts_shop") {
+    const serviceRadiusError = validateNumber(serviceRadiusKm, "Service radius", !partial);
+    if (serviceRadiusError) errors.push(serviceRadiusError);
+  }
 
   const responseTimeError = validateNumber(averageResponseTimeMinutes, "Average response time");
   if (responseTimeError) errors.push(responseTimeError);

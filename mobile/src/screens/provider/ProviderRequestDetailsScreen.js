@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Alert, Modal, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import AppInput from "../../components/AppInput";
 import ScreenContainer from "../../components/ScreenContainer";
 import ErrorState from "../../components/ui/ErrorState";
+import InfoBanner from "../../components/ui/InfoBanner";
 import LoadingState from "../../components/ui/LoadingState";
 import ScreenHeader from "../../components/ui/ScreenHeader";
 import SectionHeader from "../../components/ui/SectionHeader";
@@ -43,7 +44,7 @@ const NEXT_STATUS = {
   provider_en_route: { value: "arrived", label: "Mark Arrived" },
   on_the_way: { value: "arrived", label: "Mark Arrived" },
   arrived: { value: "in_progress", label: "Start Repair" },
-  in_progress: { value: "completed", label: "Complete Job" }
+  in_progress: { value: "completed", label: "Complete Service" }
 };
 
 export default function ProviderRequestDetailsScreen({ route }) {
@@ -55,6 +56,8 @@ export default function ProviderRequestDetailsScreen({ route }) {
   const [estimatedArrival, setEstimatedArrival] = useState("30");
   const [rejectionReason, setRejectionReason] = useState("");
   const [finalCost, setFinalCost] = useState("");
+  const [completionNote, setCompletionNote] = useState("");
+  const [showCompletion, setShowCompletion] = useState(false);
   const requestId = route.params?.requestId || request?._id;
 
   const loadRequest = useCallback(async () => {
@@ -86,14 +89,30 @@ export default function ProviderRequestDetailsScreen({ route }) {
       const updatedRequest = await updateRequestStatus(
         request._id,
         status,
-        status === "completed" && finalCost ? Number(finalCost) : undefined
+        status === "completed" ? Number(finalCost) : undefined,
+        status === "completed" ? completionNote.trim() : ""
       );
       setRequest(updatedRequest);
+      if (status === "completed") setShowCompletion(false);
     } catch (statusError) {
       setError(statusError.message);
     } finally {
       setUpdatingStatus("");
     }
+  }
+
+  function requestCompletion() {
+    const value = finalCost.trim();
+    if (!value) { setError("Please enter the final service price."); return; }
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount < 0) { setError("Please enter a valid non-negative final service price."); return; }
+    if (completionNote.trim().length > 500) { setError("Completion note must contain at most 500 characters."); return; }
+    setError("");
+    Alert.alert(
+      "Complete Job",
+      `Complete this service for LKR ${amount.toLocaleString()}?`,
+      [{ text: "Cancel", style: "cancel" }, { text: "Complete Job", onPress: () => handleUpdateStatus("completed") }]
+    );
   }
 
   async function handleAccept() {
@@ -203,20 +222,28 @@ export default function ProviderRequestDetailsScreen({ route }) {
             <AppButton title="Reject Request" variant="danger" loading={updatingStatus === "reject"} onPress={handleReject} />
           </>
         ) : null}
-        {request.status === "in_progress" ? (
-          <AppInput label="Final cost (optional)" value={finalCost} onChangeText={setFinalCost} keyboardType="numeric" />
-        ) : null}
         {NEXT_STATUS[request.status] ? (
           <AppButton
             title={NEXT_STATUS[request.status].value === "provider_en_route" ? "Mark as On the Way" : NEXT_STATUS[request.status].label}
             variant={NEXT_STATUS[request.status].value === "completed" ? "success" : "secondary"}
             loading={updatingStatus === NEXT_STATUS[request.status].value}
-            onPress={() => handleUpdateStatus(NEXT_STATUS[request.status].value)}
+            onPress={() => NEXT_STATUS[request.status].value === "completed" ? setShowCompletion(true) : handleUpdateStatus(NEXT_STATUS[request.status].value)}
           />
         ) : null}
-        {request.status === "completed" ? <Text style={styles.success}>Job completed.</Text> : null}
+        {request.status === "completed" ? <><Text style={styles.success}>Job Completed</Text><Text style={styles.body}>Final amount: LKR {Number(request.finalCost).toLocaleString()}</Text>{request.completionNote ? <Text style={styles.body}>{request.completionNote}</Text> : null}</> : null}
         {request.status === "provider_rejected" ? <Text style={styles.body}>This request was returned to the driver for another provider selection.</Text> : null}
       </AppCard>
+      <Modal visible={showCompletion} transparent animationType="slide" onRequestClose={() => setShowCompletion(false)}>
+        <View style={styles.modalOverlay}><View style={styles.modalCard}>
+          <SectionHeader title="Complete Service" subtitle="Enter the agreed final amount before closing this job." />
+          <AppInput label="Final Service Price *" value={finalCost} onChangeText={setFinalCost} keyboardType="decimal-pad" placeholder="LKR 0" />
+          <AppInput label="Completion Note (optional)" value={completionNote} onChangeText={setCompletionNote} multiline placeholder="Work completed and vehicle tested..." />
+          {error ? <InfoBanner tone="danger" message={error} /> : null}
+          <Text style={styles.label}>Vehicle</Text><Text style={styles.body}>{formatDisplayValue(request.vehicleType)}</Text>
+          <Text style={styles.label}>Service</Text><Text style={styles.body}>{formatServiceType(request.requiredServiceType)}</Text>
+          <View style={styles.modalActions}><AppButton title="Cancel" variant="secondary" onPress={() => setShowCompletion(false)} /><AppButton title="Complete Job" variant="success" loading={updatingStatus === "completed"} onPress={requestCompletion} /></View>
+        </View></View>
+      </Modal>
     </ScreenContainer>
   );
 }
@@ -274,5 +301,8 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
     fontWeight: "700",
     lineHeight: 20
-  }
+  },
+  modalOverlay: { flex: 1, justifyContent: "flex-end", backgroundColor: colors.overlay },
+  modalCard: { maxHeight: "90%", gap: spacing.md, padding: spacing.lg, paddingBottom: spacing.xxl, borderTopLeftRadius: radii.lg, borderTopRightRadius: radii.lg, backgroundColor: colors.surface },
+  modalActions: { gap: spacing.sm }
 });

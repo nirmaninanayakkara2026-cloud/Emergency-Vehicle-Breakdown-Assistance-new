@@ -13,7 +13,10 @@ import RecommendationScreen from "../screens/driver/RecommendationScreen";
 import RequestTrackingScreen from "../screens/driver/RequestTrackingScreen";
 import MyRequestsScreen from "../screens/driver/MyRequestsScreen";
 import RequestDetailsScreen from "../screens/driver/RequestDetailsScreen";
+import JobCompletionScreen from "../screens/driver/JobCompletionScreen";
 import SparePartsFinderScreen from "../screens/driver/SparePartsFinderScreen";
+import NearbySparePartsScreen from "../screens/driver/NearbySparePartsScreen";
+import SparePartsShopDetailsScreen from "../screens/driver/SparePartsShopDetailsScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import { stackScreenOptions } from "./navigationTheme";
 
@@ -37,7 +40,10 @@ export default function DriverNavigator() {
       <Stack.Screen name="RequestTracking" component={RequestTrackingScreen} options={{ title: "Track Request" }} />
       <Stack.Screen name="MyRequests" component={MyRequestsScreen} options={{ title: "My Requests" }} />
       <Stack.Screen name="RequestDetails" component={RequestDetailsScreen} options={{ title: "Request Details" }} />
+      <Stack.Screen name="JobCompletion" component={JobCompletionScreen} options={{ title: "Service Completed", gestureEnabled: false, headerBackVisible: false }} />
       <Stack.Screen name="SparePartsFinder" component={SparePartsFinderScreen} options={{ title: "Spare Parts" }} />
+      <Stack.Screen name="NearbySpareParts" component={NearbySparePartsScreen} options={{ title: "Find Spare Parts" }} />
+      <Stack.Screen name="SparePartsShopDetails" component={SparePartsShopDetailsScreen} options={{ title: "Shop Details" }} />
       <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: "Profile" }} />
     </Stack.Navigator>
   );

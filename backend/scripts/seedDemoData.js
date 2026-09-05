@@ -72,7 +72,7 @@ async function seedDemoData() {
         serviceCategories: [specialization],
         supportedVehicleTypes: ["car", "van", "three_wheeler"],
         location: { latitude, longitude, address: "Demo area, Colombo, Sri Lanka" },
-        availabilityStatus: "available",
+        availabilityStatus: "online",
         serviceRadiusKm: radius,
         averageRating: rating,
         totalReviews: reviews,
@@ -80,6 +80,7 @@ async function seedDemoData() {
         estimatedPriceRange: { minimum: 2500, maximum: 15000 },
         openingHours: "Demo hours: 7:00 AM - 9:00 PM",
         isApproved: true,
+        approvalStatus: "approved",
         isActive: true
       },
       { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }

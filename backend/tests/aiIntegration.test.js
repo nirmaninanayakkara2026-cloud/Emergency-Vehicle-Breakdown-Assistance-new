@@ -5,10 +5,11 @@ const mongoose = require("mongoose");
 const BreakdownRequest = require("../src/models/BreakdownRequest");
 const aiDiagnosisService = require("../src/services/aiDiagnosisService");
 const clarificationService = require("../src/services/clarificationService");
+const structuredProblemRoutingService = require("../src/services/structuredProblemRoutingService");
 const {
   createBreakdownRequest,
   requestClarification,
-  submitClarificationAnswers
+  submitClarificationAnswers,
 } = require("../src/controllers/breakdownRequestController");
 
 const driverId = new mongoose.Types.ObjectId();
@@ -25,9 +26,9 @@ const aiPrediction = {
   needsMoreInformation: false,
   topPredictions: [
     { fault: "steering_system_fault", probability: 0.95 },
-    { fault: "wheel_tire_fault", probability: 0.05 }
+    { fault: "wheel_tire_fault", probability: 0.05 },
   ],
-  predictionSource: "ai_model"
+  predictionSource: "ai_model",
 };
 
 function createResponse() {
@@ -41,7 +42,7 @@ function createResponse() {
     json(payload) {
       this.body = payload;
       return payload;
-    }
+    },
   };
 }
 
@@ -74,17 +75,17 @@ test("normalizes a valid FastAPI response and marks its source", async () => {
             needs_more_information: false,
             top_predictions: [
               { fault: "steering_system_fault", probability: 0.95 },
-              { fault: "wheel_tire_fault", probability: 0.05 }
-            ]
-          }
-        }
+              { fault: "wheel_tire_fault", probability: 0.05 },
+            ],
+          },
+        },
       };
-    }
+    },
   };
 
   const result = await aiDiagnosisService.diagnoseBreakdown("hard steering", {
     fallbackRequiredService: "general_mechanic",
-    httpClient
+    httpClient,
   });
   assert.equal(result.predictionSource, "ai_model");
   assert.equal(result.requiredService, "steering_mechanic");
@@ -93,7 +94,11 @@ test("normalizes a valid FastAPI response and marks its source", async () => {
 test("uses rule fallback when FastAPI is offline", async () => {
   const result = await aiDiagnosisService.diagnoseBreakdown("strange noise", {
     fallbackRequiredService: "tire_mechanic",
-    httpClient: { post: async () => { throw new Error("offline"); } }
+    httpClient: {
+      post: async () => {
+        throw new Error("offline");
+      },
+    },
   });
   assert.equal(result.predictionSource, "rule_fallback");
   assert.equal(result.requiredService, "tire_mechanic");
@@ -102,9 +107,98 @@ test("uses rule fallback when FastAPI is offline", async () => {
 test("uses rule fallback for an invalid FastAPI response", async () => {
   const result = await aiDiagnosisService.diagnoseBreakdown("strange noise", {
     fallbackRequiredService: "general_mechanic",
-    httpClient: { post: async () => ({ data: { success: true, prediction: {} } }) }
+    httpClient: {
+      post: async () => ({ data: { success: true, prediction: {} } }),
+    },
   });
   assert.equal(result.predictionSource, "rule_fallback");
+});
+
+test("high-specificity main problems cannot be overridden by an unrelated AI result", async () => {
+  const originalDiagnose = aiDiagnosisService.diagnoseBreakdown;
+  const expectedRoutes = {
+    flat_tyre: ["wheel_tire_fault", "tire_mechanic", "Wheel / Tyre Problem"],
+    brake_problem: [
+      "brake_system_fault",
+      "brake_mechanic",
+      "Brake System Problem",
+    ],
+    steering_problem: [
+      "steering_system_fault",
+      "steering_mechanic",
+      "Steering System Problem",
+    ],
+    transmission_problem: [
+      "transmission_fault",
+      "transmission_mechanic",
+      "Transmission Problem",
+    ],
+    fuel_problem: [
+      "fuel_system_fault",
+      "fuel_system_mechanic",
+      "Fuel System Problem",
+    ],
+    electrical_problem: [
+      "electrical_system_fault",
+      "battery_electrical_mechanic",
+      "Electrical / Starting System Problem",
+    ],
+    engine_overheating: [
+      "cooling_system_fault",
+      "engine_mechanic",
+      "Cooling / Overheating Problem",
+    ],
+  };
+  let modelCalls = 0;
+  aiDiagnosisService.diagnoseBreakdown = async () => {
+    modelCalls += 1;
+    return aiPrediction;
+  };
+  try {
+    for (const [breakdownType, [fault, service, label]] of Object.entries(
+      expectedRoutes,
+    )) {
+      const result =
+        await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
+          breakdownType,
+          `Main problem: ${breakdownType}`,
+        );
+      assert.equal(result.predictedFault, fault);
+      assert.equal(result.requiredService, service);
+      assert.equal(result.faultLabel, label);
+      assert.equal(result.predictionSource, "structured_problem");
+      assert.equal(result.needsMoreInformation, false);
+    }
+    assert.equal(modelCalls, Object.keys(expectedRoutes).length);
+  } finally {
+    aiDiagnosisService.diagnoseBreakdown = originalDiagnose;
+  }
+});
+
+test("diagnostic categories remain AI-first", async () => {
+  const originalDiagnose = aiDiagnosisService.diagnoseBreakdown;
+  let modelCalls = 0;
+  aiDiagnosisService.diagnoseBreakdown = async () => {
+    modelCalls += 1;
+    return aiPrediction;
+  };
+  try {
+    for (const breakdownType of structuredProblemRoutingService.AI_FIRST_PROBLEMS) {
+      const result =
+        await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
+          breakdownType,
+          "current symptoms",
+        );
+      assert.equal(result, aiPrediction);
+      assert.equal(result.predictionSource, "ai_model");
+    }
+    assert.equal(
+      modelCalls,
+      structuredProblemRoutingService.AI_FIRST_PROBLEMS.length,
+    );
+  } finally {
+    aiDiagnosisService.diagnoseBreakdown = originalDiagnose;
+  }
 });
 
 test("creates a request with the AI-required service", async () => {
@@ -125,8 +219,8 @@ test("creates a request with the AI-required service", async () => {
         breakdownType: "other",
         urgencyLevel: "medium",
         problemDescription: "steering is difficult",
-        location: { latitude: 1, longitude: 2 }
-      }
+        location: { latitude: 1, longitude: 2 },
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.statusCode, 201);
@@ -156,18 +250,22 @@ test("self-assistant mechanic escalation carries its resolved service into provi
         breakdownType: "battery_issue",
         urgencyLevel: "medium",
         problemDescription: "Possible electrical issue",
-        diagnosticInputText: "Guided symptoms\nAdditional clarification: dashboard lights become dim",
+        diagnosticInputText:
+          "Guided symptoms\nAdditional clarification: dashboard lights become dim",
         predictedFault: "electrical_system_fault",
         requiredService: "battery_electrical_mechanic",
-        location: { latitude: 1, longitude: 2 }
-      }
+        location: { latitude: 1, longitude: 2 },
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.statusCode, 201);
-    assert.equal(savedPayload.requiredServiceType, "battery_electrical_mechanic");
+    assert.equal(
+      savedPayload.requiredServiceType,
+      "battery_electrical_mechanic",
+    );
     assert.equal(
       savedPayload.diagnosticInputText,
-      "Guided symptoms\nAdditional clarification: dashboard lights become dim"
+      "Guided symptoms\nAdditional clarification: dashboard lights become dim",
     );
   } finally {
     BreakdownRequest.create = originalCreate;
@@ -188,7 +286,7 @@ test("does not call clarification for a high-confidence prediction", async () =>
   try {
     const { res, error } = await invokeController(requestClarification, {
       params: { id: new mongoose.Types.ObjectId().toString() },
-      user: { _id: driverId }
+      user: { _id: driverId },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.clarificationNeeded, false);
@@ -199,13 +297,40 @@ test("does not call clarification for a high-confidence prediction", async () =>
   }
 });
 
-test("requests questions for an ambiguous engine/cooling prediction", async () => {
+test("never asks OpenAI clarification for a structured flat tyre selection", async () => {
+  const originalFindById = BreakdownRequest.findById;
+  const originalGenerate = clarificationService.generateClarificationQuestions;
+  let clarificationCalled = false;
+  BreakdownRequest.findById = async () => ({
+    driverId,
+    breakdownType: "flat_tyre",
+    aiPrediction: { ...aiPrediction, needsMoreInformation: true },
+  });
+  clarificationService.generateClarificationQuestions = async () => {
+    clarificationCalled = true;
+    return { available: true, questions: [] };
+  };
+  try {
+    const { res, error } = await invokeController(requestClarification, {
+      params: { id: new mongoose.Types.ObjectId().toString() },
+      user: { _id: driverId },
+    });
+    assert.equal(error, undefined);
+    assert.equal(res.body.clarificationNeeded, false);
+    assert.equal(clarificationCalled, false);
+  } finally {
+    BreakdownRequest.findById = originalFindById;
+    clarificationService.generateClarificationQuestions = originalGenerate;
+  }
+});
+
+test("requests questions for an ambiguous AI-first engine prediction", async () => {
   const originalFindById = BreakdownRequest.findById;
   const originalGenerate = clarificationService.generateClarificationQuestions;
   const request = {
     driverId,
     vehicleType: "car",
-    breakdownType: "engine_overheating",
+    breakdownType: "engine_problem",
     symptomCapture: {},
     diagnosticInputText: "temperature high and steam",
     clarificationAttempts: 0,
@@ -218,10 +343,12 @@ test("requests questions for an ambiguous engine/cooling prediction", async () =
       needsMoreInformation: true,
       topPredictions: [
         { fault: "engine_system_fault", probability: 0.49 },
-        { fault: "cooling_system_fault", probability: 0.4 }
-      ]
+        { fault: "cooling_system_fault", probability: 0.4 },
+      ],
     },
-    async save() { this.saved = true; }
+    async save() {
+      this.saved = true;
+    },
   };
   BreakdownRequest.findById = async () => request;
   clarificationService.generateClarificationQuestions = async () => ({
@@ -230,25 +357,25 @@ test("requests questions for an ambiguous engine/cooling prediction", async () =
       {
         id: "clarification_1",
         question: "What do you notice near the engine area?",
-        options: ["Steam", "Fluid leaking", "Nothing visible", "Not sure"]
+        options: ["Steam", "Fluid leaking", "Nothing visible", "Not sure"],
       },
       {
         id: "clarification_2",
         question: "When does the warning appear?",
-        options: ["Immediately", "After driving", "Not sure"]
+        options: ["Immediately", "After driving", "Not sure"],
       },
       {
         id: "clarification_3",
         question: "Is another warning visible?",
-        options: ["Yes", "No", "Not sure"]
-      }
-    ]
+        options: ["Yes", "No", "Not sure"],
+      },
+    ],
   });
 
   try {
     const { res, error } = await invokeController(requestClarification, {
       params: { id: new mongoose.Types.ObjectId().toString() },
-      user: { _id: driverId }
+      user: { _id: driverId },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.clarificationNeeded, true);
@@ -268,7 +395,9 @@ test("OpenAI unavailable leaves clarification optional", async () => {
   delete process.env.OPENAI_API_KEY;
   delete process.env.OPENAI_MODEL;
   try {
-    const result = await clarificationService.generateClarificationQuestions({});
+    const result = await clarificationService.generateClarificationQuestions(
+      {},
+    );
     assert.deepEqual(result, { available: false, questions: [] });
   } finally {
     if (originalKey === undefined) delete process.env.OPENAI_API_KEY;
@@ -286,15 +415,21 @@ test("structured clarification is bounded and removes direct contact data", asyn
         requestPayload = payload;
         return {
           output_text: JSON.stringify({
-            questions: [{
-              id: "arbitrary",
-              question: "What happens when you try to start the vehicle?",
-              options: ["Nothing happens", "Clicking sound", "Engine tries to start"]
-            }]
-          })
+            questions: [
+              {
+                id: "arbitrary",
+                question: "What happens when you try to start the vehicle?",
+                options: [
+                  "Nothing happens",
+                  "Clicking sound",
+                  "Engine tries to start",
+                ],
+              },
+            ],
+          }),
         };
-      }
-    }
+      },
+    },
   };
   const result = await clarificationService.generateClarificationQuestions(
     {
@@ -304,9 +439,9 @@ test("structured clarification is bounded and removes direct contact data", asyn
       diagnosticInputText: "Call 0712345678 because dashboard lights are weak",
       topPredictions: aiPrediction.topPredictions,
       confidence: 0.3,
-      predictionMargin: 0.05
+      predictionMargin: 0.05,
     },
-    { client, model: "configured-test-model" }
+    { client, model: "configured-test-model" },
   );
   assert.equal(result.available, true);
   assert.equal(result.questions.length, 1);
@@ -331,22 +466,26 @@ test("submitting clarification appends answers and reruns AI 1", async () => {
     confidenceLevel: "low",
     predictionMargin: 0.04,
     isAmbiguous: true,
-    needsMoreInformation: true
+    needsMoreInformation: true,
   };
   const request = {
     driverId,
     breakdownType: "battery_issue",
     diagnosticInputText: "Vehicle does not start. Dashboard lights dim.",
     clarificationAttempts: 1,
-    clarificationQuestions: [{
-      id: "clarification_1",
-      question: "What happens when you try to start the vehicle?",
-      options: ["Nothing happens", "Clicking sound", "Not sure"]
-    }],
+    clarificationQuestions: [
+      {
+        id: "clarification_1",
+        question: "What happens when you try to start the vehicle?",
+        options: ["Nothing happens", "Clicking sound", "Not sure"],
+      },
+    ],
     clarificationAnswers: [],
     aiPredictionHistory: [],
     aiPrediction: { ...aiPrediction, needsMoreInformation: true },
-    async save() { this.saved = true; }
+    async save() {
+      this.saved = true;
+    },
   };
   BreakdownRequest.findById = async () => request;
   aiDiagnosisService.diagnoseBreakdown = async (text) => {
@@ -362,22 +501,33 @@ test("submitting clarification appends answers and reruns AI 1", async () => {
     const { res, error } = await invokeController(submitClarificationAnswers, {
       params: { id: new mongoose.Types.ObjectId().toString() },
       user: { _id: driverId },
-      body: { answers: [{ questionId: "clarification_1", answer: "Clicking sound" }] }
+      body: {
+        answers: [{ questionId: "clarification_1", answer: "Clicking sound" }],
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.prediction.predictedFault, "electrical_system_fault");
-    assert.match(res.body.diagnosticInputText, /Additional symptom clarification/);
+    assert.match(
+      res.body.diagnosticInputText,
+      /Additional symptom clarification/,
+    );
     assert.equal(request.requiredServiceType, "battery_electrical_mechanic");
     assert.equal(request.clarificationAnswers.length, 1);
     assert.equal(request.aiPredictionHistory.length, 2);
-    assert.equal(request.aiPredictionHistory[0].predictedFault, aiPrediction.predictedFault);
-    assert.equal(request.aiPredictionHistory[1].predictedFault, updatedPrediction.predictedFault);
+    assert.equal(
+      request.aiPredictionHistory[0].predictedFault,
+      aiPrediction.predictedFault,
+    );
+    assert.equal(
+      request.aiPredictionHistory[1].predictedFault,
+      updatedPrediction.predictedFault,
+    );
     assert.equal(request.clarificationQuestions.length, 0);
     assert.equal(request.saved, true);
 
     const secondRound = await invokeController(requestClarification, {
       params: { id: new mongoose.Types.ObjectId().toString() },
-      user: { _id: driverId }
+      user: { _id: driverId },
     });
     assert.equal(secondRound.error, undefined);
     assert.equal(secondRound.res.body.maximumAttemptsReached, true);
@@ -390,7 +540,10 @@ test("submitting clarification appends answers and reruns AI 1", async () => {
 });
 
 test("breakdown request schema allows only one clarification round", () => {
-  assert.equal(BreakdownRequest.schema.path("clarificationAttempts").options.max, 1);
+  assert.equal(
+    BreakdownRequest.schema.path("clarificationAttempts").options.max,
+    1,
+  );
 });
 
 test("rejects clarification from a driver who does not own the request", async () => {
@@ -399,7 +552,7 @@ test("rejects clarification from a driver who does not own the request", async (
   try {
     const { res, error } = await invokeController(requestClarification, {
       params: { id: new mongoose.Types.ObjectId().toString() },
-      user: { _id: otherDriverId }
+      user: { _id: otherDriverId },
     });
     assert.equal(res.statusCode, 403);
     assert.match(error.message, /Only the driver/);
@@ -415,7 +568,7 @@ test("does not call OpenAI after one clarification attempt", async () => {
   BreakdownRequest.findById = async () => ({
     driverId,
     clarificationAttempts: 1,
-    aiPrediction: { ...aiPrediction, needsMoreInformation: true }
+    aiPrediction: { ...aiPrediction, needsMoreInformation: true },
   });
   clarificationService.generateClarificationQuestions = async () => {
     clarificationCalled = true;
@@ -424,7 +577,7 @@ test("does not call OpenAI after one clarification attempt", async () => {
   try {
     const { res, error } = await invokeController(requestClarification, {
       params: { id: new mongoose.Types.ObjectId().toString() },
-      user: { _id: driverId }
+      user: { _id: driverId },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.maximumAttemptsReached, true);

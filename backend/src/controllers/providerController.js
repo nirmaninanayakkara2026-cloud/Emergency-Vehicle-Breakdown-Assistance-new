@@ -7,12 +7,13 @@ const {
 } = require("../services/providerRecommendationService");
 const { PROVIDER_ROLES } = require("../utils/domainConstants");
 const { validateProviderProfileInput } = require("../utils/providerValidation");
+const { APPROVED_PROVIDER_QUERY, isProviderApproved } = require("../utils/providerApproval");
 
 function isProviderRole(role) {
   return PROVIDER_ROLES.includes(role);
 }
 
-function buildProviderPayload(body) {
+function buildProviderPayload(body, providerType = body.providerType) {
   const allowedFields = [
     "providerType",
     "businessName",
@@ -21,17 +22,19 @@ function buildProviderPayload(body) {
     "serviceCategories",
     "supportedVehicleTypes",
     "location",
-    "availabilityStatus",
     "serviceRadiusKm",
     "averageResponseTimeMinutes",
     "estimatedPriceRange",
-    "openingHours"
+    "openingHours",
+    "description"
   ];
 
-  return allowedFields.reduce((payload, field) => {
-    if (body[field] !== undefined) payload[field] = body[field];
-    return payload;
+  const payload = allowedFields.reduce((result, field) => {
+    if (body[field] !== undefined) result[field] = body[field];
+    return result;
   }, {});
+  if (providerType === "spare_parts_shop") delete payload.serviceRadiusKm;
+  return payload;
 }
 
 async function createProviderProfile(req, res, next) {
@@ -59,7 +62,7 @@ async function createProviderProfile(req, res, next) {
     }
 
     const profile = await ProviderProfile.create({
-      ...buildProviderPayload(req.body),
+      ...buildProviderPayload(req.body, req.user.role),
       userId: req.user._id
     });
 
@@ -94,7 +97,7 @@ async function getMyProviderProfile(req, res, next) {
 
 async function updateMyProviderProfile(req, res, next) {
   try {
-    const errors = validateProviderProfileInput(req.body, true);
+    const errors = validateProviderProfileInput({ ...req.body, providerType: req.user.role }, true);
     if (errors.length > 0) {
       res.status(400);
       throw new Error(errors.join(". "));
@@ -107,7 +110,7 @@ async function updateMyProviderProfile(req, res, next) {
 
     const profile = await ProviderProfile.findOneAndUpdate(
       { userId: req.user._id },
-      buildProviderPayload(req.body),
+      buildProviderPayload(req.body, req.user.role),
       { new: true, runValidators: true }
     );
 
@@ -128,8 +131,11 @@ async function updateMyProviderProfile(req, res, next) {
 
 async function updateAvailability(req, res, next) {
   try {
+    const availabilityStatus = req.body.availabilityStatus === "available"
+      ? "online"
+      : req.body.availabilityStatus;
     const errors = validateProviderProfileInput(
-      { availabilityStatus: req.body.availabilityStatus },
+      { availabilityStatus },
       true
     );
     if (errors.length > 0) {
@@ -137,16 +143,17 @@ async function updateAvailability(req, res, next) {
       throw new Error(errors.join(". "));
     }
 
-    const profile = await ProviderProfile.findOneAndUpdate(
-      { userId: req.user._id },
-      { availabilityStatus: req.body.availabilityStatus },
-      { new: true, runValidators: true }
-    );
-
+    const profile = await ProviderProfile.findOne({ userId: req.user._id });
     if (!profile) {
       res.status(404);
       throw new Error("Provider profile not found");
     }
+    if (!isProviderApproved(profile) && availabilityStatus === "online") {
+      res.status(403);
+      throw new Error("Only approved providers can go online");
+    }
+    profile.availabilityStatus = availabilityStatus;
+    await profile.save();
 
     return res.status(200).json({
       success: true,
@@ -160,14 +167,21 @@ async function updateAvailability(req, res, next) {
 
 async function getProviders(req, res, next) {
   try {
-    const { providerType, vehicleType, availabilityStatus } = req.query;
-    const filter = { isApproved: true, isActive: { $ne: false } };
+    const { providerType, vehicleType } = req.query;
+    const filter = {
+      ...APPROVED_PROVIDER_QUERY,
+      isActive: { $ne: false },
+      availabilityStatus: "online"
+    };
 
     if (providerType) filter.providerType = providerType;
-    if (availabilityStatus) filter.availabilityStatus = availabilityStatus;
     if (vehicleType) filter.supportedVehicleTypes = vehicleType;
 
-    const providers = await ProviderProfile.find(filter).sort({ averageRating: -1, createdAt: -1 });
+    const query = ProviderProfile.find(filter).sort({ averageRating: -1, createdAt: -1 });
+    const populated = typeof query.populate === "function"
+      ? await query.populate("userId", "isActive")
+      : await query;
+    const providers = populated.filter((profile) => profile.userId?.isActive !== false);
 
     return res.status(200).json({
       success: true,
@@ -209,13 +223,16 @@ async function getProviderById(req, res, next) {
       throw new Error("Provider id is invalid");
     }
 
-    const provider = await ProviderProfile.findOne({
+    const query = ProviderProfile.findOne({
       _id: req.params.id,
-      isApproved: true,
+      ...APPROVED_PROVIDER_QUERY,
       isActive: { $ne: false }
     });
+    const provider = typeof query.populate === "function"
+      ? await query.populate("userId", "isActive")
+      : await query;
 
-    if (!provider) {
+    if (!provider || provider.userId?.isActive === false) {
       res.status(404);
       throw new Error("Approved provider not found");
     }
@@ -230,12 +247,50 @@ async function getProviderById(req, res, next) {
   }
 }
 
+async function resubmitProviderProfile(req, res, next) {
+  try {
+    const profile = await ProviderProfile.findOne({ userId: req.user._id });
+    if (!profile) {
+      res.status(404);
+      throw new Error("Provider profile not found");
+    }
+    if (profile.approvalStatus !== "rejected") {
+      res.status(409);
+      throw new Error("Only a rejected provider profile can be resubmitted");
+    }
+    const lastHistory = profile.approvalHistory[profile.approvalHistory.length - 1];
+    if (!lastHistory || lastHistory.status !== "rejected" || lastHistory.reason !== profile.rejectionReason) {
+      profile.approvalHistory.push({
+        status: "rejected",
+        reason: profile.rejectionReason,
+        changedBy: profile.rejectedBy,
+        changedAt: profile.rejectedAt || new Date()
+      });
+    }
+    profile.approvalStatus = "pending";
+    profile.isApproved = false;
+    profile.availabilityStatus = "offline";
+    profile.rejectionReason = "";
+    profile.rejectedAt = null;
+    profile.rejectedBy = null;
+    await profile.save();
+    return res.status(200).json({
+      success: true,
+      message: "Provider profile resubmitted for review",
+      data: { profile }
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   createProviderProfile,
   getMyProviderProfile,
   getProviderRecommendations,
   getProviderById,
   getProviders,
+  resubmitProviderProfile,
   updateAvailability,
   updateMyProviderProfile
 };

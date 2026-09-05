@@ -21,22 +21,30 @@ const prediction = {
   isAmbiguous: false,
   needsMoreInformation: false,
   topPredictions: [{ fault: "electrical_system_fault", probability: 0.91 }],
-  predictionSource: "ai_model"
+  predictionSource: "ai_model",
 };
 
 function response() {
   return {
     statusCode: 200,
     body: null,
-    status(code) { this.statusCode = code; return this; },
-    json(payload) { this.body = payload; return payload; }
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(payload) {
+      this.body = payload;
+      return payload;
+    },
   };
 }
 
 async function invoke(handler, req) {
   const res = response();
   let error;
-  await handler(req, res, (forwarded) => { error = forwarded; });
+  await handler(req, res, (forwarded) => {
+    error = forwarded;
+  });
   return { res, error };
 }
 
@@ -52,15 +60,17 @@ function fakeSession(overrides = {}) {
       step_id: "step_1",
       instruction: "Use the approved visual check.",
       result_question: "What did you safely observe?",
-      possible_results: [{ value: "not_sure", label: "Not Sure" }]
+      possible_results: [{ value: "not_sure", label: "Not Sure" }],
     },
     currentPhase: "result",
     currentInstructionConfirmedAt: new Date(),
     completedSteps: [],
     recommendedService: "battery_electrical_mechanic",
     completedAt: null,
-    async save() { this.saved = true; },
-    ...overrides
+    async save() {
+      this.saved = true;
+    },
+    ...overrides,
   };
 }
 
@@ -70,13 +80,13 @@ test("AI 2 client sends bounded requests to FastAPI", async () => {
     async post(url, body, options) {
       request = { url, body, options };
       return { data: { success: true, guide_available: false } };
-    }
+    },
   };
   const result = await ai2Service.findGuide(
     "electrical_system_fault",
     "weak lights",
     "vehicle_not_starting",
-    { httpClient }
+    { httpClient },
   );
   assert.equal(result.guide_available, false);
   assert.match(request.url, /\/ai2\/find-guide$/);
@@ -86,7 +96,11 @@ test("AI 2 client sends bounded requests to FastAPI", async () => {
 
 test("AI 2 client fails closed when Python is offline", async () => {
   const result = await ai2Service.startGuide("guide", true, {
-    httpClient: { post: async () => { throw new Error("offline"); } }
+    httpClient: {
+      post: async () => {
+        throw new Error("offline");
+      },
+    },
   });
   assert.equal(result.status, "troubleshooting_unavailable");
   assert.equal(result.canRequestMechanic, true);
@@ -99,19 +113,39 @@ test("low AI 1 confidence requests more information without creating a session",
   const originalCreate = TroubleshootingSession.create;
   let created = false;
   let ai2Called = false;
-  aiDiagnosisService.diagnoseBreakdown = async () => ({ ...prediction, needsMoreInformation: true });
-  ai2Service.findGuide = async () => { ai2Called = true; };
-  TroubleshootingSession.create = async () => { created = true; };
+  aiDiagnosisService.diagnoseBreakdown = async () => ({
+    ...prediction,
+    needsMoreInformation: true,
+  });
+  ai2Service.findGuide = async () => {
+    ai2Called = true;
+  };
+  TroubleshootingSession.create = async () => {
+    created = true;
+  };
   try {
     const { res, error } = await invoke(controller.startSelfAssistant, {
       user: { _id: driverId },
-      body: { vehicleType: "car", breakdownType: "vehicle_not_starting", diagnosticInputText: "does not start" }
+      body: {
+        vehicleType: "car",
+        breakdownType: "vehicle_not_starting",
+        diagnosticInputText: "does not start",
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "more_information_required");
-    assert.equal(res.body.aiPrediction.predictedFault, "electrical_system_fault");
-    assert.equal(res.body.aiPrediction.faultLabel, "Electrical / Starting System Problem");
-    assert.equal(res.body.aiPrediction.requiredService, "battery_electrical_mechanic");
+    assert.equal(
+      res.body.aiPrediction.predictedFault,
+      "electrical_system_fault",
+    );
+    assert.equal(
+      res.body.aiPrediction.faultLabel,
+      "Electrical / Starting System Problem",
+    );
+    assert.equal(
+      res.body.aiPrediction.requiredService,
+      "battery_electrical_mechanic",
+    );
     assert.equal(res.body.aiPrediction.fallbackUsed, false);
     assert.equal(created, false);
     assert.equal(ai2Called, false);
@@ -127,16 +161,23 @@ test("low-confidence response derives service from the existing fault mapping", 
   aiDiagnosisService.diagnoseBreakdown = async () => ({
     ...prediction,
     requiredService: undefined,
-    needsMoreInformation: true
+    needsMoreInformation: true,
   });
   try {
     const { res, error } = await invoke(controller.startSelfAssistant, {
       user: { _id: driverId },
-      body: { vehicleType: "car", breakdownType: "vehicle_not_starting", diagnosticInputText: "clicking" }
+      body: {
+        vehicleType: "car",
+        breakdownType: "vehicle_not_starting",
+        diagnosticInputText: "clicking",
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "more_information_required");
-    assert.equal(res.body.aiPrediction.requiredService, "battery_electrical_mechanic");
+    assert.equal(
+      res.body.aiPrediction.requiredService,
+      "battery_electrical_mechanic",
+    );
     assert.equal(res.body.aiPrediction.fallbackUsed, false);
   } finally {
     aiDiagnosisService.diagnoseBreakdown = originalDiagnose;
@@ -150,12 +191,16 @@ test("low-confidence response uses marked general mechanic fallback when fault a
     predictedFault: null,
     faultLabel: "Fault classification unavailable",
     requiredService: undefined,
-    needsMoreInformation: true
+    needsMoreInformation: true,
   });
   try {
     const { res, error } = await invoke(controller.startSelfAssistant, {
       user: { _id: driverId },
-      body: { vehicleType: "car", breakdownType: "other", diagnosticInputText: "unclear problem" }
+      body: {
+        vehicleType: "car",
+        breakdownType: "other",
+        diagnosticInputText: "unclear problem",
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "more_information_required");
@@ -183,15 +228,21 @@ test("caution guide waits for confirmation and exposes no step", async () => {
       safety_warning: "Park safely.",
       before_you_begin: ["Apply the parking brake"],
       recommended_service: "battery_electrical_mechanic",
-      professional_help_required: false
-    }
+      professional_help_required: false,
+    },
   });
-  ai2Service.startGuide = async () => { startCalled = true; };
+  ai2Service.startGuide = async () => {
+    startCalled = true;
+  };
   TroubleshootingSession.create = async (payload) => fakeSession(payload);
   try {
     const { res, error } = await invoke(controller.startSelfAssistant, {
       user: { _id: driverId },
-      body: { vehicleType: "car", breakdownType: "vehicle_not_starting", diagnosticInputText: "weak lights and clicking" }
+      body: {
+        vehicleType: "car",
+        breakdownType: "vehicle_not_starting",
+        diagnosticInputText: "weak lights and clicking",
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "awaiting_safety_confirmation");
@@ -210,19 +261,40 @@ test("low-risk guide starts only with a FastAPI-approved step", async () => {
   const originalFind = ai2Service.findGuide;
   const originalStart = ai2Service.startGuide;
   const originalCreate = TroubleshootingSession.create;
-  aiDiagnosisService.diagnoseBreakdown = async () => ({ ...prediction, predictedFault: "wheel_tire_fault" });
-  ai2Service.findGuide = async () => ({ success: true, guide_available: true, guide: {
-    guide_id: "ai2_aktc_0098", title: "Tyre Pressure Check", risk_level: "LOW",
-    recommended_service: "tire_mechanic", professional_help_required: false
-  } });
-  ai2Service.startGuide = async () => ({ success: true, status: "in_progress", current_step: {
-    step_id: "step_1", instruction: "Use the approved visual check.", question: "What do you notice?", possible_results: []
-  } });
+  aiDiagnosisService.diagnoseBreakdown = async () => ({
+    ...prediction,
+    predictedFault: "wheel_tire_fault",
+  });
+  ai2Service.findGuide = async () => ({
+    success: true,
+    guide_available: true,
+    guide: {
+      guide_id: "ai2_aktc_0098",
+      title: "Tyre Pressure Check",
+      risk_level: "LOW",
+      recommended_service: "tire_mechanic",
+      professional_help_required: false,
+    },
+  });
+  ai2Service.startGuide = async () => ({
+    success: true,
+    status: "in_progress",
+    current_step: {
+      step_id: "step_1",
+      instruction: "Use the approved visual check.",
+      question: "What do you notice?",
+      possible_results: [],
+    },
+  });
   TroubleshootingSession.create = async (payload) => fakeSession(payload);
   try {
     const { res, error } = await invoke(controller.startSelfAssistant, {
       user: { _id: driverId },
-      body: { vehicleType: "car", breakdownType: "flat_tyre", diagnosticInputText: "tyre pressure warning" }
+      body: {
+        vehicleType: "car",
+        breakdownType: "flat_tyre",
+        diagnosticInputText: "tyre pressure warning",
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "ready_to_start");
@@ -240,16 +312,30 @@ test("high-risk guide creates no active repair process", async () => {
   const originalDiagnose = aiDiagnosisService.diagnoseBreakdown;
   const originalFind = ai2Service.findGuide;
   const originalCreate = TroubleshootingSession.create;
-  aiDiagnosisService.diagnoseBreakdown = async () => ({ ...prediction, predictedFault: "brake_system_fault" });
-  ai2Service.findGuide = async () => ({ success: true, guide_available: true, guide: {
-    guide_id: "ai2_aktc_0001", title: "Brake Issue", risk_level: "HIGH",
-    recommended_service: "brake_mechanic", professional_help_required: true
-  } });
+  aiDiagnosisService.diagnoseBreakdown = async () => ({
+    ...prediction,
+    predictedFault: "brake_system_fault",
+  });
+  ai2Service.findGuide = async () => ({
+    success: true,
+    guide_available: true,
+    guide: {
+      guide_id: "ai2_aktc_0001",
+      title: "Brake Issue",
+      risk_level: "HIGH",
+      recommended_service: "brake_mechanic",
+      professional_help_required: true,
+    },
+  });
   TroubleshootingSession.create = async (payload) => fakeSession(payload);
   try {
     const { res, error } = await invoke(controller.startSelfAssistant, {
       user: { _id: driverId },
-      body: { vehicleType: "car", breakdownType: "brake_problem", diagnosticInputText: "brakes feel unsafe" }
+      body: {
+        vehicleType: "car",
+        breakdownType: "brake_problem",
+        diagnosticInputText: "brakes feel unsafe",
+      },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "professional_help_required");
@@ -269,10 +355,23 @@ test("safety confirmation starts a caution session", async () => {
   TroubleshootingSession.findById = async () => session;
   ai2Service.startGuide = async (guideId, confirmed) => {
     assert.equal(confirmed, true);
-    return { success: true, status: "in_progress", current_step: { step_id: "step_1", instruction: "Look safely.", question: "What do you see?", possible_results: [] } };
+    return {
+      success: true,
+      status: "in_progress",
+      current_step: {
+        step_id: "step_1",
+        instruction: "Look safely.",
+        question: "What do you see?",
+        possible_results: [],
+      },
+    };
   };
   try {
-    const { res, error } = await invoke(controller.confirmSafety, { params: { sessionId }, user: { _id: driverId }, body: {} });
+    const { res, error } = await invoke(controller.confirmSafety, {
+      params: { sessionId },
+      user: { _id: driverId },
+      body: {},
+    });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "in_progress");
     assert.equal(session.safetyConfirmed, true);
@@ -290,12 +389,14 @@ test("action confirmation persists result phase before options can be submitted"
     status: "in_progress",
     currentStepId: "step_1",
     currentPhase: "instruction",
-    currentInstructionConfirmedAt: null
+    currentInstructionConfirmedAt: null,
   });
   TroubleshootingSession.findById = async () => session;
   try {
     const { res, error } = await invoke(controller.confirmStepAction, {
-      params: { sessionId }, user: { _id: driverId }, body: { stepId: "step_1" }
+      params: { sessionId },
+      user: { _id: driverId },
+      body: { stepId: "step_1" },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.currentPhase, "result");
@@ -311,11 +412,20 @@ test("result submission is rejected until the approved action is confirmed", asy
   const originalFindById = TroubleshootingSession.findById;
   const originalStep = ai2Service.processStep;
   let engineCalled = false;
-  TroubleshootingSession.findById = async () => fakeSession({ status: "in_progress", currentStepId: "step_1", currentPhase: "instruction" });
-  ai2Service.processStep = async () => { engineCalled = true; };
+  TroubleshootingSession.findById = async () =>
+    fakeSession({
+      status: "in_progress",
+      currentStepId: "step_1",
+      currentPhase: "instruction",
+    });
+  ai2Service.processStep = async () => {
+    engineCalled = true;
+  };
   try {
     const { res, error } = await invoke(controller.submitStep, {
-      params: { sessionId }, user: { _id: driverId }, body: { stepId: "step_1", selectedResult: "not_sure" }
+      params: { sessionId },
+      user: { _id: driverId },
+      body: { stepId: "step_1", selectedResult: "not_sure" },
     });
     assert.equal(res.statusCode, 409);
     assert.match(error.message, /Confirm the approved instruction/);
@@ -329,14 +439,27 @@ test("result submission is rejected until the approved action is confirmed", asy
 test("backend next step resets the persisted phase to instruction", async () => {
   const originalFindById = TroubleshootingSession.findById;
   const originalStep = ai2Service.processStep;
-  const session = fakeSession({ status: "in_progress", currentStepId: "step_1", currentPhase: "result" });
+  const session = fakeSession({
+    status: "in_progress",
+    currentStepId: "step_1",
+    currentPhase: "result",
+  });
   TroubleshootingSession.findById = async () => session;
-  ai2Service.processStep = async () => ({ success: true, status: "in_progress", next_step: {
-    step_id: "step_2", instruction: "Read the next approved check.", result_question: "What happened?", possible_results: []
-  } });
+  ai2Service.processStep = async () => ({
+    success: true,
+    status: "in_progress",
+    next_step: {
+      step_id: "step_2",
+      instruction: "Read the next approved check.",
+      result_question: "What happened?",
+      possible_results: [],
+    },
+  });
   try {
     const { res, error } = await invoke(controller.submitStep, {
-      params: { sessionId }, user: { _id: driverId }, body: { stepId: "step_1", selectedResult: "not_sure" }
+      params: { sessionId },
+      user: { _id: driverId },
+      body: { stepId: "step_1", selectedResult: "not_sure" },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.nextStep.step_id, "step_2");
@@ -351,9 +474,14 @@ test("backend next step resets the persisted phase to instruction", async () => 
 
 test("confirmation cannot bypass the session state gate", async () => {
   const originalFindById = TroubleshootingSession.findById;
-  TroubleshootingSession.findById = async () => fakeSession({ status: "in_progress" });
+  TroubleshootingSession.findById = async () =>
+    fakeSession({ status: "in_progress" });
   try {
-    const { res, error } = await invoke(controller.confirmSafety, { params: { sessionId }, user: { _id: driverId }, body: {} });
+    const { res, error } = await invoke(controller.confirmSafety, {
+      params: { sessionId },
+      user: { _id: driverId },
+      body: {},
+    });
     assert.equal(res.statusCode, 409);
     assert.match(error.message, /not awaiting safety confirmation/);
   } finally {
@@ -364,11 +492,23 @@ test("confirmation cannot bypass the session state gate", async () => {
 test("smoke stops an active session immediately", async () => {
   const originalFindById = TroubleshootingSession.findById;
   const originalStop = ai2Service.checkStopCondition;
-  const session = fakeSession({ status: "in_progress", currentStepId: "step_1" });
+  const session = fakeSession({
+    status: "in_progress",
+    currentStepId: "step_1",
+  });
   TroubleshootingSession.findById = async () => session;
-  ai2Service.checkStopCondition = async () => ({ success: true, stop: true, status: "professional_help_required", message: "Stop for smoke." });
+  ai2Service.checkStopCondition = async () => ({
+    success: true,
+    stop: true,
+    status: "professional_help_required",
+    message: "Stop for smoke.",
+  });
   try {
-    const { res, error } = await invoke(controller.stopSession, { params: { sessionId }, user: { _id: driverId }, body: { condition: "smoke" } });
+    const { res, error } = await invoke(controller.stopSession, {
+      params: { sessionId },
+      user: { _id: driverId },
+      body: { condition: "smoke" },
+    });
     assert.equal(error, undefined);
     assert.equal(res.body.stop, true);
     assert.equal(session.status, "professional_help_required");
@@ -382,15 +522,24 @@ test("smoke stops an active session immediately", async () => {
 test("not sure is delegated to the authoritative engine", async () => {
   const originalFindById = TroubleshootingSession.findById;
   const originalStep = ai2Service.processStep;
-  const session = fakeSession({ status: "in_progress", currentStepId: "step_1" });
+  const session = fakeSession({
+    status: "in_progress",
+    currentStepId: "step_1",
+  });
   TroubleshootingSession.findById = async () => session;
   ai2Service.processStep = async (guideId, stepId, selectedResult) => {
     assert.equal(selectedResult, "not_sure");
-    return { success: true, status: "professional_help_required", message: "Stopped safely." };
+    return {
+      success: true,
+      status: "professional_help_required",
+      message: "Stopped safely.",
+    };
   };
   try {
     const { res, error } = await invoke(controller.submitStep, {
-      params: { sessionId }, user: { _id: driverId }, body: { stepId: "step_1", selectedResult: "not_sure" }
+      params: { sessionId },
+      user: { _id: driverId },
+      body: { stepId: "step_1", selectedResult: "not_sure" },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "professional_help_required");
@@ -404,16 +553,22 @@ test("not sure is delegated to the authoritative engine", async () => {
 test("engine completion waits for the driver's real-world resolution confirmation", async () => {
   const originalFindById = TroubleshootingSession.findById;
   const originalStep = ai2Service.processStep;
-  const session = fakeSession({ status: "in_progress", currentStepId: "step_1", currentPhase: "result" });
+  const session = fakeSession({
+    status: "in_progress",
+    currentStepId: "step_1",
+    currentPhase: "result",
+  });
   TroubleshootingSession.findById = async () => session;
   ai2Service.processStep = async () => ({
     success: true,
     status: "resolved",
-    message: "The approved pathway is complete."
+    message: "The approved pathway is complete.",
   });
   try {
     const { res, error } = await invoke(controller.submitStep, {
-      params: { sessionId }, user: { _id: driverId }, body: { stepId: "step_1", selectedResult: "clean" }
+      params: { sessionId },
+      user: { _id: driverId },
+      body: { stepId: "step_1", selectedResult: "clean" },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "resolved");
@@ -428,9 +583,13 @@ test("engine completion waits for the driver's real-world resolution confirmatio
 
 test("driver cannot access another driver's session", async () => {
   const originalFindById = TroubleshootingSession.findById;
-  TroubleshootingSession.findById = async () => fakeSession({ driverId: otherDriverId });
+  TroubleshootingSession.findById = async () =>
+    fakeSession({ driverId: otherDriverId });
   try {
-    const { res, error } = await invoke(controller.getSession, { params: { sessionId }, user: { _id: driverId } });
+    const { res, error } = await invoke(controller.getSession, {
+      params: { sessionId },
+      user: { _id: driverId },
+    });
     assert.equal(res.statusCode, 403);
     assert.match(error.message, /permission/);
   } finally {
@@ -445,12 +604,19 @@ test("history is scoped to the authenticated driver and limited to five", async 
   TroubleshootingSession.find = (query) => {
     filter = query;
     return {
-      sort() { return this; },
-      async limit(value) { limit = value; return []; }
+      sort() {
+        return this;
+      },
+      async limit(value) {
+        limit = value;
+        return [];
+      },
     };
   };
   try {
-    const { res, error } = await invoke(controller.getHistory, { user: { _id: driverId } });
+    const { res, error } = await invoke(controller.getHistory, {
+      user: { _id: driverId },
+    });
     assert.equal(error, undefined);
     assert.equal(String(filter.driverId), String(driverId));
     assert.equal(limit, 5);
@@ -462,11 +628,18 @@ test("history is scoped to the authenticated driver and limited to five", async 
 
 test("driver-confirmed result is persisted only after engine completion", async () => {
   const originalFindById = TroubleshootingSession.findById;
-  const session = fakeSession({ status: "awaiting_resolution_confirmation", currentStepId: null, currentStep: null, currentPhase: "completed" });
+  const session = fakeSession({
+    status: "awaiting_resolution_confirmation",
+    currentStepId: null,
+    currentStep: null,
+    currentPhase: "completed",
+  });
   TroubleshootingSession.findById = async () => session;
   try {
     const { res, error } = await invoke(controller.setResult, {
-      params: { sessionId }, user: { _id: driverId }, body: { resolved: true }
+      params: { sessionId },
+      user: { _id: driverId },
+      body: { resolved: true },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.status, "resolved");

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, radii, spacing, typography } from "../theme";
 
-export default function AppSelect({ label, options, value, onChange }) {
+export default function AppSelect({ label, options, value, onChange, disabled = false }) {
   return (
     <View style={styles.wrapper}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
@@ -15,9 +15,10 @@ export default function AppSelect({ label, options, value, onChange }) {
               key={option.value}
               accessibilityRole="radio"
               accessibilityLabel={option.label}
-              accessibilityState={{ selected }}
+              accessibilityState={{ selected, disabled }}
+              disabled={disabled}
               onPress={() => onChange(option.value)}
-              style={[styles.option, selected && styles.selectedOption]}
+              style={[styles.option, selected && styles.selectedOption, disabled && styles.disabled]}
             >
               <Text style={[styles.optionText, selected && styles.selectedText]}>{option.label}</Text>
               {selected ? <Ionicons name="checkmark-circle" size={18} color={colors.teal} /> : null}
@@ -66,5 +67,6 @@ const styles = StyleSheet.create({
   selectedText: {
     color: colors.primaryDark,
     fontWeight: "600"
-  }
+  },
+  disabled: { opacity: 0.55 }
 });

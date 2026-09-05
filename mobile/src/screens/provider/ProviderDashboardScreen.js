@@ -7,6 +7,7 @@ import AppSelect from "../../components/AppSelect";
 import ScreenContainer from "../../components/ScreenContainer";
 import EmptyState from "../../components/ui/EmptyState";
 import ErrorState from "../../components/ui/ErrorState";
+import InfoBanner from "../../components/ui/InfoBanner";
 import LoadingState from "../../components/ui/LoadingState";
 import ScreenHeader from "../../components/ui/ScreenHeader";
 import SectionHeader from "../../components/ui/SectionHeader";
@@ -18,13 +19,15 @@ import { colors, radii, spacing, typography } from "../../theme";
 import { formatDisplayValue, formatFaultLabel, formatRequestStatus, formatServiceType } from "../../utils/displayLabels";
 
 const availabilityOptions = [
-  { label: "Online", value: "available" },
+  { label: "Online", value: "online" },
   { label: "Busy", value: "busy" },
   { label: "Offline", value: "offline" }
 ];
 
 function formatValue(value) {
-  return value ? value.replaceAll("_", " ") : "Not available";
+  if (!value) return "Not available";
+  const formatted = value.replaceAll("_", " ");
+  return `${formatted.charAt(0).toUpperCase()}${formatted.slice(1)}`;
 }
 
 export default function ProviderDashboardScreen({ navigation }) {
@@ -92,6 +95,14 @@ export default function ProviderDashboardScreen({ navigation }) {
     }
   }
 
+  const approvalStatus = profile?.approvalStatus || "pending";
+  const approvalContent = {
+    pending: { tone: "warning", title: "Pending Approval", message: "Your profile is under review. You will not appear to drivers yet." },
+    approved: { tone: profile?.availabilityStatus === "online" ? "success" : "warning", title: "Approved", message: profile?.availabilityStatus === "online" ? "Your profile is approved and visible to drivers." : "Your profile is approved, but drivers cannot find you while you are offline." },
+    rejected: { tone: "danger", title: "Rejected", message: `Your profile was not approved.${profile?.rejectionReason ? ` Reason: ${profile.rejectionReason}` : ""}` },
+    suspended: { tone: "danger", title: "Suspended", message: `Your provider account is temporarily suspended.${profile?.suspensionReason ? ` Reason: ${profile.suspensionReason}` : ""}` }
+  }[approvalStatus];
+
   if (loading) {
     return (
       <ScreenContainer>
@@ -119,8 +130,12 @@ export default function ProviderDashboardScreen({ navigation }) {
             options={availabilityOptions}
             value={profile.availabilityStatus}
             onChange={handleAvailability}
+            disabled={approvalStatus !== "approved"}
           />
-          <AppButton title="Edit Provider Profile" variant="secondary" onPress={() => navigation.navigate("ProviderProfile")} />
+          <Text style={styles.body}>Approval: {formatValue(approvalStatus)}</Text>
+          <Text style={styles.body}>Availability: {formatValue(profile.availabilityStatus)}</Text>
+          {approvalContent ? <InfoBanner tone={approvalContent.tone} title={approvalContent.title} message={approvalContent.message} /> : null}
+          <AppButton title={approvalStatus === "rejected" ? "Edit & Resubmit" : "Edit Provider Profile"} variant="secondary" onPress={() => navigation.navigate("ProviderProfile", { resubmit: approvalStatus === "rejected" })} />
         </AppCard>
       ) : null}
 
@@ -148,7 +163,7 @@ export default function ProviderDashboardScreen({ navigation }) {
             compact
             onPress={() => navigation.navigate("ProviderRequestDetails", { requestId: request._id, request })}
           />
-          {request.status === "provider_requested" ? (
+          {request.status === "provider_requested" && approvalStatus === "approved" ? (
             <View style={styles.actions}>
               <AppButton
                 title="Accept"

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Linking, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Linking, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
@@ -10,7 +10,7 @@ import InfoBanner from "../../components/ui/InfoBanner";
 import LoadingState from "../../components/ui/LoadingState";
 import ScreenHeader from "../../components/ui/ScreenHeader";
 import StatusBadge from "../../components/ui/StatusBadge";
-import { cancelRequest, getRequestById, submitRequestReview } from "../../services/requestService";
+import { cancelRequest, getRequestById } from "../../services/requestService";
 import { colors, radii, spacing, typography } from "../../theme";
 import { formatFaultLabel, formatRequestStatus, formatServiceType } from "../../utils/displayLabels";
 
@@ -24,13 +24,12 @@ const STATUS_INDEX = { provider_requested: 0, recommended: 0, accepted: 1, provi
 export default function RequestTrackingScreen({ navigation, route }) {
   const [request, setRequest] = useState(route.params?.request || null); const [loading, setLoading] = useState(!route.params?.request);
   const [refreshing, setRefreshing] = useState(false); const [error, setError] = useState(""); const [cancellationReason, setCancellationReason] = useState("");
-  const [rating, setRating] = useState(5); const [reviewComment, setReviewComment] = useState(""); const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const requestId = route.params?.requestId || request?._id;
-  const loadRequest = useCallback(async () => { setError(""); if (!requestId) { setError("This request could not be opened."); setLoading(false); setRefreshing(false); return; } try { setRequest(await getRequestById(requestId)); } catch (requestError) { setError(requestError.message); } finally { setLoading(false); setRefreshing(false); } }, [requestId]);
+  const loadRequest = useCallback(async () => { setError(""); if (!requestId) { setError("This request could not be opened."); setLoading(false); setRefreshing(false); return; } try { const data = await getRequestById(requestId); if (data.status === "completed") { navigation.replace("JobCompletion", { requestId, request: data }); return; } setRequest(data); } catch (requestError) { setError(requestError.message); } finally { setLoading(false); setRefreshing(false); } }, [navigation, requestId]);
   useEffect(() => { loadRequest(); }, [loadRequest]);
   async function handleCancel() { setSubmitting(true); setError(""); try { setRequest(await cancelRequest(requestId, cancellationReason)); } catch (cancelError) { setError(cancelError.message); } finally { setSubmitting(false); } }
-  async function handleReview() { setSubmitting(true); setError(""); try { await submitRequestReview(requestId, rating, reviewComment); await loadRequest(); } catch (reviewError) { setError(reviewError.message); } finally { setSubmitting(false); } }
-  if (loading || !request) return <ScreenContainer scroll={false}><LoadingState message="Loading request details..." /></ScreenContainer>;
+  if (loading || !request || request.status === "completed") return <ScreenContainer scroll={false}><LoadingState message={request?.status === "completed" ? "Opening completed service..." : "Loading request details..."} /></ScreenContainer>;
 
   const activeIndex = STATUS_INDEX[request.status] ?? -1; const provider = request.selectedProviderId;
   return <ScreenContainer refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadRequest(); }} />}>
@@ -41,8 +40,6 @@ export default function RequestTrackingScreen({ navigation, route }) {
     <AppCard style={styles.providerCard}><View style={styles.providerTop}><View style={styles.providerIcon}><Ionicons name="construct" size={26} color={colors.primary} /></View><View style={styles.flex}><Text style={styles.providerName}>{provider?.businessName || "Awaiting provider selection"}</Text>{provider ? <Text style={styles.service}>{formatServiceType(provider.providerType)}</Text> : null}</View></View>{provider ? <View style={styles.providerMeta}><Text style={styles.eta}>{request.estimatedArrivalMinutes ? `${request.estimatedArrivalMinutes} min` : "ETA pending"}</Text><Text style={styles.etaLabel}>Estimated arrival</Text></View> : null}{provider?.phone ? <AppButton title="Call Provider" icon="call-outline" variant="secondary" onPress={() => Linking.openURL(`tel:${provider.phone}`)} /> : null}</AppCard>
     <AppCard><Text style={styles.cardTitle}>Request Progress</Text><View style={styles.timeline}>{TIMELINE.map(([key, label, icon], index) => { const complete = index <= activeIndex; const current = index === activeIndex; return <View key={key} style={styles.timelineRow}>{index < TIMELINE.length - 1 ? <View style={[styles.line, complete && styles.activeLine]} /> : null}<View style={[styles.dot, complete && styles.activeDot, current && styles.currentDot]}><Ionicons name={complete ? "checkmark" : icon} size={17} color={complete ? colors.surface : colors.muted} /></View><View style={styles.timelineCopy}><Text style={[styles.timelineText, complete && styles.activeText]}>{label}</Text>{current ? <Text style={styles.current}>Current status</Text> : null}</View></View>; })}</View></AppCard>
     <AppCard><Text style={styles.cardTitle}>Request Summary</Text><Detail icon="information-circle-outline" label="Possible problem" value={formatFaultLabel(request.aiPrediction?.predictedFault, request.aiPrediction?.faultLabel || "Inspection required")} /><Detail icon="construct-outline" label="Required service" value={formatServiceType(request.requiredServiceType)} />{request.estimatedCostRange ? <Detail icon="wallet-outline" label="Estimated service range" value={`${request.estimatedCostRange.currency} ${Number(request.estimatedCostRange.min).toLocaleString()} – ${Number(request.estimatedCostRange.max).toLocaleString()}`} note="Actual cost may vary after inspection." /> : null}{request.finalCost != null ? <Detail icon="receipt-outline" label="Final cost" value={`LKR ${Number(request.finalCost).toLocaleString()}`} /> : null}</AppCard>
-    {!request.review && request.status === "completed" ? <AppCard><Text style={styles.cardTitle}>Rate Your Provider</Text><View style={styles.ratingRow}>{[1,2,3,4,5].map((value) => <Pressable key={value} accessibilityRole="radio" accessibilityLabel={`${value} stars`} accessibilityState={{ selected: rating === value }} onPress={() => setRating(value)} style={styles.star}><Ionicons name={value <= rating ? "star" : "star-outline"} size={30} color={colors.amber} /></Pressable>)}</View><AppInput label="Review (optional)" value={reviewComment} onChangeText={setReviewComment} multiline /><AppButton title="Submit Review" loading={submitting} onPress={handleReview} /></AppCard> : null}
-    {request.review ? <InfoBanner tone="success" message="Thank you for reviewing this provider." /> : null}
     {!['completed','cancelled'].includes(request.status) ? <AppCard style={styles.cancelCard}><Text style={styles.cardTitle}>Need to cancel?</Text><AppInput label="Cancellation reason (optional)" value={cancellationReason} onChangeText={setCancellationReason} multiline /><AppButton title="Cancel Request" variant="danger" loading={submitting} onPress={handleCancel} /></AppCard> : null}
     <View style={styles.bottomActions}><AppButton title="Refresh Status" icon="refresh-outline" variant="secondary" onPress={loadRequest} /><AppButton title="Back to My Requests" variant="ghost" onPress={() => navigation.navigate("MyRequests")} /></View>
   </ScreenContainer>;

@@ -5,6 +5,7 @@ const {
   getProviderById,
   getProviderRecommendations,
   getProviders,
+  resubmitProviderProfile,
   updateAvailability,
   updateMyProviderProfile
 } = require("../controllers/providerController");
@@ -17,6 +18,7 @@ router.post("/profile", protect, authorizeRoles(...PROVIDER_ROLES), createProvid
 router.get("/profile/me", protect, authorizeRoles(...PROVIDER_ROLES), getMyProviderProfile);
 router.patch("/profile/me", protect, authorizeRoles(...PROVIDER_ROLES), updateMyProviderProfile);
 router.patch("/availability", protect, authorizeRoles(...PROVIDER_ROLES), updateAvailability);
+router.post("/profile/resubmit", protect, authorizeRoles(...PROVIDER_ROLES), resubmitProviderProfile);
 router.get("/recommendations", protect, authorizeRoles("driver"), getProviderRecommendations);
 router.get("/", getProviders);
 router.get("/:id", getProviderById);

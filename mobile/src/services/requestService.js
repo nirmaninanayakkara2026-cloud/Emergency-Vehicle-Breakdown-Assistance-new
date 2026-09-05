@@ -1,4 +1,3 @@
-import { mockSparePartsShops } from "../data/mockSparePartsShops";
 import api from "./api";
 
 function getErrorMessage(error) {
@@ -99,9 +98,9 @@ export async function cancelRequest(requestId, reason = "") {
   }
 }
 
-export async function updateRequestStatus(requestId, status, finalCost) {
+export async function updateRequestStatus(requestId, status, finalCost, completionNote = "") {
   try {
-    const response = await api.patch(`/breakdown-requests/${requestId}/status`, { status, finalCost });
+    const response = await api.patch(`/breakdown-requests/${requestId}/status`, { status, finalCost, completionNote });
     return response.data.data.request;
   } catch (error) {
     throw new Error(getErrorMessage(error));
@@ -145,16 +144,23 @@ export async function getAssignedRequests() {
 }
 
 export async function findSpareParts(query, vehicleType) {
-  const keyword = (query || "").toLowerCase();
-
-  return mockSparePartsShops.filter((shop) => {
-    const partMatch =
-      !keyword || shop.availableParts.some((part) => part.toLowerCase().includes(keyword));
-    const vehicleMatch =
-      !vehicleType ||
-      vehicleType !== "bike" ||
-      shop.availableParts.some((part) => part.toLowerCase().includes("bike"));
-
-    return partMatch && vehicleMatch;
-  });
+  try {
+    const response = await api.get("/providers", {
+      params: { providerType: "spare_parts_shop", availabilityStatus: "online", vehicleType }
+    });
+    const keyword = String(query || "").trim().toLowerCase();
+    return response.data.data.providers
+      .filter((shop) => !keyword || [...(shop.specializations || []), ...(shop.serviceCategories || [])]
+        .some((item) => String(item).toLowerCase().includes(keyword)))
+      .map((shop) => ({
+        id: shop._id,
+        name: shop.businessName,
+        phone: shop.phone,
+        location: shop.location,
+        availableParts: [...new Set([...(shop.specializations || []), ...(shop.serviceCategories || [])])],
+        openingHours: shop.openingHours || "Contact shop for opening hours"
+      }));
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 }

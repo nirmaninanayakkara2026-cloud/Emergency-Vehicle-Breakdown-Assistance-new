@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 const BreakdownRequest = require("../models/BreakdownRequest");
 const ProviderProfile = require("../models/ProviderProfile");
+const RequestAssignment = require("../models/RequestAssignment");
+const Review = require("../models/Review");
 const TroubleshootingSession = require("../models/TroubleshootingSession");
 const {
   PROVIDER_ROLES,
-  PROVIDER_STATUS_TRANSITIONS,
   SERVICE_TYPE_MAP,
   mapBreakdownToServiceType
 } = require("../utils/domainConstants");
@@ -17,11 +18,24 @@ const {
   toPublicRecommendationResult
 } = require("../services/recommendationService");
 const { getServiceCostRange } = require("../config/serviceCostRanges");
-const aiDiagnosisService = require("../services/aiDiagnosisService");
+const structuredProblemRoutingService = require("../services/structuredProblemRoutingService");
 const clarificationService = require("../services/clarificationService");
 const { normalizeSymptomCapture } = require("../utils/symptomNormalizer");
 const { buildDiagnosticText } = require("../utils/buildDiagnosticText");
+const { buildBreakdownRequestResponse } = require("../utils/breakdownRequestResponse");
+const {
+  acceptAssignment,
+  cancelAssignment,
+  createAssignment,
+  ensureCurrentAssignment,
+  getCurrentAssignment,
+  rejectAssignment,
+  updateAssignmentStatus
+} = require("../services/requestAssignmentService");
+const { createRequestEvent } = require("../services/requestEventService");
+const { runWithOptionalTransaction } = require("../services/transactionService");
 const faultServiceMapping = require("../../ai/config/fault_service_mapping.json");
+const { APPROVED_PROVIDER_QUERY, isProviderApproved } = require("../utils/providerApproval");
 
 const MAX_CLARIFICATION_ATTEMPTS = 1;
 const KNOWN_REQUIRED_SERVICES = new Set([
@@ -47,9 +61,11 @@ async function canUserViewRequest(user, request) {
   if (user.role === "admin") return true;
   if (user.role === "driver" && isSameId(request.driverId, user._id)) return true;
 
-  if (isProviderRole(user.role) && request.selectedProviderId) {
+  if (isProviderRole(user.role)) {
     const profile = await getProviderProfileForUser(user._id);
-    return profile && isSameId(request.selectedProviderId, profile._id);
+    if (!profile) return false;
+    const assignment = await getCurrentAssignment(request);
+    return isSameId(assignment?.providerId || request.selectedProviderId, profile._id);
   }
 
   return false;
@@ -58,7 +74,19 @@ async function canUserViewRequest(user, request) {
 function populateRequest(query) {
   return query
     .populate("driverId", "name phone role")
+    .populate({ path: "currentAssignmentId", populate: { path: "providerId" } })
     .populate("selectedProviderId");
+}
+
+async function compatibleRequest(request, suppliedAssignment = null, suppliedProvider = null) {
+  const assignment = suppliedAssignment || await getCurrentAssignment(request, { populateProvider: true });
+  const provider = suppliedProvider ||
+    (assignment?.providerId && typeof assignment.providerId === "object" ? assignment.providerId : null);
+  return buildBreakdownRequestResponse(request, assignment, provider);
+}
+
+async function compatibleRequests(requests) {
+  return Promise.all((requests || []).map((request) => compatibleRequest(request)));
 }
 
 async function createBreakdownRequest(req, res, next) {
@@ -99,7 +127,8 @@ async function createBreakdownRequest(req, res, next) {
       : null;
     const fallbackRequiredService = troubleshootingSession?.recommendedService || carriedRequiredService ||
       mapBreakdownToServiceType(req.body.breakdownType);
-    const aiPrediction = await aiDiagnosisService.diagnoseBreakdown(
+    const aiPrediction = await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
+      req.body.breakdownType,
       diagnosticInputText,
       { fallbackRequiredService }
     );
@@ -128,11 +157,25 @@ async function createBreakdownRequest(req, res, next) {
         maximum: estimatedCostRange.max
       }
     });
+    if (troubleshootingSession && typeof troubleshootingSession.save === "function") {
+      troubleshootingSession.breakdownRequestId = request._id;
+      await troubleshootingSession.save();
+    }
+
+    await createRequestEvent({
+      breakdownRequestId: request._id,
+      actorId: req.user._id,
+      actorRole: req.user.role,
+      eventType: "request_created",
+      fromStatus: "",
+      toStatus: request.status,
+      message: "Driver created a breakdown request."
+    });
 
     return res.status(201).json({
       success: true,
       message: "Breakdown request created successfully",
-      data: { request }
+      data: { request: buildBreakdownRequestResponse(request) }
     });
   } catch (error) {
     return next(error);
@@ -154,6 +197,12 @@ async function requestClarification(req, res, next) {
     if (!isSameId(request.driverId, req.user._id)) {
       res.status(403);
       throw new Error("Only the driver who created the request can request clarification");
+    }
+    if (structuredProblemRoutingService.getStructuredProblemRoute(request.breakdownType)) {
+      return res.status(200).json({
+        success: true,
+        clarificationNeeded: false
+      });
     }
     if (!request.aiPrediction || !request.aiPrediction.needsMoreInformation) {
       return res.status(200).json({
@@ -189,6 +238,7 @@ async function requestClarification(req, res, next) {
       confidence: request.aiPrediction.confidence,
       predictionMargin: request.aiPrediction.predictionMargin
     });
+
     if (!clarification.available) {
       return res.status(200).json({
         success: true,
@@ -244,6 +294,7 @@ async function submitClarificationAnswers(req, res, next) {
       res.status(404);
       throw new Error("Breakdown request not found");
     }
+    //------------------------------------------------
     if (!isSameId(request.driverId, req.user._id)) {
       res.status(403);
       throw new Error("Only the driver who created the request can submit clarification");
@@ -283,7 +334,8 @@ async function submitClarificationAnswers(req, res, next) {
     request.clarificationQuestions = [];
 
     const fallbackRequiredService = mapBreakdownToServiceType(request.breakdownType);
-    const aiPrediction = await aiDiagnosisService.diagnoseBreakdown(
+    const aiPrediction = await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
+      request.breakdownType,
       request.diagnosticInputText,
       { fallbackRequiredService }
     );
@@ -319,7 +371,7 @@ async function getMyBreakdownRequests(req, res, next) {
     return res.status(200).json({
       success: true,
       message: "Driver breakdown requests fetched successfully",
-      data: { requests }
+      data: { requests: await compatibleRequests(requests) }
     });
   } catch (error) {
     return next(error);
@@ -335,14 +387,21 @@ async function getAssignedProviderRequests(req, res, next) {
       throw new Error("Provider profile not found");
     }
 
-    const requests = await populateRequest(
-      BreakdownRequest.find({ selectedProviderId: profile._id }).sort({ createdAt: -1 })
-    );
+    const normalizedRequestIds = await RequestAssignment.distinct("breakdownRequestId", {
+      providerId: profile._id,
+      status: { $nin: ["rejected", "cancelled"] }
+    });
+    const requests = await populateRequest(BreakdownRequest.find({
+      $or: [
+        { _id: { $in: normalizedRequestIds } },
+        { selectedProviderId: profile._id }
+      ]
+    }).sort({ createdAt: -1 }));
 
     return res.status(200).json({
       success: true,
       message: "Assigned breakdown requests fetched successfully",
-      data: { requests }
+      data: { requests: await compatibleRequests(requests) }
     });
   } catch (error) {
     return next(error);
@@ -371,7 +430,7 @@ async function getBreakdownRequestById(req, res, next) {
     return res.status(200).json({
       success: true,
       message: "Breakdown request fetched successfully",
-      data: { request }
+      data: { request: await compatibleRequest(request) }
     });
   } catch (error) {
     return next(error);
@@ -440,7 +499,7 @@ async function selectProvider(req, res, next) {
       throw new Error("Provider cannot be selected for a completed or cancelled request");
     }
 
-    if (request.selectedProviderId && request.status !== "provider_rejected") {
+    if ((request.currentAssignmentId || request.selectedProviderId) && request.status !== "provider_rejected") {
       res.status(409);
       throw new Error("A provider has already been requested for this breakdown");
     }
@@ -454,37 +513,37 @@ async function selectProvider(req, res, next) {
       throw new Error("The selected provider is not currently suitable for this request");
     }
 
-    const provider = await ProviderProfile.findOne({
+    const providerQuery = ProviderProfile.findOne({
       _id: providerId,
-      isApproved: true,
+      ...APPROVED_PROVIDER_QUERY,
       isActive: { $ne: false },
-      availabilityStatus: "available"
+      availabilityStatus: "online"
     });
+    const provider = typeof providerQuery.populate === "function"
+      ? await providerQuery.populate("userId", "isActive")
+      : await providerQuery;
 
-    if (!provider) {
+    if (!provider || provider.userId?.isActive === false || provider.availabilityStatus !== "online") {
       res.status(404);
       throw new Error("Approved provider not found");
     }
 
-    request.selectedProviderId = provider._id;
-    request.status = "provider_requested";
-    request.assignedAt = new Date();
-    request.providerDistanceKm = recommendation.distanceKm;
-    request.rejectedAt = null;
-    request.rejectionReason = "";
     request.estimatedCostRange = getServiceCostRange(request.requiredServiceType);
     request.estimatedCost = {
       minimum: request.estimatedCostRange.min,
       maximum: request.estimatedCostRange.max
     };
-    await request.save();
-
-    const populatedRequest = await populateRequest(BreakdownRequest.findById(request._id));
+    const assignment = await createAssignment({
+      request,
+      provider,
+      recommendation,
+      actor: req.user
+    });
 
     return res.status(200).json({
       success: true,
       message: "Provider selected successfully",
-      data: { request: populatedRequest }
+      data: { request: buildBreakdownRequestResponse(request, assignment, provider) }
     });
   } catch (error) {
     return next(error);
@@ -492,16 +551,23 @@ async function selectProvider(req, res, next) {
 }
 
 async function requireSelectedProvider(req, res, request) {
-  if (!request.selectedProviderId) {
+  const profile = await getProviderProfileForUser(req.user._id);
+  const approved = isProviderApproved(profile);
+  if (!approved || profile.isActive === false) {
+    res.status(403);
+    throw new Error("Only an active, approved provider can manage requests");
+  }
+  const assignment = await ensureCurrentAssignment(request);
+  const selectedProviderId = assignment?.providerId || request.selectedProviderId;
+  if (!selectedProviderId) {
     res.status(400);
     throw new Error("No provider has been selected for this request");
   }
-  const profile = await getProviderProfileForUser(req.user._id);
-  if (!profile || !isSameId(request.selectedProviderId, profile._id)) {
+  if (!isSameId(selectedProviderId, profile._id)) {
     res.status(403);
     throw new Error("Only the selected provider can manage this request");
   }
-  return profile;
+  return { profile, assignment };
 }
 
 async function acceptBreakdownRequest(req, res, next) {
@@ -515,8 +581,8 @@ async function acceptBreakdownRequest(req, res, next) {
       res.status(404);
       throw new Error("Breakdown request not found");
     }
-    await requireSelectedProvider(req, res, request);
-    if (request.status !== "provider_requested") {
+    const { profile, assignment: currentAssignment } = await requireSelectedProvider(req, res, request);
+    if (currentAssignment.status !== "requested") {
       res.status(409);
       throw new Error("Only a newly requested provider assignment can be accepted");
     }
@@ -526,15 +592,16 @@ async function acceptBreakdownRequest(req, res, next) {
       res.status(400);
       throw new Error("Estimated arrival must be between 1 and 1440 minutes");
     }
-    request.status = "accepted";
-    request.acceptedAt = new Date();
-    if (arrival !== undefined) request.estimatedArrivalMinutes = Number(arrival);
-    await request.save();
-    const populatedRequest = await populateRequest(BreakdownRequest.findById(request._id));
+    const assignment = await acceptAssignment({
+      request,
+      providerId: profile._id,
+      estimatedArrivalMinutes: arrival,
+      actor: req.user
+    });
     return res.status(200).json({
       success: true,
       message: "Breakdown request accepted",
-      data: { request: populatedRequest }
+      data: { request: buildBreakdownRequestResponse(request, assignment, profile) }
     });
   } catch (error) {
     return next(error);
@@ -552,25 +619,21 @@ async function rejectBreakdownRequest(req, res, next) {
       res.status(404);
       throw new Error("Breakdown request not found");
     }
-    const provider = await requireSelectedProvider(req, res, request);
-    if (request.status !== "provider_requested") {
+    const { profile: provider, assignment: currentAssignment } = await requireSelectedProvider(req, res, request);
+    if (currentAssignment.status !== "requested") {
       res.status(409);
       throw new Error("Only a pending provider request can be rejected");
     }
-    if (!(request.rejectedProviderIds || []).some((id) => isSameId(id, provider._id))) {
-      request.rejectedProviderIds.push(provider._id);
-    }
-    request.status = "provider_rejected";
-    request.rejectedAt = new Date();
-    request.rejectionReason = String(req.body.reason || "").trim().slice(0, 300);
-    request.selectedProviderId = null;
-    request.assignedAt = null;
-    request.providerDistanceKm = null;
-    await request.save();
+    await rejectAssignment({
+      request,
+      providerId: provider._id,
+      reason: req.body.reason,
+      actor: req.user
+    });
     return res.status(200).json({
       success: true,
       message: "Provider declined the request. The driver can select another provider.",
-      data: { request }
+      data: { request: buildBreakdownRequestResponse(request) }
     });
   } catch (error) {
     return next(error);
@@ -597,43 +660,65 @@ async function updateBreakdownRequestStatus(req, res, next) {
       throw new Error("Breakdown request not found");
     }
 
-    const providerProfile = await requireSelectedProvider(req, res, request);
+    const { profile: providerProfile, assignment: currentAssignment } =
+      await requireSelectedProvider(req, res, request);
 
     if (request.status === "cancelled") {
       res.status(400);
       throw new Error("Cancelled requests cannot be updated");
     }
 
-    const allowedNext = PROVIDER_STATUS_TRANSITIONS[request.status] || [];
-    if (!allowedNext.includes(req.body.status)) {
+    const normalizedStatus = req.body.status === "on_the_way" ? "provider_en_route" : req.body.status;
+    const assignmentTransitions = {
+      accepted: ["provider_en_route"],
+      provider_en_route: ["arrived"],
+      arrived: ["in_progress"],
+      in_progress: ["completed"]
+    };
+    if (!(assignmentTransitions[currentAssignment.status] || []).includes(normalizedStatus)) {
       res.status(409);
-      throw new Error(`Request cannot move from ${request.status} to ${req.body.status}`);
+      throw new Error(`Request cannot move from ${currentAssignment.status} to ${normalizedStatus}`);
     }
 
-    const now = new Date();
-    request.status = req.body.status;
-    if (["provider_en_route", "on_the_way"].includes(req.body.status)) request.enRouteAt = now;
-    if (req.body.status === "arrived") request.arrivedAt = now;
-    if (req.body.status === "in_progress") request.workStartedAt = now;
-    if (req.body.status === "completed") {
-      if (req.body.finalCost !== undefined &&
-          (!Number.isFinite(Number(req.body.finalCost)) || Number(req.body.finalCost) < 0)) {
+    if (normalizedStatus === "completed") {
+      const rawFinalCost = req.body.finalCost;
+      if (rawFinalCost === undefined || rawFinalCost === null ||
+          (typeof rawFinalCost === "string" && !rawFinalCost.trim())) {
         res.status(400);
-        throw new Error("Final cost must be a non-negative number");
+        throw new Error("Final service price is required before completing the job.");
       }
-      request.completedAt = now;
-      if (req.body.finalCost !== undefined) request.finalCost = Number(req.body.finalCost);
+      if (!["number", "string"].includes(typeof rawFinalCost) ||
+          (typeof rawFinalCost === "string" && !/^\d+(\.\d{1,2})?$/.test(rawFinalCost.trim()))) {
+        res.status(400);
+        throw new Error("Final service price must be a valid non-negative number.");
+      }
+      const finalCost = Number(rawFinalCost);
+      if (!Number.isFinite(finalCost) || finalCost < 0 || finalCost > Number.MAX_SAFE_INTEGER) {
+        res.status(400);
+        throw new Error("Final service price must be a valid non-negative number.");
+      }
+      if (String(req.body.completionNote || "").trim().length > 500) {
+        res.status(400);
+        throw new Error("Completion note must contain at most 500 characters");
+      }
+    }
+    const assignment = await updateAssignmentStatus({
+      request,
+      providerId: providerProfile._id,
+      status: normalizedStatus,
+      finalCost: req.body.finalCost,
+      completionNote: req.body.completionNote,
+      actor: req.user
+    });
+    if (normalizedStatus === "completed") {
       providerProfile.completedJobs = Number(providerProfile.completedJobs || 0) + 1;
       await providerProfile.save();
     }
-    await request.save();
-
-    const populatedRequest = await populateRequest(BreakdownRequest.findById(request._id));
 
     return res.status(200).json({
       success: true,
       message: "Breakdown request status updated successfully",
-      data: { request: populatedRequest }
+      data: { request: buildBreakdownRequestResponse(request, assignment, providerProfile) }
     });
   } catch (error) {
     return next(error);
@@ -664,15 +749,16 @@ async function cancelBreakdownRequest(req, res, next) {
       throw new Error("Completed requests cannot be cancelled");
     }
 
-    request.status = "cancelled";
-    request.cancelledAt = new Date();
-    request.cancellationReason = String(req.body.reason || "").trim().slice(0, 300);
-    await request.save();
+    const assignment = await cancelAssignment({
+      request,
+      reason: req.body.reason,
+      actor: req.user
+    });
 
     return res.status(200).json({
       success: true,
       message: "Breakdown request cancelled successfully",
-      data: { request }
+      data: { request: buildBreakdownRequestResponse(request, assignment) }
     });
   } catch (error) {
     return next(error);
@@ -698,7 +784,8 @@ async function reviewBreakdownRequest(req, res, next) {
       res.status(409);
       throw new Error("A review can only be submitted after the job is completed");
     }
-    if (request.review) {
+    const existingReview = await Review.findOne({ breakdownRequestId: request._id });
+    if (existingReview || request.review) {
       res.status(409);
       throw new Error("A review has already been submitted for this request");
     }
@@ -712,29 +799,71 @@ async function reviewBreakdownRequest(req, res, next) {
       res.status(400);
       throw new Error("Review comment must contain at most 500 characters");
     }
-    if (!request.selectedProviderId) {
+    const assignment = await ensureCurrentAssignment(request);
+    const providerId = assignment?.providerId || request.selectedProviderId;
+    if (!assignment || !providerId) {
       res.status(400);
       throw new Error("The completed request has no provider to review");
     }
-    const provider = await ProviderProfile.findById(request.selectedProviderId);
+    const provider = await ProviderProfile.findById(providerId);
     if (!provider) {
       res.status(404);
       throw new Error("Selected provider not found");
     }
+    const submittedAt = new Date();
+    const legacyReview = { rating, comment, submittedAt };
+    let review;
     const previousReviews = Number(provider.totalReviews || 0);
     const previousAverage = Number(provider.averageRating || 0);
-    provider.averageRating = Number(
-      ((previousAverage * previousReviews + rating) / (previousReviews + 1)).toFixed(2)
-    );
-    provider.totalReviews = previousReviews + 1;
-    request.review = { rating, comment, submittedAt: new Date() };
-    await provider.save();
-    await request.save();
+    try {
+      await runWithOptionalTransaction(async (session) => {
+        const payload = {
+          breakdownRequestId: request._id,
+          requestAssignmentId: assignment._id,
+          providerId: provider._id,
+          driverId: req.user._id,
+          rating,
+          comment,
+          createdAt: submittedAt
+        };
+        if (session) {
+          [review] = await Review.create([payload], { session });
+        } else {
+          review = await Review.create(payload);
+        }
+        provider.averageRating = Number(
+          ((previousAverage * previousReviews + rating) / (previousReviews + 1)).toFixed(2)
+        );
+        provider.totalReviews = previousReviews + 1;
+        request.currentAssignmentId = assignment._id;
+        // Deprecated embedded response mirror retained during Stage 1.
+        request.review = legacyReview;
+        await provider.save(session ? { session } : undefined);
+        await request.save(session ? { session } : undefined);
+      });
+    } catch (reviewError) {
+      if (review?._id) {
+        try {
+          await Review.deleteOne({ _id: review._id });
+          provider.averageRating = previousAverage;
+          provider.totalReviews = previousReviews;
+          await provider.save();
+        } catch (_rollbackError) {
+          reviewError.partialWrite = { reviewId: review._id, rollbackFailed: true };
+        }
+      }
+      if (reviewError.code === 11000) {
+        res.status(409);
+        throw new Error("A review has already been submitted for this request");
+      }
+      throw reviewError;
+    }
     return res.status(201).json({
       success: true,
       message: "Review submitted successfully",
       data: {
-        review: request.review,
+        review: legacyReview,
+        reviewId: review._id,
         providerRating: provider.averageRating,
         providerTotalReviews: provider.totalReviews
       }

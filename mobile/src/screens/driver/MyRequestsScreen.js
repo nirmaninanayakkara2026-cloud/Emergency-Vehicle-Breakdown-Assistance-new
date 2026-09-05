@@ -68,8 +68,8 @@ export default function MyRequestsScreen({ navigation }) {
         </AppCard>
       ) : null}
       {requests.map((request) => (
-        <Pressable key={request._id} onPress={() => navigation.navigate("RequestDetails", { requestId: request._id })}>
-          <AppCard><View style={styles.cardTop}><View style={styles.icon}><Ionicons name="car-sport-outline" size={23} color={colors.primary} /></View><View style={styles.flex}><Text style={styles.cardTitle}>{formatFaultLabel(request.aiPrediction?.predictedFault, request.aiPrediction?.faultLabel || formatDisplayValue(request.breakdownType))}</Text><Text style={styles.date}>{new Date(request.createdAt).toLocaleDateString()}</Text></View><StatusBadge status={request.status} tone={request.status === "completed" ? "success" : request.status === "cancelled" ? "neutral" : "info"} /></View><View style={styles.meta}><Text style={styles.body}>{formatDisplayValue(request.vehicleType)}</Text><Text style={styles.dot}>•</Text><Text style={styles.body}>{formatServiceType(request.requiredServiceType)}</Text></View><View style={styles.open}><Text style={styles.openText}>View details</Text><Ionicons name="chevron-forward" size={20} color={colors.teal} /></View>
+        <Pressable key={request._id} onPress={() => navigation.navigate(request.status === "completed" ? "JobCompletion" : "RequestDetails", { requestId: request._id, request })}>
+          <AppCard><View style={styles.cardTop}><View style={styles.icon}><Ionicons name="car-sport-outline" size={23} color={colors.primary} /></View><View style={styles.flex}><Text style={styles.cardTitle}>{formatFaultLabel(request.aiPrediction?.predictedFault, request.aiPrediction?.faultLabel || formatDisplayValue(request.breakdownType))}</Text><Text style={styles.date}>{new Date(request.completedAt || request.createdAt).toLocaleDateString()}</Text></View><StatusBadge status={request.status} tone={request.status === "completed" ? "success" : request.status === "cancelled" ? "neutral" : "info"} /></View><View style={styles.meta}><Text style={styles.body}>{request.selectedProviderId?.businessName || formatDisplayValue(request.vehicleType)}</Text><Text style={styles.dot}>•</Text><Text style={styles.body}>{formatServiceType(request.requiredServiceType)}</Text></View>{request.status === "completed" ? <View style={styles.completedMeta}><Text style={styles.finalPrice}>LKR {Number(request.finalCost || 0).toLocaleString()}</Text>{request.review ? <Text style={styles.reviewStars}>{"★".repeat(request.review.rating)}{"☆".repeat(5 - request.review.rating)}</Text> : <Text style={styles.date}>Rate This Provider</Text>}</View> : null}<View style={styles.open}><Text style={styles.openText}>{request.status === "completed" ? "View completed service" : "View details"}</Text><Ionicons name="chevron-forward" size={20} color={colors.teal} /></View>
           </AppCard>
         </Pressable>
       ))}
@@ -95,6 +95,9 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     textTransform: "capitalize"
   },
+  completedMeta: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  finalPrice: { ...typography.bodyStrong, color: colors.green },
+  reviewStars: { color: colors.amber, fontSize: 18 },
   empty: {
     color: COLORS.muted,
     lineHeight: 21

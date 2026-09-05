@@ -8,7 +8,9 @@
     "dev": "nodemon server.js",
     "test": "node --test",
     "test:verbose": "node --test --test-reporter=spec",
-    "seed:demo": "node scripts/seedDemoData.js"
+    "seed:demo": "node scripts/seedDemoData.js",
+    "migrate:normalize": "node scripts/migrateNormalizedCollections.js",
+    "create:admin": "node scripts/createAdmin.js"
   },
   "keywords": [
     "express",

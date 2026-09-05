@@ -56,12 +56,24 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
     setProblemDescription(captured.description || "");
   }, [route.params?.guidedSymptoms]);
 
+  function changeVehicleType(nextVehicleType) {
+    if (guidedSymptoms && guidedSymptoms.vehicleType !== nextVehicleType) setGuidedSymptoms(null);
+    setVehicleType(nextVehicleType);
+  }
+
+  function changeBreakdownType(nextBreakdownType) {
+    if (guidedSymptoms && guidedSymptoms.breakdownType !== nextBreakdownType) setGuidedSymptoms(null);
+    setBreakdownType(nextBreakdownType);
+  }
+
   function openGuidedSymptoms() {
+    const currentGuidedSymptoms = guidedSymptoms?.vehicleType === vehicleType &&
+      guidedSymptoms?.breakdownType === breakdownType ? guidedSymptoms : null;
     navigation.navigate("GuidedSymptomCapture", {
       sourceRoute: "SelfBreakdownAssistant",
       vehicleType,
       breakdownType,
-      initialData: guidedSymptoms || {
+      initialData: currentGuidedSymptoms || {
         vehicleType,
         breakdownType,
         symptoms: {},
@@ -133,9 +145,9 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
       <InfoBanner tone="info" title="Safety comes first" message="If an issue may be unsafe, we'll recommend professional assistance instead." />
       <AppCard>
         <SectionHeader title="Tell us what happened" subtitle="We'll check whether a guided self-check is suitable." />
-        <AppSelect label="Vehicle type" options={VEHICLE_TYPES} value={vehicleType} onChange={setVehicleType} />
+        <AppSelect label="Vehicle type" options={VEHICLE_TYPES} value={vehicleType} onChange={changeVehicleType} />
         <Text style={styles.fieldLabel}>Main problem</Text>
-        <MainProblemGrid options={SYMPTOM_BREAKDOWN_TYPES} value={breakdownType} onChange={setBreakdownType} />
+        <MainProblemGrid options={SYMPTOM_BREAKDOWN_TYPES} value={breakdownType} onChange={changeBreakdownType} />
         <AppInput label="What did you notice?" value={problemDescription} onChangeText={setProblemDescription} multiline />
         <AppButton title={guidedSymptoms ? "Edit Guided Symptoms" : "Smart Guided Symptom Capture"} variant="secondary" onPress={openGuidedSymptoms} />
         {error ? <InfoBanner tone="danger" message={error} /> : null}

@@ -57,20 +57,33 @@ export const symptomQuestionFlows = {
         { value: "front_right", label: "Front right" },
         { value: "rear_left", label: "Rear left" },
         { value: "rear_right", label: "Rear right" },
-        { value: "multiple", label: "More than one" },
         notSure
       ]
     },
     {
       id: "tyre_condition",
-      question: "What does the tyre look like?",
-      summaryLabel: "Tyre condition",
-      type: "single_choice",
+      question: "What do you notice?",
+      summaryLabel: "What you notice",
+      type: "multi_choice",
       options: [
         { value: "completely_flat", label: "Completely flat" },
-        { value: "low_pressure", label: "Low air pressure" },
+        { value: "low_pressure", label: "Low pressure" },
         { value: "visible_damage", label: "Visible damage" },
         { value: "pulling_side", label: "Vehicle pulling to one side" },
+        notSure
+      ]
+    },
+    {
+      id: "tyre_observations",
+      question: "Any other tyre observations? (optional)",
+      summaryLabel: "Other tyre observations",
+      type: "multi_choice",
+      optional: true,
+      options: [
+        { value: "puncture_visible", label: "Puncture visible" },
+        { value: "sidewall_damage", label: "Sidewall damage" },
+        { value: "unusual_vibration", label: "Unusual vibration" },
+        { value: "none", label: "None" },
         notSure
       ]
     }

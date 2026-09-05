@@ -17,7 +17,7 @@ export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState(""); const [email, setEmail] = useState(""); const [phone, setPhone] = useState("");
   const [password, setPassword] = useState(""); const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("driver"); const [loading, setLoading] = useState(false); const [error, setError] = useState("");
-  const providerSelected = role !== "driver";
+  const serviceProviderSelected = ["mechanic", "garage", "towing_service"].includes(role);
 
   async function handleRegister() {
     setError("");
@@ -34,10 +34,11 @@ export default function RegisterScreen({ navigation }) {
     <ScreenContainer keyboard>
       <ScreenHeader eyebrow="Join RoadCare" title="Create your account" subtitle="Choose how you'll use the app, then add your details." />
       <View style={styles.roleRow}>
-        <RoleCard icon="car-outline" title="Driver" description="Request roadside help" selected={!providerSelected} onPress={() => setRole("driver")} />
-        <RoleCard icon="construct-outline" title="Service Provider" description="Respond to drivers" selected={providerSelected} onPress={() => setRole("mechanic")} />
+        <RoleCard icon="car-outline" title="Driver" description="Request roadside help" selected={role === "driver"} onPress={() => setRole("driver")} />
+        <RoleCard icon="construct-outline" title="Service Provider" description="Mechanic, garage, or towing" selected={serviceProviderSelected} onPress={() => setRole("mechanic")} />
+        <RoleCard icon="storefront-outline" title="Spare Parts Shop Owner" description="Create a shop and manage inventory" selected={role === "spare_parts_shop"} onPress={() => setRole("spare_parts_shop")} />
       </View>
-      {providerSelected ? <AppCard><Text style={styles.groupLabel}>Provider type</Text><View style={styles.chips}>{PROVIDER_ROLES.map((item) => <Pressable key={item} accessibilityRole="radio" accessibilityState={{ selected: role === item }} onPress={() => setRole(item)} style={[styles.chip, role === item && styles.chipSelected]}><Text style={[styles.chipText, role === item && styles.chipTextSelected]}>{formatDisplayValue(item)}</Text>{role === item ? <Ionicons name="checkmark-circle" size={17} color={colors.teal} /> : null}</Pressable>)}</View></AppCard> : null}
+      {serviceProviderSelected ? <AppCard><Text style={styles.groupLabel}>Provider type</Text><View style={styles.chips}>{PROVIDER_ROLES.filter((item) => item !== "spare_parts_shop").map((item) => <Pressable key={item} accessibilityRole="radio" accessibilityState={{ selected: role === item }} onPress={() => setRole(item)} style={[styles.chip, role === item && styles.chipSelected]}><Text style={[styles.chipText, role === item && styles.chipTextSelected]}>{formatDisplayValue(item)}</Text>{role === item ? <Ionicons name="checkmark-circle" size={17} color={colors.teal} /> : null}</Pressable>)}</View></AppCard> : null}
       <AppCard style={styles.form}>
         <Text style={styles.groupLabel}>Account details</Text>
         <AppInput label="Full name" icon="person-outline" value={name} onChangeText={setName} placeholder="Your name" autoComplete="name" />
@@ -55,5 +56,5 @@ export default function RegisterScreen({ navigation }) {
 
 function RoleCard({ icon, title, description, selected, onPress }) { return <Pressable accessibilityRole="radio" accessibilityState={{ selected }} onPress={onPress} style={[styles.roleCard, selected && styles.roleSelected]}><Ionicons name={icon} size={28} color={selected ? colors.teal : colors.textSecondary} /><Text style={styles.roleTitle}>{title}</Text><Text style={styles.roleDescription}>{description}</Text>{selected ? <Ionicons name="checkmark-circle" size={20} color={colors.teal} style={styles.check} /> : null}</Pressable>; }
 const styles = StyleSheet.create({
-  roleRow: { flexDirection: "row", gap: spacing.sm }, roleCard: { flex: 1, minHeight: 138, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs }, roleSelected: { borderColor: colors.teal, backgroundColor: colors.tealLight }, check: { position: "absolute", right: 12, top: 12 }, roleTitle: { ...typography.cardTitle, color: colors.textPrimary }, roleDescription: { ...typography.caption, color: colors.textSecondary }, form: { gap: spacing.md }, groupLabel: { ...typography.cardTitle, color: colors.primaryDark }, chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs }, chip: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: spacing.xs, borderWidth: 1, borderColor: colors.border, borderRadius: radii.md, paddingHorizontal: spacing.sm }, chipSelected: { borderColor: colors.teal, backgroundColor: colors.tealLight }, chipText: { ...typography.caption, color: colors.textSecondary }, chipTextSelected: { color: colors.primaryDark, fontWeight: "600" }
+  roleRow: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: spacing.sm }, roleCard: { width: "48%", minHeight: 138, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs }, roleSelected: { borderColor: colors.teal, backgroundColor: colors.tealLight }, check: { position: "absolute", right: 12, top: 12 }, roleTitle: { ...typography.cardTitle, color: colors.textPrimary }, roleDescription: { ...typography.caption, color: colors.textSecondary }, form: { gap: spacing.md }, groupLabel: { ...typography.cardTitle, color: colors.primaryDark }, chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs }, chip: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: spacing.xs, borderWidth: 1, borderColor: colors.border, borderRadius: radii.md, paddingHorizontal: spacing.sm }, chipSelected: { borderColor: colors.teal, backgroundColor: colors.tealLight }, chipText: { ...typography.caption, color: colors.textSecondary }, chipTextSelected: { color: colors.primaryDark, fontWeight: "600" }
 });

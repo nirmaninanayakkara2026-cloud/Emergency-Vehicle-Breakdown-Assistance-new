@@ -2,6 +2,16 @@
 
 Backend foundation for the Emergency Vehicle Breakdown Assistance Mobile Application.
 
+## Admin account
+
+Configure `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in `backend/.env`, then run:
+
+```powershell
+npm run create:admin
+```
+
+The command is idempotent: it creates the configured admin when missing and safely updates that same account on later runs. No admin password is stored in source control.
+
 Current phase: **Final integrated backend with AI 1 diagnosis, AI 2 safe self-troubleshooting, provider recommendation, and request tracking**
 
 The backend calls the FastAPI AI service configured by `AI_SERVICE_URL` for AI 1
@@ -520,6 +530,24 @@ Provider status progression is enforced as `accepted` â†’ `provider_en_route` â†
 subsequent recommendations. Cost ranges are service-based LKR estimates and are
 stored separately from the provider's optional final cost.
 
+## Normalized Request Lifecycle
+
+Provider assignment history, reviews, and lifecycle events are stored in
+`requestAssignments`, `reviews`, and `requestEvents`. `BreakdownRequest` keeps
+`currentAssignmentId` as the normalized relationship. Deprecated assignment and
+review fields remain readable as Stage 1 compatibility mirrors for existing
+mobile clients and older database records.
+
+To migrate existing records manually:
+
+```bash
+npm run migrate:normalize
+```
+
+The migration requires `MONGO_URI`, is idempotent, never deletes old data, and is
+not run during server startup. Back up the database before running any manual
+migration in production.
+
 ## Project Structure
 
 ```text
@@ -530,6 +558,9 @@ backend/
     models/
       BreakdownRequest.js
       ProviderProfile.js
+      RequestAssignment.js
+      RequestEvent.js
+      Review.js
       TroubleshootingSession.js
       User.js
     controllers/
@@ -549,6 +580,9 @@ backend/
     services/
       ai2TroubleshootingService.js
       providerRecommendationService.js
+      requestAssignmentService.js
+      requestEventService.js
+      transactionService.js
     config/
       serviceCostRanges.js
     utils/

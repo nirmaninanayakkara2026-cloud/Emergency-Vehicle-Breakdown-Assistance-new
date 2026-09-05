@@ -21,7 +21,7 @@ export default function DriverHomeScreen({ navigation }) {
     getMyRequests().then((items) => {
       if (!active) return;
       const current = items.find((item) => !["completed", "cancelled", "provider_rejected"].includes(item.status));
-      setRecentRequest(current || items[0] || null);
+      setRecentRequest(current || null);
     }).catch(() => { if (active) setRecentRequest(null); });
     return () => { active = false; };
   }, []));

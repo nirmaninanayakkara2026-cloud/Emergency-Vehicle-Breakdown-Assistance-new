@@ -26,16 +26,21 @@ const observationIcons = { see: "eye-outline", hear: "ear-outline", smell: "flow
 export default function GuidedSymptomCaptureScreen({ navigation, route }) {
   const initialData = route.params?.initialData || {};
   const sourceRoute = route.params?.sourceRoute || "RequestMechanic";
-  const vehicleType = initialData.vehicleType || route.params?.vehicleType || "car";
-  const breakdownType = initialData.breakdownType || route.params?.breakdownType || "other";
+  const requestedVehicleType = route.params?.vehicleType || "car";
+  const requestedBreakdownType = route.params?.breakdownType || "other";
+  const initialDataMatches = initialData.breakdownType === requestedBreakdownType &&
+    (!initialData.vehicleType || initialData.vehicleType === requestedVehicleType);
+  const currentInitialData = initialDataMatches ? initialData : {};
+  const vehicleType = requestedVehicleType;
+  const breakdownType = requestedBreakdownType;
   const questions = useMemo(() => getQuestionsForProblem(breakdownType), [breakdownType]);
   const [stepIndex, setStepIndex] = useState(0);
-  const [symptoms, setSymptoms] = useState(initialData.symptoms || {});
+  const [symptoms, setSymptoms] = useState(currentInitialData.symptoms || {});
   const [observedSymptoms, setObservedSymptoms] = useState({
     ...emptyObservedSymptoms,
-    ...(initialData.observedSymptoms || {})
+    ...(currentInitialData.observedSymptoms || {})
   });
-  const [description, setDescription] = useState(initialData.description || "");
+  const [description, setDescription] = useState(currentInitialData.description || "");
   const [error, setError] = useState("");
   const [activeObservation, setActiveObservation] = useState("see");
 

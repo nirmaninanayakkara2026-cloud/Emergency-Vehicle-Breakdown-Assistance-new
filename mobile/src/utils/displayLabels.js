@@ -4,7 +4,7 @@ export const FAULT_LABELS = {
   electrical_system_fault: "Electrical / Starting System Problem",
   engine_system_fault: "Engine / Cooling System Problem",
   brake_system_fault: "Brake System Problem",
-  wheel_tire_fault: "Tyre / Wheel Problem",
+  wheel_tire_fault: "Wheel / Tyre Problem",
   steering_system_fault: "Steering System Problem",
   fuel_system_fault: "Fuel System Problem",
   drivetrain_fault: "Transmission / Drivetrain Problem"

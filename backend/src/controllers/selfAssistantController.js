@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const TroubleshootingSession = require("../models/TroubleshootingSession");
-const aiDiagnosisService = require("../services/aiDiagnosisService");
+const structuredProblemRoutingService = require("../services/structuredProblemRoutingService");
 const ai2Service = require("../services/ai2TroubleshootingService");
 const { buildDiagnosticText } = require("../utils/buildDiagnosticText");
 const { normalizeSymptomCapture } = require("../utils/symptomNormalizer");
@@ -111,7 +111,8 @@ async function startSelfAssistant(req, res, next) {
       throw new Error("Symptom information is required");
     }
 
-    const aiPrediction = await aiDiagnosisService.diagnoseBreakdown(
+    const aiPrediction = await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
+      breakdownType,
       diagnosticInputText,
       { fallbackRequiredService: mapBreakdownToServiceType(breakdownType) }
     );

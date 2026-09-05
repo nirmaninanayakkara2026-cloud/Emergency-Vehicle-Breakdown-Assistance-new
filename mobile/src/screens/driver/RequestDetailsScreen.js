@@ -31,6 +31,10 @@ export default function RequestDetailsScreen({ navigation, route }) {
     setError("");
     try {
       const requestData = await (requestId ? getRequestById(requestId) : Promise.resolve(request));
+      if (requestData.status === "completed") {
+        navigation.replace("JobCompletion", { requestId: requestData._id, request: requestData });
+        return;
+      }
       setRequest(requestData);
     } catch (detailsError) {
       setError(detailsError.message);
@@ -38,7 +42,7 @@ export default function RequestDetailsScreen({ navigation, route }) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [requestId]);
+  }, [navigation, requestId]);
 
   useEffect(() => {
     loadDetails();
@@ -62,7 +66,7 @@ export default function RequestDetailsScreen({ navigation, route }) {
     }
   }
 
-  if (loading || !request) {
+  if (loading || !request || request.status === "completed") {
     return (
       <ScreenContainer>
         <LoadingState message="Loading request details..." />

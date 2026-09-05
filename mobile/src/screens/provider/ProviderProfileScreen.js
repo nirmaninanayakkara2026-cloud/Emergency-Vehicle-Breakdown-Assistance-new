@@ -15,6 +15,7 @@ import { useAuth } from "../../context/AuthContext";
 import {
   createProviderProfile,
   getMyProviderProfile,
+  resubmitProviderProfile,
   updateAvailability,
   updateProviderProfile
 } from "../../services/providerService";
@@ -33,7 +34,12 @@ const providerTypeOptions = PROVIDER_ROLES.map((role) => ({
 }));
 
 const availabilityOptions = [
-  { label: "Online", value: "available" },
+  { label: "Online", value: "online" },
+  { label: "Busy", value: "busy" },
+  { label: "Offline", value: "offline" }
+];
+const shopAvailabilityOptions = [
+  { label: "Online", value: "online" },
   { label: "Busy", value: "busy" },
   { label: "Offline", value: "offline" }
 ];
@@ -42,8 +48,9 @@ function toggleValue(values, value) {
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
 }
 
-export default function ProviderProfileScreen({ navigation }) {
+export default function ProviderProfileScreen({ navigation, route }) {
   const { user } = useAuth();
+  const shopOwner = user?.role === "spare_parts_shop";
   const [profileId, setProfileId] = useState(null);
   const [businessName, setBusinessName] = useState("");
   const [providerType, setProviderType] = useState(user?.role || "mechanic");
@@ -57,7 +64,9 @@ export default function ProviderProfileScreen({ navigation }) {
   const [minimumEstimatedPrice, setMinimumEstimatedPrice] = useState("");
   const [maximumEstimatedPrice, setMaximumEstimatedPrice] = useState("");
   const [openingHours, setOpeningHours] = useState("");
+  const [description, setDescription] = useState("");
   const [availabilityStatus, setAvailabilityStatus] = useState("offline");
+  const [approvalStatus, setApprovalStatus] = useState("pending");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -81,7 +90,9 @@ export default function ProviderProfileScreen({ navigation }) {
       setMinimumEstimatedPrice(profile.estimatedPriceRange?.minimum?.toString() || "");
       setMaximumEstimatedPrice(profile.estimatedPriceRange?.maximum?.toString() || "");
       setOpeningHours(profile.openingHours || "");
+      setDescription(profile.description || "");
       setAvailabilityStatus(profile.availabilityStatus || "offline");
+      setApprovalStatus(profile.approvalStatus || "pending");
     } catch (profileError) {
       if (!profileError.message.toLowerCase().includes("not found")) {
         setError(profileError.message);
@@ -100,22 +111,23 @@ export default function ProviderProfileScreen({ navigation }) {
       providerType,
       businessName: businessName.trim(),
       phone: phone.trim(),
-      specializations,
-      serviceCategories: specializations,
-      supportedVehicleTypes,
+      specializations: shopOwner ? [] : specializations,
+      serviceCategories: shopOwner ? [] : specializations,
+      supportedVehicleTypes: shopOwner ? [] : supportedVehicleTypes,
       location: {
         latitude: selectedLocation.latitude,
         longitude: selectedLocation.longitude,
         address: address.trim()
       },
       availabilityStatus,
-      serviceRadiusKm: Number(serviceRadiusKm),
+      ...(shopOwner ? {} : { serviceRadiusKm: Number(serviceRadiusKm) }),
       averageResponseTimeMinutes: averageResponseTimeMinutes ? Number(averageResponseTimeMinutes) : undefined,
       estimatedPriceRange: {
         minimum: minimumEstimatedPrice ? Number(minimumEstimatedPrice) : undefined,
         maximum: maximumEstimatedPrice ? Number(maximumEstimatedPrice) : undefined
       },
-      openingHours: openingHours.trim() || undefined
+      openingHours: openingHours.trim() || undefined,
+      description: description.trim()
     };
   }
 
@@ -124,8 +136,8 @@ export default function ProviderProfileScreen({ navigation }) {
     if (!isValidLocation(selectedLocation)) {
       return "Please select your service location on the map or use your current location.";
     }
-    if (!serviceRadiusKm || Number.isNaN(Number(serviceRadiusKm))) return "Service radius must be a valid number.";
-    if (supportedVehicleTypes.length === 0) return "Select at least one supported vehicle type.";
+    if (!shopOwner && (!serviceRadiusKm || Number.isNaN(Number(serviceRadiusKm)))) return "Service radius must be a valid number.";
+    if (!shopOwner && supportedVehicleTypes.length === 0) return "Select at least one supported vehicle type.";
     return "";
   }
 
@@ -143,13 +155,19 @@ export default function ProviderProfileScreen({ navigation }) {
       const payload = buildPayload();
       if (profileId) {
         await updateProviderProfile(payload);
-        setMessage("Provider profile updated successfully.");
+        if (route.params?.resubmit && approvalStatus === "rejected") {
+          await resubmitProviderProfile();
+          setApprovalStatus("pending");
+          setMessage("Provider profile updated and resubmitted for approval.");
+        } else {
+          setMessage("Provider profile updated successfully.");
+        }
       } else {
         const createdProfile = await createProviderProfile(payload);
         setProfileId(createdProfile._id);
         setMessage("Provider profile created successfully.");
       }
-      navigation.replace("ProviderDashboard");
+      navigation.replace(shopOwner ? "SparePartsShopDashboard" : "ProviderDashboard");
     } catch (saveError) {
       setError(saveError.message);
     } finally {
@@ -178,16 +196,17 @@ export default function ProviderProfileScreen({ navigation }) {
 
   return (
     <ScreenContainer>
-      <ScreenHeader eyebrow="Service provider" title={profileId ? "Provider Profile" : "Create Provider Profile"} subtitle="Keep service details accurate so drivers can choose with confidence." />
+      <ScreenHeader eyebrow={shopOwner ? "Spare parts shop" : "Service provider"} title={shopOwner ? profileId ? "Spare Parts Shop Profile" : "Create Spare Parts Shop Profile" : profileId ? "Provider Profile" : "Create Provider Profile"} subtitle={shopOwner ? "Add the shop details drivers use to find your inventory." : "Keep service details accurate so drivers can choose with confidence."} />
       <View style={styles.profileHero}><View style={styles.profileIcon}><Ionicons name="business" size={32} color={colors.primary} /></View><Text style={styles.heroText}>{businessName || "Your service business"}</Text></View>
 
       <AppCard>
         <SectionHeader title="Business details" subtitle="Shown to drivers in recommendations." />
         <AppInput label="Business name" value={businessName} onChangeText={setBusinessName} />
-        <AppSelect label="Provider type" options={providerTypeOptions} value={providerType} onChange={setProviderType} />
+        {!shopOwner ? <AppSelect label="Provider type" options={providerTypeOptions} value={providerType} onChange={setProviderType} /> : null}
         <AppInput label="Phone" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+        {shopOwner ? <AppInput label="Shop description (optional)" value={description} onChangeText={setDescription} multiline /> : null}
 
-        <Text style={styles.label}>Specializations</Text>
+        {!shopOwner ? <><Text style={styles.label}>Specializations</Text>
         <View style={styles.chipGrid}>
           {PROVIDER_SPECIALIZATIONS.map((item) => (
             <Pressable
@@ -198,9 +217,9 @@ export default function ProviderProfileScreen({ navigation }) {
               <Text style={[styles.chipText, specializations.includes(item.value) && styles.selectedChipText]}>{item.label}</Text>
             </Pressable>
           ))}
-        </View>
+        </View></> : null}
 
-        <Text style={styles.label}>Supported vehicle types</Text>
+        {!shopOwner ? <><Text style={styles.label}>Supported vehicle types</Text>
         <View style={styles.chipGrid}>
           {VEHICLE_TYPES.map((item) => (
             <Pressable
@@ -211,7 +230,7 @@ export default function ProviderProfileScreen({ navigation }) {
               <Text style={[styles.chipText, supportedVehicleTypes.includes(item.value) && styles.selectedChipText]}>{item.label}</Text>
             </Pressable>
           ))}
-        </View>
+        </View></> : null}
       </AppCard>
 
       <AppCard>
@@ -226,8 +245,8 @@ export default function ProviderProfileScreen({ navigation }) {
 
       <AppCard>
         <SectionHeader title="Service details" subtitle="Set your coverage, pricing, and availability." />
-        <AppInput label="Service radius (km)" value={serviceRadiusKm} onChangeText={setServiceRadiusKm} keyboardType="numeric" />
-        <AppInput label="Average response time (minutes)" value={averageResponseTimeMinutes} onChangeText={setAverageResponseTimeMinutes} keyboardType="numeric" />
+        {!shopOwner ? <AppInput label="Service radius (km)" value={serviceRadiusKm} onChangeText={setServiceRadiusKm} keyboardType="numeric" /> : null}
+        {!shopOwner ? <><AppInput label="Average response time (minutes)" value={averageResponseTimeMinutes} onChangeText={setAverageResponseTimeMinutes} keyboardType="numeric" />
         <View style={styles.row}>
           <View style={styles.flex}>
             <AppInput label="Min price" value={minimumEstimatedPrice} onChangeText={setMinimumEstimatedPrice} keyboardType="numeric" />
@@ -235,13 +254,13 @@ export default function ProviderProfileScreen({ navigation }) {
           <View style={styles.flex}>
             <AppInput label="Max price" value={maximumEstimatedPrice} onChangeText={setMaximumEstimatedPrice} keyboardType="numeric" />
           </View>
-        </View>
+        </View></> : null}
         <AppInput label="Opening hours (optional)" value={openingHours} onChangeText={setOpeningHours} />
-        <AppSelect label="Availability" options={availabilityOptions} value={availabilityStatus} onChange={handleAvailabilityChange} />
+        <AppSelect label="Availability" options={shopOwner ? shopAvailabilityOptions : availabilityOptions} value={availabilityStatus} onChange={handleAvailabilityChange} disabled={approvalStatus !== "approved"} />
 
         {message ? <InfoBanner tone="success" message={message} /> : null}
         {error ? <InfoBanner tone="danger" message={error} /> : null}
-        <AppButton title={profileId ? "Save Profile" : "Create Profile"} onPress={handleSave} loading={saving} />
+        <AppButton title={route.params?.resubmit && approvalStatus === "rejected" ? "Save & Resubmit" : profileId ? "Save Profile" : "Create Profile"} onPress={handleSave} loading={saving} />
       </AppCard>
     </ScreenContainer>
   );

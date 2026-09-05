@@ -43,7 +43,11 @@ export function getCurrentQuestion(flow, index) {
 
 export function validateAnswer(question, answer) {
   if (!question) return false;
-  if (question.type === "multi_choice") return Array.isArray(answer) && answer.length > 0;
+  if (question.optional && (answer === undefined || answer === "" || (Array.isArray(answer) && !answer.length))) {
+    return true;
+  }
+  if (question.type === "multi_choice") 
+    return Array.isArray(answer) && answer.length > 0;
   return typeof answer === "string" && answer.length > 0;
 }
 
@@ -64,7 +68,11 @@ export function buildSymptomSummary(data) {
   const payload = buildStructuredSymptomPayload(data);
   const questions = getQuestionsForProblem(payload.breakdownType);
   const answers = questions
-    .filter((question) => validateAnswer(question, payload.symptoms[question.id]))
+    .filter((question) => {
+      const answer = payload.symptoms[question.id];
+      const hasAnswer = Array.isArray(answer) ? answer.length > 0 : typeof answer === "string" && answer.length > 0;
+      return hasAnswer && validateAnswer(question, answer);
+    })
     .map((question) => ({
       key: question.id,
       label: question.summaryLabel || question.question,
@@ -104,19 +112,19 @@ export function buildSymptomDescription(data) {
 }
 
 export function mapSymptomTypeToRequestType(breakdownType) {
-  if (breakdownType === "vehicle_not_starting" || breakdownType === "electrical_problem") {
-    return "battery_issue";
-  }
-
-  if (breakdownType === "fuel_problem") return "fuel_issue";
-
   const backendTypes = [
+    "vehicle_not_starting",
     "flat_tyre",
     "battery_issue",
     "engine_problem",
     "engine_overheating",
     "brake_problem",
+    "electrical_problem",
+    "fuel_problem",
     "fuel_issue",
+    "steering_problem",
+    "transmission_problem",
+    "strange_noise",
     "accident",
     "towing_needed",
     "other"

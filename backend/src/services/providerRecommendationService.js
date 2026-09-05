@@ -1,5 +1,7 @@
 const ProviderProfile = require("../models/ProviderProfile");
 const { getServiceCostRange } = require("../config/serviceCostRanges");
+const { getRejectedProviderIds } = require("./requestAssignmentService");
+const { APPROVED_PROVIDER_QUERY, isProviderApproved } = require("../utils/providerApproval");
 
 const SCORE_WEIGHTS = Object.freeze({
   serviceMatch: 40,
@@ -97,7 +99,7 @@ function scoreProvider(provider, distanceKm, tier) {
     serviceMatchScore: serviceMatchScore(tier),
     distanceScore: distanceScore(distanceKm),
     ratingScore: ratingScore(provider),
-    availabilityScore: provider.availabilityStatus === "available" ? 10 : 0,
+    availabilityScore: provider.availabilityStatus === "online" ? 10 : 0,
     responseTimeScore: responseTimeScore(provider.averageResponseTimeMinutes)
   };
   return {
@@ -122,8 +124,11 @@ function rankProviders(providers, input) {
   const driverLocation = { latitude: Number(input.latitude), longitude: Number(input.longitude) };
   const rejectedIds = new Set((input.rejectedProviderIds || []).map(String));
   const suitable = providers.map((provider) => {
-    if (!provider.isApproved || provider.isActive === false ||
-        provider.availabilityStatus !== "available" || rejectedIds.has(String(provider._id))) {
+    const approved = isProviderApproved(provider);
+    const accountActive = !(provider.userId && typeof provider.userId === "object") ||
+      provider.userId.isActive !== false;
+    if (!approved || !accountActive || provider.isActive === false ||
+        provider.availabilityStatus !== "online" || rejectedIds.has(String(provider._id))) {
       return null;
     }
     if (provider.supportedVehicleTypes?.length &&
@@ -178,11 +183,14 @@ function rankProviders(providers, input) {
 }
 
 async function getProviderRecommendations(input) {
-  const providers = await ProviderProfile.find({
-    isApproved: true,
+  const query = ProviderProfile.find({
+    ...APPROVED_PROVIDER_QUERY,
     isActive: { $ne: false },
-    availabilityStatus: "available"
+    availabilityStatus: "online"
   });
+  const providers = typeof query.populate === "function"
+    ? await query.populate("userId", "isActive")
+    : await query;
   const ranked = rankProviders(providers, input);
   return {
     requiredService: input.requiredServiceType,
@@ -199,13 +207,14 @@ async function getProviderRecommendations(input) {
 }
 
 async function getRecommendationsForRequest(request) {
+  const rejectedProviderIds = await getRejectedProviderIds(request);
   return getProviderRecommendations({
     requiredServiceType: request.requiredServiceType,
     latitude: request.location.latitude,
     longitude: request.location.longitude,
     vehicleType: request.vehicleType,
     breakdownType: request.breakdownType,
-    rejectedProviderIds: request.rejectedProviderIds || []
+    rejectedProviderIds
   });
 }
 

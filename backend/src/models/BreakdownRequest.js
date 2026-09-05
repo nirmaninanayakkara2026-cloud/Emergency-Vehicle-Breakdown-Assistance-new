@@ -98,7 +98,7 @@ const aiPredictionSchema = new mongoose.Schema(
     topPredictions: { type: [topPredictionSchema], default: [] },
     predictionSource: {
       type: String,
-      enum: ["ai_model", "rule_fallback"],
+      enum: ["ai_model", "rule_fallback", "structured_problem"],
       required: true
     }
   },
@@ -195,6 +195,12 @@ const breakdownRequestSchema = new mongoose.Schema(
       type: String,
       required: [true, "Required service type is required"]
     },
+    currentAssignmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "RequestAssignment",
+      default: null
+    },
+    // Stage 1 compatibility mirrors. RequestAssignment is authoritative for new writes.
     selectedProviderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProviderProfile"
@@ -214,6 +220,7 @@ const breakdownRequestSchema = new mongoose.Schema(
     estimatedCost: estimatedCostSchema,
     estimatedCostRange: serviceCostRangeSchema,
     finalCost: { type: Number, min: 0, default: null },
+    completionNote: { type: String, default: "", trim: true, maxlength: 500 },
     assignedAt: { type: Date, default: null },
     providerDistanceKm: { type: Number, min: 0, default: null },
     acceptedAt: { type: Date, default: null },
@@ -267,5 +274,7 @@ const breakdownRequestSchema = new mongoose.Schema(
     }
   }
 );
+
+breakdownRequestSchema.index({ driverId: 1, createdAt: -1 });
 
 module.exports = mongoose.model("BreakdownRequest", breakdownRequestSchema);

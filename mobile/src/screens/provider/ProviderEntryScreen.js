@@ -4,8 +4,10 @@ import ScreenContainer from "../../components/ScreenContainer";
 import ErrorState from "../../components/ui/ErrorState";
 import LoadingState from "../../components/ui/LoadingState";
 import { getMyProviderProfile } from "../../services/providerService";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ProviderEntryScreen({ navigation }) {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -14,7 +16,7 @@ export default function ProviderEntryScreen({ navigation }) {
     setError("");
     try {
       await getMyProviderProfile();
-      navigation.replace("ProviderDashboard");
+      navigation.replace(user?.role === "spare_parts_shop" ? "SparePartsShopDashboard" : "ProviderDashboard");
     } catch (profileError) {
       if (profileError.message.toLowerCase().includes("not found")) {
         navigation.replace("ProviderProfile");
@@ -24,7 +26,7 @@ export default function ProviderEntryScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
-  }, [navigation]);
+  }, [navigation, user?.role]);
 
   useEffect(() => {
     checkProfile();

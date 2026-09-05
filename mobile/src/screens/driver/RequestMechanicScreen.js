@@ -65,11 +65,13 @@ export default function RequestMechanicScreen({ navigation, route }) {
   }
 
   function openGuidedSymptoms() {
+    const currentGuidedSymptoms = guidedSymptoms?.vehicleType === vehicleType &&
+      guidedSymptoms?.breakdownType === breakdownType ? guidedSymptoms : undefined;
     navigation.navigate("GuidedSymptomCapture", {
       sourceRoute: "RequestMechanic",
       vehicleType,
       breakdownType,
-      initialData: guidedSymptoms || undefined
+      initialData: currentGuidedSymptoms
     });
   }
 
