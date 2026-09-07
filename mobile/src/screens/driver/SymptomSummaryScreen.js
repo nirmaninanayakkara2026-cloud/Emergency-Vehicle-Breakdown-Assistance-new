@@ -6,9 +6,13 @@ import ScreenHeader from "../../components/ui/ScreenHeader";
 import { buildSymptomSummary } from "../../services/symptomCaptureService";
 import { startSelfAssistant } from "../../services/selfAssistantService";
 import InfoBanner from "../../components/ui/InfoBanner";
-import { buildSelfAssistantPayload, routeSelfAssistantResponse } from "../../utils/selfAssistantFlow";
+import {
+  buildSelfAssistantPayload,
+  routeSelfAssistantResponse,
+} from "../../utils/selfAssistantFlow";
 
 export default function SymptomSummaryScreen({ navigation, route }) {
+  // Read the captured symptoms and identify the flow that opened this summary.
   const structuredSymptoms = route.params?.structuredSymptoms;
   const sourceRoute = route.params?.sourceRoute || "RequestMechanic";
   const selfAssistantSource = sourceRoute === "SelfBreakdownAssistant";
@@ -17,9 +21,10 @@ export default function SymptomSummaryScreen({ navigation, route }) {
   const processingRef = useRef(false);
   const summary = useMemo(
     () => buildSymptomSummary(structuredSymptoms || {}),
-    [structuredSymptoms]
+    [structuredSymptoms],
   );
 
+  // Return edited symptoms to the request form or start self-assistance processing.
   async function continueToSource() {
     if (!selfAssistantSource) {
       navigation.popTo(sourceRoute, { guidedSymptoms: structuredSymptoms });
@@ -32,7 +37,10 @@ export default function SymptomSummaryScreen({ navigation, route }) {
     const payload = buildSelfAssistantPayload(structuredSymptoms);
     try {
       const response = await startSelfAssistant(payload);
-      routeSelfAssistantResponse(navigation, response, payload, { replace: true, resetFlow: true });
+      routeSelfAssistantResponse(navigation, response, payload, {
+        replace: true,
+        resetFlow: true,
+      });
     } catch (_processingError) {
       setError("We couldn't check your updated symptoms. Please try again.");
       processingRef.current = false;
@@ -42,11 +50,31 @@ export default function SymptomSummaryScreen({ navigation, route }) {
 
   return (
     <ScreenContainer>
-      <ScreenHeader eyebrow="Review" title="What We Understood" subtitle="Check these details before continuing. You can correct any answer." />
+      {/* Summary header and captured symptom details. */}
+      <ScreenHeader
+        eyebrow="Review"
+        title="What We Understood"
+        subtitle="Check these details before continuing. You can correct any answer."
+      />
       <SymptomSummaryCard summary={summary} />
+      {/* Processing errors and edit/continue navigation actions. */}
       {error ? <InfoBanner tone="danger" message={error} /> : null}
-      <AppButton title="Edit Answers" icon="create-outline" variant="secondary" disabled={processing} onPress={() => navigation.goBack()} />
-      <AppButton title={selfAssistantSource ? "Use These Symptoms and Continue" : "Continue"} icon="arrow-forward" loading={processing} disabled={processing} onPress={continueToSource} />
+      <AppButton
+        title="Edit Answers"
+        icon="create-outline"
+        variant="secondary"
+        disabled={processing}
+        onPress={() => navigation.goBack()}
+      />
+      <AppButton
+        title={
+          selfAssistantSource ? "Use These Symptoms and Continue" : "Continue"
+        }
+        icon="arrow-forward"
+        loading={processing}
+        disabled={processing}
+        onPress={continueToSource}
+      />
     </ScreenContainer>
   );
 }

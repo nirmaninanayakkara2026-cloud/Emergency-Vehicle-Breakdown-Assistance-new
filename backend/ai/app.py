@@ -18,6 +18,7 @@ from ai2.services.troubleshooting_engine import (
 )
 
 
+# Check whether the AI knowledge and safety configuration files are available.
 def _load_json_status(path) -> bool:
     try:
         with path.open("r", encoding="utf-8") as source:
@@ -30,12 +31,14 @@ AI2_KNOWLEDGE_LOADED = _load_json_status(KNOWLEDGE_PATH)
 AI2_SAFETY_RULES_LOADED = _load_json_status(AI2_ROOT / "config" / "risk_rules.json")
 
 
+# Create the FastAPI application exposed to the backend.
 app = FastAPI(
     title="Emergency Vehicle Breakdown AI Service",
     version="1.0.0",
 )
 
 
+# Request models for AI 1 and AI 2 operations.
 class FaultPredictionRequest(BaseModel):
     symptom_text: str = Field(
         ...,
@@ -75,6 +78,7 @@ class StopConditionRequest(BaseModel):
     condition: str = Field(..., min_length=1, max_length=200)
 
 
+# Return only the guide fields needed by API consumers.
 def _guide_summary(guide: dict[str, object]) -> dict[str, object]:
     return {
         "guide_id": guide["id"],
@@ -91,6 +95,7 @@ def _guide_summary(guide: dict[str, object]) -> dict[str, object]:
     }
 
 
+# Service health and model availability endpoint.
 @app.get("/health")
 def health() -> dict[str, object]:
     return {
@@ -104,6 +109,7 @@ def health() -> dict[str, object]:
     }
 
 
+# AI 1 fault classification endpoint.
 @app.post("/predict-fault")
 def predict_fault_endpoint(payload: FaultPredictionRequest) -> dict[str, object]:
     return {
@@ -112,6 +118,7 @@ def predict_fault_endpoint(payload: FaultPredictionRequest) -> dict[str, object]
     }
 
 
+# AI 2 guide lookup endpoint.
 @app.post("/ai2/find-guide")
 def find_guide_endpoint(payload: FindGuideRequest) -> dict[str, object]:
     guide = get_guide_for_fault(payload.fault_category.strip())
@@ -129,6 +136,7 @@ def find_guide_endpoint(payload: FindGuideRequest) -> dict[str, object]:
     }
 
 
+# AI 2 troubleshooting session start endpoint.
 @app.post("/ai2/start")
 def start_guide_endpoint(payload: StartGuideRequest) -> dict[str, object]:
     return {
@@ -137,6 +145,7 @@ def start_guide_endpoint(payload: StartGuideRequest) -> dict[str, object]:
     }
 
 
+# AI 2 troubleshooting step processing endpoint.
 @app.post("/ai2/step")
 def process_step_endpoint(payload: StepResultRequest) -> dict[str, object]:
     result = process_step_result(
@@ -147,6 +156,7 @@ def process_step_endpoint(payload: StepResultRequest) -> dict[str, object]:
     return {"success": True, **result}
 
 
+# AI 2 safety stop-condition endpoint.
 @app.post("/ai2/stop-condition")
 def stop_condition_endpoint(payload: StopConditionRequest) -> dict[str, object]:
     result = check_stop_condition(payload.guide_id, payload.condition)

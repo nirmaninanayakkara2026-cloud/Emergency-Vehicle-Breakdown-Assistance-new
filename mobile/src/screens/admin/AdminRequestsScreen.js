@@ -1,4 +1,93 @@
-import React,{useCallback,useEffect,useState}from"react";import{StyleSheet,Text,View}from"react-native";import AppCard from"../../components/AppCard";import AppSelect from"../../components/AppSelect";import ScreenContainer from"../../components/ScreenContainer";import InfoBanner from"../../components/ui/InfoBanner";import LoadingState from"../../components/ui/LoadingState";import ScreenHeader from"../../components/ui/ScreenHeader";import StatusBadge from"../../components/ui/StatusBadge";import{getAdminRequests}from"../../services/adminService";import{adminStyles,formatDate,titleCase}from"./adminUi";
-const statuses=[{label:"All",value:""},...['provider_selection','provider_requested','accepted','provider_en_route','arrived','in_progress','completed','cancelled'].map(value=>({label:titleCase(value),value}))];
-export default function AdminRequestsScreen(){const[status,setStatus]=useState("");const[requests,setRequests]=useState([]);const[loading,setLoading]=useState(true);const[error,setError]=useState("");const load=useCallback(async()=>{setLoading(true);setError("");try{const data=await getAdminRequests({status:status||undefined});setRequests(data.requests||[]);}catch(e){setError(e.message);}finally{setLoading(false);}},[status]);useEffect(()=>{load();},[load]);return <ScreenContainer><ScreenHeader eyebrow="Administration" title="Breakdown Requests" subtitle="Monitor request ownership, provider assignment, and tracking state."/><AppCard><AppSelect label="Request status" options={statuses} value={status} onChange={setStatus}/></AppCard>{error?<InfoBanner tone="danger" message={error}/>:null}{loading?<LoadingState message="Loading requests..."/>:null}{requests.map(item=><AppCard key={item.requestId}><View style={styles.heading}><Text style={styles.title}>{item.driver?.name||"Driver"}</Text><StatusBadge status={item.status} tone={item.status==="completed"?"success":"info"}/></View><Text style={styles.body}>{titleCase(item.vehicleType)} · {titleCase(item.breakdownType)}</Text><Text style={styles.body}>Service: {titleCase(item.requiredService)}</Text><Text style={styles.body}>Provider: {item.provider?.businessName||"Not assigned"}</Text><Text style={styles.body}>Created: {formatDate(item.createdAt)}</Text></AppCard>)}</ScreenContainer>}
-const styles=StyleSheet.create({...adminStyles,heading:{flexDirection:"row",justifyContent:"space-between",gap:8}});
+import React, { useCallback, useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import AppCard from "../../components/AppCard";
+import AppSelect from "../../components/AppSelect";
+import ScreenContainer from "../../components/ScreenContainer";
+import InfoBanner from "../../components/ui/InfoBanner";
+import LoadingState from "../../components/ui/LoadingState";
+import ScreenHeader from "../../components/ui/ScreenHeader";
+import StatusBadge from "../../components/ui/StatusBadge";
+import { getAdminRequests } from "../../services/adminService";
+import { adminStyles, formatDate, titleCase } from "./adminUi";
+const statuses = [
+  { label: "All", value: "" },
+  ...[
+    "provider_selection",
+    "provider_requested",
+    "accepted",
+    "provider_en_route",
+    "arrived",
+    "in_progress",
+    "completed",
+    "cancelled",
+  ].map((value) => ({ label: titleCase(value), value })),
+];
+export default function AdminRequestsScreen() {
+  const [status, setStatus] = useState("");
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await getAdminRequests({ status: status || undefined });
+      setRequests(data.requests || []);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [status]);
+  useEffect(() => {
+    load();
+  }, [load]);
+  return (
+    <ScreenContainer>
+      {/* Breakdown requests page header and administration context. */}
+      <ScreenHeader
+        eyebrow="Administration"
+        title="Breakdown Requests"
+        subtitle="Monitor request ownership, provider assignment, and tracking state."
+      />
+      {/* Filter requests by their current workflow status. */}
+      <AppCard>
+        <AppSelect
+          label="Request status"
+          options={statuses}
+          value={status}
+          onChange={setStatus}
+        />
+      </AppCard>
+      {/* Feedback shown while requests load or when loading fails. */}
+      {error ? <InfoBanner tone="danger" message={error} /> : null}
+      {loading ? <LoadingState message="Loading requests..." /> : null}
+      {/* Request results with driver, service, provider, and date details. */}
+      {requests.map((item) => (
+        <AppCard key={item.requestId}>
+          <View style={styles.heading}>
+            <Text style={styles.title}>{item.driver?.name || "Driver"}</Text>
+            <StatusBadge
+              status={item.status}
+              tone={item.status === "completed" ? "success" : "info"}
+            />
+          </View>
+          <Text style={styles.body}>
+            {titleCase(item.vehicleType)} · {titleCase(item.breakdownType)}
+          </Text>
+          <Text style={styles.body}>
+            Service: {titleCase(item.requiredService)}
+          </Text>
+          <Text style={styles.body}>
+            Provider: {item.provider?.businessName || "Not assigned"}
+          </Text>
+          <Text style={styles.body}>Created: {formatDate(item.createdAt)}</Text>
+        </AppCard>
+      ))}
+    </ScreenContainer>
+  );
+}
+const styles = StyleSheet.create({
+  ...adminStyles,
+  heading: { flexDirection: "row", justifyContent: "space-between", gap: 8 },
+});

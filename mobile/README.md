@@ -6,6 +6,9 @@ This Expo React Native app is a beginner-friendly mobile UI demo for an Emergenc
 
 ## Install Dependencies
 
+This app uses **Expo SDK 57** and requires an Expo Go version that supports SDK 57.
+Use Node.js 22.13 or newer in the Node.js 22 release line, or a supported newer LTS release.
+
 ```bash
 cd mobile
 npm install
@@ -18,6 +21,15 @@ npx expo start
 ```
 
 Open the app with Expo Go or an Android/iOS emulator.
+
+After upgrading from SDK 54, stop any running Expo server, then start with a clean Metro cache:
+
+```bash
+npm start -- --clear
+```
+
+Scan the new QR code with Expo Go. The phone and computer should be on the same network.
+To check dependency compatibility, run `npx expo install --check` and `npx expo-doctor`.
 
 ## Completed Phase 1 Features
 
@@ -68,16 +80,11 @@ Spare parts shops and troubleshooting guides still use temporary local mock data
 
 ## Backend API Configuration
 
-The mobile app cannot use `localhost` when running on a physical phone through Expo Go. Set the backend URL in:
+The mobile app cannot use `localhost` when running on a physical phone through Expo Go.
+Copy `.env.example` to `.env` in the `mobile` directory and set the backend URL there:
 
-```text
-src/services/api.js
-```
-
-Current value:
-
-```js
-export const API_BASE_URL = "http://192.168.1.2:5050/api";
+```dotenv
+EXPO_PUBLIC_API_BASE_URL=http://YOUR_COMPUTER_WIFI_IP:YOUR_BACKEND_PORT/api
 ```
 
 To find your computer IPv4 address on Windows:
@@ -86,15 +93,14 @@ To find your computer IPv4 address on Windows:
 ipconfig
 ```
 
-Look for the Wi-Fi adapter `IPv4 Address`, then update `API_BASE_URL`.
+Look for the Wi-Fi adapter `IPv4 Address` and use the `PORT` configured in `backend/.env`.
+Keep `/api` at the end of the URL. The phone and computer must be on the same network.
+`src/services/api.js` reads `EXPO_PUBLIC_API_BASE_URL` automatically; no source-code edit is needed.
+The local `.env` file is ignored by Git.
 
-If your backend runs on the requested default port `5000`, use:
-
-```js
-export const API_BASE_URL = "http://YOUR_LOCAL_IP:5000/api";
-```
-
-On this machine, port `5000` is occupied by Windows, so the backend has been tested on `5050`.
+After changing `.env`, restart Expo with `npm start -- --clear` and reload the app.
+With the backend running, open `http://YOUR_COMPUTER_WIFI_IP:YOUR_BACKEND_PORT/api/health`
+on the phone to verify connectivity.
 
 No AI model, photo upload, safety checklist, or triage screen is implemented in this phase.
 

@@ -2,12 +2,15 @@ const mongoose = require("mongoose");
 
 function transactionsUnavailable(error) {
   const message = String(error?.message || "").toLowerCase();
-  return error?.code === 20 ||
+  return (
+    error?.code === 20 ||
     message.includes("transaction numbers are only allowed") ||
     message.includes("replica set") ||
-    message.includes("transactions are not supported");
+    message.includes("transactions are not supported")
+  );
 }
 
+// Transactions are optional for one database insert, but useful when related updates must succeed together.
 async function runWithOptionalTransaction(work) {
   if (mongoose.connection.readyState !== 1) return work(null);
 

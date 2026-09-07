@@ -9,7 +9,7 @@ import ScreenHeader from "../../components/ui/ScreenHeader";
 import {
   confirmTroubleshootingAction,
   submitTroubleshootingStep,
-  triggerStopCondition
+  triggerStopCondition,
 } from "../../services/selfAssistantService";
 import { colors, radii, spacing, typography } from "../../theme";
 import { formatFaultLabel } from "../../utils/displayLabels";
@@ -21,36 +21,53 @@ const UNSAFE_CONDITIONS = [
   { label: "Burning smell", value: "burning smell" },
   { label: "Serious fluid leak", value: "serious fluid leak" },
   { label: "Vehicle unstable", value: "vehicle instability" },
-  { label: "Other unsafe condition", value: "unexpected dangerous condition" }
+  { label: "Other unsafe condition", value: "unexpected dangerous condition" },
 ];
 
 function restoredMessages(session, aiPrediction, currentStep) {
-  const messages = aiPrediction?.faultLabel ? [{
-    role: "assistant",
-    text: `Your symptoms may indicate ${formatFaultLabel(aiPrediction.predictedFault, aiPrediction.faultLabel)}.`
-  }] : [];
+  // Rebuild the conversation when an existing troubleshooting session is resumed.
+  const messages = aiPrediction?.faultLabel
+    ? [
+        {
+          role: "assistant",
+          text: `Your symptoms may indicate ${formatFaultLabel(aiPrediction.predictedFault, aiPrediction.faultLabel)}.`,
+        },
+      ]
+    : [];
   for (const completed of session?.completedSteps || []) {
-    if (completed.instruction) messages.push({ role: "assistant", text: completed.instruction });
+    if (completed.instruction)
+      messages.push({ role: "assistant", text: completed.instruction });
     messages.push({ role: "user", text: "Done – I Checked" });
     messages.push({ role: "assistant", text: "Great. What did you observe?" });
-    messages.push({ role: "user", text: completed.resultLabel || completed.selectedResult });
-    messages.push({ role: "assistant", text: "Okay. Let's continue with the next check." });
+    messages.push({
+      role: "user",
+      text: completed.resultLabel || completed.selectedResult,
+    });
+    messages.push({
+      role: "assistant",
+      text: "Okay. Let's continue with the next check.",
+    });
   }
-  if (currentStep?.instruction) messages.push({ role: "assistant", text: currentStep.instruction });
+  if (currentStep?.instruction)
+    messages.push({ role: "assistant", text: currentStep.instruction });
   return messages;
 }
 
-export default function TroubleshootingConversationScreen({ navigation, route }) {
+export default function TroubleshootingConversationScreen({
+  navigation,
+  route,
+}) {
+  // Restore the session and track the current troubleshooting phase.
   const { sessionId, aiPrediction, prefill } = route.params || {};
   const initialSession = route.params?.session || {};
   const initialStep = route.params?.currentStep || initialSession.currentStep;
   const [activeSession, setActiveSession] = useState(initialSession);
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [currentPhase, setCurrentPhase] = useState(
-    route.params?.currentPhase || initialSession.currentPhase || "instruction"
+    route.params?.currentPhase || initialSession.currentPhase || "instruction",
   );
   const [messages, setMessages] = useState(() =>
-    restoredMessages(initialSession, aiPrediction, initialStep)
+    restoredMessages(initialSession, aiPrediction, initialStep),
   );
   const [unsafeOpen, setUnsafeOpen] = useState(false);
   const [cannotContinue, setCannotContinue] = useState(false);
@@ -67,6 +84,7 @@ export default function TroubleshootingConversationScreen({ navigation, route })
 
   const checkNumber = (activeSession?.completedSteps?.length || 0) + 1;
 
+  // Route completed or stopped sessions to the result screen.
   function showResult(response) {
     navigation.replace("SelfAssistantResult", {
       sessionId,
@@ -74,26 +92,37 @@ export default function TroubleshootingConversationScreen({ navigation, route })
       aiPrediction,
       prefill,
       status: response.status,
-      message: response.status === "resolved"
-        ? "That completes the basic troubleshooting steps."
-        : response.message,
+      message:
+        response.status === "resolved"
+          ? "That completes the basic troubleshooting steps."
+          : response.message,
       recommendedService: response.recommendedService,
-      riskLevel: route.params?.riskLevel || activeSession?.riskLevel
+      riskLevel: route.params?.riskLevel || activeSession?.riskLevel,
     });
   }
 
+  // Confirm that the driver completed the current instruction.
   async function confirmAction() {
     if (!currentStep || submittingRef.current) return;
     submittingRef.current = true;
     setLoading(true);
     setError("");
     try {
-      const response = await confirmTroubleshootingAction(sessionId, currentStep.step_id);
+      const response = await confirmTroubleshootingAction(
+        sessionId,
+        currentStep.step_id,
+      );
       setActiveSession(response.session || activeSession);
       setMessages((items) => [
         ...items,
         { role: "user", text: "Done – I Checked" },
-        { role: "assistant", text: currentStep.result_question || currentStep.question || "Great. What did you observe?" }
+        {
+          role: "assistant",
+          text:
+            currentStep.result_question ||
+            currentStep.question ||
+            "Great. What did you observe?",
+        },
       ]);
       setCurrentPhase("result");
     } catch (actionError) {
@@ -104,8 +133,10 @@ export default function TroubleshootingConversationScreen({ navigation, route })
     }
   }
 
+  // Submit the driver's observation and load the next approved step.
   async function chooseAnswer(option) {
-    if (!currentStep || currentPhase !== "result" || submittingRef.current) return;
+    if (!currentStep || currentPhase !== "result" || submittingRef.current)
+      return;
     submittingRef.current = true;
     setCurrentPhase("processing");
     setLoading(true);
@@ -115,15 +146,18 @@ export default function TroubleshootingConversationScreen({ navigation, route })
       const response = await submitTroubleshootingStep(
         sessionId,
         currentStep.step_id,
-        option.value
+        option.value,
       );
       if (response.status === "in_progress" && response.nextStep) {
         setActiveSession(response.session || activeSession);
         setCurrentStep(response.nextStep);
         setMessages((items) => [
           ...items,
-          { role: "assistant", text: "Okay. Let's continue with the next check." },
-          { role: "assistant", text: response.nextStep.instruction }
+          {
+            role: "assistant",
+            text: "Okay. Let's continue with the next check.",
+          },
+          { role: "assistant", text: response.nextStep.instruction },
         ]);
         setCurrentPhase("instruction");
       } else {
@@ -139,6 +173,7 @@ export default function TroubleshootingConversationScreen({ navigation, route })
     }
   }
 
+  // Stop the flow when the driver reports an unsafe condition.
   async function stopForCondition(condition) {
     if (submittingRef.current) return;
     submittingRef.current = true;
@@ -154,11 +189,15 @@ export default function TroubleshootingConversationScreen({ navigation, route })
     }
   }
 
+  // Escalate directly to a mechanic while preserving the request draft.
   async function stopAndRequestMechanic() {
     if (submittingRef.current) return;
     submittingRef.current = true;
     try {
-      await triggerStopCondition(sessionId, "User requested professional assistance");
+      await triggerStopCondition(
+        sessionId,
+        "User requested professional assistance",
+      );
     } catch (_error) {
       // Mechanic escalation remains available if session persistence is temporarily unavailable.
     } finally {
@@ -169,6 +208,7 @@ export default function TroubleshootingConversationScreen({ navigation, route })
 
   return (
     <ScreenContainer>
+      {/* Conversation header and current check phase. */}
       <ScreenHeader
         eyebrow="Guided safety check"
         title="Checking your vehicle"
@@ -177,40 +217,97 @@ export default function TroubleshootingConversationScreen({ navigation, route })
       <View style={styles.checkHeader}>
         <Text style={styles.checkLabel}>Check {checkNumber}</Text>
         <Text style={styles.phaseLabel}>
-          {currentPhase === "result" ? "Observation" : currentPhase === "processing" ? "Reviewing" : "Action"}
+          {currentPhase === "result"
+            ? "Observation"
+            : currentPhase === "processing"
+              ? "Reviewing"
+              : "Action"}
         </Text>
       </View>
 
+      {/* Restored assistant and driver conversation messages. */}
       {messages.map((message, index) => (
-        <View key={`${message.role}-${index}`} style={[styles.messageRow, message.role === "user" && styles.userRow]}>
-          {message.role === "assistant" ? <View style={styles.avatar}><Ionicons name="shield-checkmark" size={18} color={colors.teal} /></View> : null}
-          <View style={[styles.bubble, message.role === "user" ? styles.userBubble : styles.assistantBubble]}>
-            <Text style={[styles.message, message.role === "user" && styles.userMessage]}>{message.text}</Text>
+        <View
+          key={`${message.role}-${index}`}
+          style={[styles.messageRow, message.role === "user" && styles.userRow]}
+        >
+          {message.role === "assistant" ? (
+            <View style={styles.avatar}>
+              <Ionicons name="shield-checkmark" size={18} color={colors.teal} />
+            </View>
+          ) : null}
+          <View
+            style={[
+              styles.bubble,
+              message.role === "user"
+                ? styles.userBubble
+                : styles.assistantBubble,
+            ]}
+          >
+            <Text
+              style={[
+                styles.message,
+                message.role === "user" && styles.userMessage,
+              ]}
+            >
+              {message.text}
+            </Text>
           </View>
         </View>
       ))}
 
+      {/* Approved instruction and completion controls. */}
       {currentStep && currentPhase === "instruction" && !cannotContinue ? (
         <AppCard style={styles.actionCard}>
           <Text style={styles.overline}>First, do this:</Text>
           <Text style={styles.instruction}>{currentStep.instruction}</Text>
-          <AppButton title="Done – I Checked" icon="checkmark-circle-outline" loading={loading} onPress={confirmAction} />
-          <AppButton title="I Can't Do This" variant="secondary" disabled={loading} onPress={() => setCannotContinue(true)} />
-          <AppButton title="Stop & Request Mechanic" variant="danger" disabled={loading} onPress={stopAndRequestMechanic} />
+          <AppButton
+            title="Done – I Checked"
+            icon="checkmark-circle-outline"
+            loading={loading}
+            onPress={confirmAction}
+          />
+          <AppButton
+            title="I Can't Do This"
+            variant="secondary"
+            disabled={loading}
+            onPress={() => setCannotContinue(true)}
+          />
+          <AppButton
+            title="Stop & Request Mechanic"
+            variant="danger"
+            disabled={loading}
+            onPress={stopAndRequestMechanic}
+          />
         </AppCard>
       ) : null}
 
+      {/* Recovery path when the driver cannot complete the instruction. */}
       {cannotContinue ? (
         <AppCard style={styles.cannotCard}>
-          <Text style={styles.question}>That's okay. Do not continue if you are unsure.</Text>
-          <AppButton title="Request Mechanic" onPress={stopAndRequestMechanic} />
-          <AppButton title="Go Back" variant="secondary" onPress={() => setCannotContinue(false)} />
+          <Text style={styles.question}>
+            That's okay. Do not continue if you are unsure.
+          </Text>
+          <AppButton
+            title="Request Mechanic"
+            onPress={stopAndRequestMechanic}
+          />
+          <AppButton
+            title="Go Back"
+            variant="secondary"
+            onPress={() => setCannotContinue(false)}
+          />
         </AppCard>
       ) : null}
 
+      {/* Observation question and safe answer options. */}
       {currentStep && currentPhase === "result" && !cannotContinue ? (
         <AppCard>
-          <Text style={styles.question}>{currentStep.result_question || currentStep.question || "Great. What did you observe?"}</Text>
+          <Text style={styles.question}>
+            {currentStep.result_question ||
+              currentStep.question ||
+              "Great. What did you observe?"}
+          </Text>
           <Text style={styles.help}>Choose only what you safely observed.</Text>
           {answerOptions.map((option) => (
             <Pressable
@@ -218,54 +315,140 @@ export default function TroubleshootingConversationScreen({ navigation, route })
               accessibilityRole="button"
               disabled={loading}
               onPress={() => chooseAnswer(option)}
-              style={({ pressed }) => [styles.answer, option.value === "not_sure" && styles.neutralAnswer, pressed && styles.pressed]}
+              style={({ pressed }) => [
+                styles.answer,
+                option.value === "not_sure" && styles.neutralAnswer,
+                pressed && styles.pressed,
+              ]}
             >
-              <Text style={styles.answerText}>{option.value === "not_sure" ? "Not Sure" : option.label}</Text>
+              <Text style={styles.answerText}>
+                {option.value === "not_sure" ? "Not Sure" : option.label}
+              </Text>
               <Ionicons name="chevron-forward" size={20} color={colors.teal} />
             </Pressable>
           ))}
         </AppCard>
       ) : null}
 
-      {currentPhase === "processing" ? <InfoBanner tone="info" message="Reviewing your observation and loading the next approved check..." /> : null}
+      {/* Processing and submission error feedback. */}
+      {currentPhase === "processing" ? (
+        <InfoBanner
+          tone="info"
+          message="Reviewing your observation and loading the next approved check..."
+        />
+      ) : null}
       {error ? <InfoBanner tone="danger" message={error} /> : null}
 
+      {/* Unsafe-condition reporting and final mechanic escalation. */}
       {unsafeOpen ? (
         <AppCard style={styles.unsafeCard}>
-          <Text style={styles.unsafeTitle}>What unsafe condition did you notice?</Text>
-          {UNSAFE_CONDITIONS.map((item) => <AppButton key={item.value} title={item.label} variant="danger" disabled={loading} onPress={() => stopForCondition(item.value)} />)}
-          <AppButton title="Go Back" variant="secondary" onPress={() => setUnsafeOpen(false)} />
+          <Text style={styles.unsafeTitle}>
+            What unsafe condition did you notice?
+          </Text>
+          {UNSAFE_CONDITIONS.map((item) => (
+            <AppButton
+              key={item.value}
+              title={item.label}
+              variant="danger"
+              disabled={loading}
+              onPress={() => stopForCondition(item.value)}
+            />
+          ))}
+          <AppButton
+            title="Go Back"
+            variant="secondary"
+            onPress={() => setUnsafeOpen(false)}
+          />
         </AppCard>
       ) : (
-        <AppButton title="I Noticed Something Unsafe" icon="warning-outline" variant="secondary" disabled={loading} onPress={() => setUnsafeOpen(true)} />
+        <AppButton
+          title="I Noticed Something Unsafe"
+          icon="warning-outline"
+          variant="secondary"
+          disabled={loading}
+          onPress={() => setUnsafeOpen(true)}
+        />
       )}
-      {currentPhase !== "instruction" ? <AppButton title="Stop & Request Mechanic" icon="construct-outline" variant="danger" disabled={loading} onPress={stopAndRequestMechanic} /> : null}
+      {currentPhase !== "instruction" ? (
+        <AppButton
+          title="Stop & Request Mechanic"
+          icon="construct-outline"
+          variant="danger"
+          disabled={loading}
+          onPress={stopAndRequestMechanic}
+        />
+      ) : null}
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  checkHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: spacing.xs, borderBottomWidth: 1, borderBottomColor: colors.border },
+  checkHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
   checkLabel: { ...typography.sectionTitle, color: colors.primaryDark },
-  phaseLabel: { ...typography.caption, color: colors.teal, fontWeight: "800", textTransform: "uppercase" },
+  phaseLabel: {
+    ...typography.caption,
+    color: colors.teal,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
   messageRow: { flexDirection: "row", alignItems: "flex-end", gap: spacing.xs },
   userRow: { justifyContent: "flex-end" },
-  avatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.tealLight, alignItems: "center", justifyContent: "center" },
+  avatar: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.tealLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   bubble: { maxWidth: "82%", borderRadius: radii.lg, padding: spacing.md },
-  assistantBubble: { backgroundColor: colors.blueLight, borderBottomLeftRadius: 4 },
+  assistantBubble: {
+    backgroundColor: colors.blueLight,
+    borderBottomLeftRadius: 4,
+  },
   userBubble: { backgroundColor: colors.primary, borderBottomRightRadius: 4 },
   message: { ...typography.body, color: colors.textPrimary },
   userMessage: { color: colors.surface },
   actionCard: { borderColor: colors.teal, backgroundColor: colors.tealLight },
-  overline: { ...typography.caption, color: colors.teal, fontWeight: "800", textTransform: "uppercase" },
-  instruction: { ...typography.cardTitle, color: colors.primaryDark, lineHeight: 26 },
+  overline: {
+    ...typography.caption,
+    color: colors.teal,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
+  instruction: {
+    ...typography.cardTitle,
+    color: colors.primaryDark,
+    lineHeight: 26,
+  },
   question: { ...typography.cardTitle, color: colors.primaryDark },
   help: { ...typography.caption, color: colors.textSecondary },
-  answer: { minHeight: 52, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm, borderWidth: 1, borderColor: colors.border, borderRadius: radii.md, paddingHorizontal: spacing.md, backgroundColor: colors.surface },
+  answer: {
+    minHeight: 52,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.surface,
+  },
   neutralAnswer: { backgroundColor: colors.softSurface },
   answerText: { ...typography.bodyStrong, flex: 1, color: colors.textPrimary },
   pressed: { backgroundColor: colors.tealLight },
   cannotCard: { borderColor: colors.amber, backgroundColor: colors.amberLight },
-  unsafeCard: { borderColor: colors.danger, backgroundColor: colors.dangerLight },
-  unsafeTitle: { ...typography.cardTitle, color: colors.danger }
+  unsafeCard: {
+    borderColor: colors.danger,
+    backgroundColor: colors.dangerLight,
+  },
+  unsafeTitle: { ...typography.cardTitle, color: colors.danger },
 });

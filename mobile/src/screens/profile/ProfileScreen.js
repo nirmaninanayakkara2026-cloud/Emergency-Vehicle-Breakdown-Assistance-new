@@ -19,6 +19,7 @@ function formatRole(role) {
 
 export default function ProfileScreen() {
   const { user, logout, updateUserProfile } = useAuth();
+  // Track profile edit mode, form values, save state, and feedback messages.
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,12 +28,14 @@ export default function ProfileScreen() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  // Keep the editable form synchronized with the authenticated user.
   useEffect(() => {
     setName(user?.name || "");
     setEmail(user?.email || "");
     setPhone(user?.phone || "");
   }, [user]);
 
+  // Validate and save updated contact details through the auth context.
   async function handleSave() {
     setError("");
     setMessage("");
@@ -47,7 +50,7 @@ export default function ProfileScreen() {
       await updateUserProfile({
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        phone: phone.trim()
+        phone: phone.trim(),
       });
       setMessage("Profile updated successfully.");
       setIsEditing(false);
@@ -60,71 +63,156 @@ export default function ProfileScreen() {
 
   return (
     <ScreenContainer>
-      <ScreenHeader eyebrow="Your account" title="Profile" subtitle="Manage your contact details and account." />
-      <View style={styles.identity}><View style={styles.avatar}><Text style={styles.avatarText}>{(user?.name || "U").slice(0, 1).toUpperCase()}</Text></View><Text style={styles.name}>{user?.name || "Account User"}</Text><Text style={styles.role}>{formatDisplayValue(user?.role || "driver")}</Text></View>
+      {/* Profile header and current account identity. */}
+      <ScreenHeader
+        eyebrow="Your account"
+        title="Profile"
+        subtitle="Manage your contact details and account."
+      />
+      <View style={styles.identity}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {(user?.name || "U").slice(0, 1).toUpperCase()}
+          </Text>
+        </View>
+        <Text style={styles.name}>{user?.name || "Account User"}</Text>
+        <Text style={styles.role}>
+          {formatDisplayValue(user?.role || "driver")}
+        </Text>
+      </View>
 
+      {/* Editable contact form or read-only profile details. */}
       <AppCard>
         {isEditing ? (
           <>
             <AppInput label="Name" value={name} onChangeText={setName} />
-            <AppInput label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
-            <AppInput label="Phone" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+            <AppInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+            <AppInput
+              label="Phone"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+            />
           </>
         ) : (
           <>
-            <ProfileRow icon="person-outline" label="Name" value={user?.name} /><Divider />
-            <ProfileRow icon="call-outline" label="Phone" value={user?.phone} /><Divider />
+            <ProfileRow icon="person-outline" label="Name" value={user?.name} />
+            <Divider />
+            <ProfileRow icon="call-outline" label="Phone" value={user?.phone} />
+            <Divider />
             <ProfileRow icon="mail-outline" label="Email" value={user?.email} />
           </>
         )}
 
-        {isEditing ? <><Text style={styles.label}>Role</Text><Text style={styles.body}>{formatRole(user?.role)}</Text></> : null}
+        {/* Save feedback and edit-mode actions. */}
+        {isEditing ? (
+          <>
+            <Text style={styles.label}>Role</Text>
+            <Text style={styles.body}>{formatRole(user?.role)}</Text>
+          </>
+        ) : null}
 
         {message ? <InfoBanner tone="success" message={message} /> : null}
         {error ? <InfoBanner tone="danger" message={error} /> : null}
 
         {isEditing ? (
           <>
-            <AppButton title="Save profile" onPress={handleSave} loading={loading} />
-            <AppButton title="Cancel" variant="secondary" onPress={() => setIsEditing(false)} />
+            <AppButton
+              title="Save profile"
+              onPress={handleSave}
+              loading={loading}
+            />
+            <AppButton
+              title="Cancel"
+              variant="secondary"
+              onPress={() => setIsEditing(false)}
+            />
           </>
         ) : (
-          <AppButton title="Edit Profile" icon="create-outline" variant="secondary" onPress={() => setIsEditing(true)} />
+          <AppButton
+            title="Edit Profile"
+            icon="create-outline"
+            variant="secondary"
+            onPress={() => setIsEditing(true)}
+          />
         )}
       </AppCard>
 
-      <AppButton title="Log Out" icon="log-out-outline" variant="danger" onPress={logout} />
+      {/* End the authenticated session. */}
+      <AppButton
+        title="Log Out"
+        icon="log-out-outline"
+        variant="danger"
+        onPress={logout}
+      />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  identity: { alignItems: "center", gap: spacing.xs }, avatar: { width: 82, height: 82, borderRadius: 41, backgroundColor: colors.tealLight, alignItems: "center", justifyContent: "center" }, avatarText: { fontSize: 30, fontWeight: "700", color: colors.teal }, name: { ...typography.sectionTitle, color: colors.primaryDark }, role: { ...typography.body, color: colors.textSecondary },
+  identity: { alignItems: "center", gap: spacing.xs },
+  avatar: {
+    width: 82,
+    height: 82,
+    borderRadius: 41,
+    backgroundColor: colors.tealLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: { fontSize: 30, fontWeight: "700", color: colors.teal },
+  name: { ...typography.sectionTitle, color: colors.primaryDark },
+  role: { ...typography.body, color: colors.textSecondary },
   subtitle: {
     color: COLORS.muted,
-    lineHeight: 21
+    lineHeight: 21,
   },
   label: {
     color: COLORS.primaryDark,
-    fontWeight: "800"
+    fontWeight: "800",
   },
   body: {
     color: COLORS.text,
     fontSize: 16,
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   profileRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  rowIcon: { width: 40, height: 40, borderRadius: radii.sm, backgroundColor: colors.tealLight, alignItems: "center", justifyContent: "center" },
-  rowCopy: { flex: 1, gap: spacing.xxs }, rowLabel: { ...typography.caption, color: colors.textSecondary }, rowValue: { ...typography.bodyStrong, color: colors.textPrimary },
+  rowIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radii.sm,
+    backgroundColor: colors.tealLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rowCopy: { flex: 1, gap: spacing.xxs },
+  rowLabel: { ...typography.caption, color: colors.textSecondary },
+  rowValue: { ...typography.bodyStrong, color: colors.textPrimary },
   success: {
     color: COLORS.success,
-    fontWeight: "700"
+    fontWeight: "700",
   },
   error: {
     color: COLORS.danger,
     fontWeight: "700",
-    lineHeight: 20
-  }
+    lineHeight: 20,
+  },
 });
 
-function ProfileRow({ icon, label, value }) { return <View style={styles.profileRow}><View style={styles.rowIcon}><Ionicons name={icon} size={20} color={colors.teal} /></View><View style={styles.rowCopy}><Text style={styles.rowLabel}>{label}</Text><Text style={styles.rowValue}>{value || "Not available"}</Text></View></View>; }
+function ProfileRow({ icon, label, value }) {
+  return (
+    <View style={styles.profileRow}>
+      <View style={styles.rowIcon}>
+        <Ionicons name={icon} size={20} color={colors.teal} />
+      </View>
+      <View style={styles.rowCopy}>
+        <Text style={styles.rowLabel}>{label}</Text>
+        <Text style={styles.rowValue}>{value || "Not available"}</Text>
+      </View>
+    </View>
+  );
+}

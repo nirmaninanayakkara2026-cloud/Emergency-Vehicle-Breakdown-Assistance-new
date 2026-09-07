@@ -8,6 +8,7 @@ import { saveTroubleshootingHistory } from "../../services/troubleshootingServic
 import { COLORS } from "../../utils/constants";
 
 export default function TroubleshootingResultScreen({ navigation, route }) {
+  // Read the completed guide context and prepare result state.
   const {
     guideId,
     vehicleType,
@@ -15,12 +16,13 @@ export default function TroubleshootingResultScreen({ navigation, route }) {
     requestBreakdownType,
     problemDescription,
     serviceType,
-    symptomData
+    symptomData,
   } = route.params || {};
   const guide = troubleshootingGuides.find((item) => item.id === guideId);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
+  // Preserve troubleshooting context for a possible mechanic request.
   const requestPrefill = useMemo(
     () => ({
       vehicleType,
@@ -28,15 +30,25 @@ export default function TroubleshootingResultScreen({ navigation, route }) {
       problemDescription: [
         symptomData ? "" : problemDescription,
         "Self-troubleshooting attempted",
-        serviceType ? `Suggested service type: ${serviceType}` : ""
-      ].filter(Boolean).join("\n"),
+        serviceType ? `Suggested service type: ${serviceType}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n"),
       requiredServiceType: serviceType,
       selfTroubleshootingAttempted: true,
-      guidedSymptoms: symptomData
+      guidedSymptoms: symptomData,
     }),
-    [vehicleType, breakdownType, requestBreakdownType, problemDescription, serviceType, symptomData]
+    [
+      vehicleType,
+      breakdownType,
+      requestBreakdownType,
+      problemDescription,
+      serviceType,
+      symptomData,
+    ],
   );
 
+  // Save the outcome locally while keeping the result visible if saving fails.
   async function saveResult(nextResult) {
     setError("");
     try {
@@ -44,7 +56,7 @@ export default function TroubleshootingResultScreen({ navigation, route }) {
         vehicleType,
         breakdownType,
         riskLevel: guide?.riskLevel || "high",
-        result: nextResult
+        result: nextResult,
       });
       setResult(nextResult);
     } catch (historyError) {
@@ -53,36 +65,62 @@ export default function TroubleshootingResultScreen({ navigation, route }) {
     }
   }
 
+  // Open the mechanic request form with the troubleshooting details prefilled.
   function handleRequestMechanic() {
     navigation.navigate("RequestMechanic", { prefill: requestPrefill });
   }
 
   return (
     <ScreenContainer>
+      {/* Result question, guide context, and save errors. */}
       <AppCard>
         <Text style={styles.title}>Did this solve the problem?</Text>
-        <Text style={styles.body}>{guide?.title || "Self-assistance guide completed."}</Text>
+        <Text style={styles.body}>
+          {guide?.title || "Self-assistance guide completed."}
+        </Text>
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
+        {/* Initial outcome choices. */}
         {!result ? (
           <>
-            <AppButton title="YES - Problem Fixed" variant="success" onPress={() => saveResult("resolved")} />
-            <AppButton title="NO - I Still Need Help" onPress={() => saveResult("mechanic_requested")} />
+            <AppButton
+              title="YES - Problem Fixed"
+              variant="success"
+              onPress={() => saveResult("resolved")}
+            />
+            <AppButton
+              title="NO - I Still Need Help"
+              onPress={() => saveResult("mechanic_requested")}
+            />
           </>
         ) : null}
 
+        {/* Resolved outcome and home navigation. */}
         {result === "resolved" ? (
           <>
             <Text style={styles.success}>Problem marked as resolved.</Text>
-            <AppButton title="Return Home" onPress={() => navigation.navigate("DriverHome")} />
+            <AppButton
+              title="Return Home"
+              onPress={() => navigation.navigate("DriverHome")}
+            />
           </>
         ) : null}
 
+        {/* Professional-assistance outcome and mechanic request actions. */}
         {result === "mechanic_requested" ? (
           <>
-            <Text style={styles.warning}>Professional assistance is recommended.</Text>
-            <AppButton title="Request Mechanic" onPress={handleRequestMechanic} />
-            <AppButton title="Return Home" variant="secondary" onPress={() => navigation.navigate("DriverHome")} />
+            <Text style={styles.warning}>
+              Professional assistance is recommended.
+            </Text>
+            <AppButton
+              title="Request Mechanic"
+              onPress={handleRequestMechanic}
+            />
+            <AppButton
+              title="Return Home"
+              variant="secondary"
+              onPress={() => navigation.navigate("DriverHome")}
+            />
           </>
         ) : null}
       </AppCard>
@@ -94,23 +132,23 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.primaryDark,
     fontSize: 24,
-    fontWeight: "900"
+    fontWeight: "900",
   },
   body: {
     color: COLORS.muted,
-    lineHeight: 21
+    lineHeight: 21,
   },
   success: {
     color: COLORS.success,
-    fontWeight: "900"
+    fontWeight: "900",
   },
   warning: {
     color: COLORS.warning,
-    fontWeight: "900"
+    fontWeight: "900",
   },
   error: {
     color: COLORS.danger,
     fontWeight: "700",
-    lineHeight: 20
-  }
+    lineHeight: 20,
+  },
 });

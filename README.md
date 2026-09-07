@@ -6,10 +6,10 @@ rule-based provider recommendation and tracking.
 
 ## Requirements
 
-- Node.js and npm
+- Node.js 22.13+ in the Node.js 22 release line (or a supported newer LTS release) and npm
 - Python 3.11+
 - MongoDB
-- Expo Go or an Android/iOS emulator
+- Expo Go supporting SDK 57, or an Android/iOS emulator
 
 ## 1. Start FastAPI
 
@@ -49,6 +49,9 @@ cd mobile
 npm install
 npm start
 ```
+
+After an Expo SDK upgrade, stop the old mobile server and run `npm start -- --clear`,
+then scan the new QR code in Expo Go.
 
 `EXPO_PUBLIC_API_BASE_URL` must include `/api`, for example
 `http://192.168.1.100:5000/api` for a physical device on the same network.

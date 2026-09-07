@@ -12,13 +12,17 @@ import StatusBadge from "../../components/ui/StatusBadge";
 import { cancelRequest, getRequestById } from "../../services/requestService";
 import { COLORS } from "../../utils/constants";
 import { colors, radii, spacing, typography } from "../../theme";
-import { formatDisplayValue, formatServiceType } from "../../utils/displayLabels";
+import {
+  formatDisplayValue,
+  formatServiceType,
+} from "../../utils/displayLabels";
 
 function formatValue(value) {
   return value ? value.replaceAll("_", " ") : "Not available";
 }
 
 export default function RequestDetailsScreen({ navigation, route }) {
+  // Store the request and the loading state for detail and action requests.
   const [request, setRequest] = useState(route.params?.request || null);
   const [loading, setLoading] = useState(!route.params?.request);
   const [refreshing, setRefreshing] = useState(false);
@@ -27,12 +31,18 @@ export default function RequestDetailsScreen({ navigation, route }) {
 
   const requestId = route.params?.requestId || request?._id;
 
+  // Load current request data and move completed requests to the completion screen.
   const loadDetails = useCallback(async () => {
     setError("");
     try {
-      const requestData = await (requestId ? getRequestById(requestId) : Promise.resolve(request));
+      const requestData = await (requestId
+        ? getRequestById(requestId)
+        : Promise.resolve(request));
       if (requestData.status === "completed") {
-        navigation.replace("JobCompletion", { requestId: requestData._id, request: requestData });
+        navigation.replace("JobCompletion", {
+          requestId: requestData._id,
+          request: requestData,
+        });
         return;
       }
       setRequest(requestData);
@@ -53,6 +63,7 @@ export default function RequestDetailsScreen({ navigation, route }) {
     await loadDetails();
   }
 
+  // Cancel the active request and update the displayed status.
   async function handleCancel() {
     setActionLoading(true);
     setError("");
@@ -77,14 +88,34 @@ export default function RequestDetailsScreen({ navigation, route }) {
   const selectedProvider = request.selectedProviderId;
 
   return (
-    <ScreenContainer refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
-      <ScreenHeader eyebrow="Roadside request" title="Request Details" subtitle="Review the assistance details and next actions." right={<StatusBadge status={request.status} tone={request.status === "completed" ? "success" : "info"} />} />
+    <ScreenContainer
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
+      {/* Request header and current status. */}
+      <ScreenHeader
+        eyebrow="Roadside request"
+        title="Request Details"
+        subtitle="Review the assistance details and next actions."
+        right={
+          <StatusBadge
+            status={request.status}
+            tone={request.status === "completed" ? "success" : "info"}
+          />
+        }
+      />
+      {/* Request loading or refresh error feedback. */}
       {error ? (
         <AppCard>
-          <ErrorState message="We couldn't load this request." onRetry={loadDetails} />
+          <ErrorState
+            message="We couldn't load this request."
+            onRetry={loadDetails}
+          />
         </AppCard>
       ) : null}
 
+      {/* AI prediction and optional clarification action. */}
       <PredictionSummaryCard prediction={request.aiPrediction} />
 
       {request.aiPrediction?.needsMoreInformation &&
@@ -96,14 +127,26 @@ export default function RequestDetailsScreen({ navigation, route }) {
             navigation.navigate("AIClarification", {
               requestId: request._id,
               request,
-              aiPrediction: request.aiPrediction
+              aiPrediction: request.aiPrediction,
             })
           }
         />
       ) : null}
 
+      {/* Vehicle, breakdown, location, provider, and request action details. */}
       <AppCard>
-        <View style={styles.cardHeader}><View style={styles.icon}><Ionicons name="car-sport-outline" size={24} color={colors.primary} /></View><Text style={styles.cardTitle}>{formatDisplayValue(request.vehicleType)} assistance</Text></View>
+        <View style={styles.cardHeader}>
+          <View style={styles.icon}>
+            <Ionicons
+              name="car-sport-outline"
+              size={24}
+              color={colors.primary}
+            />
+          </View>
+          <Text style={styles.cardTitle}>
+            {formatDisplayValue(request.vehicleType)} assistance
+          </Text>
+        </View>
         <Text style={styles.label}>Vehicle type</Text>
         <Text style={styles.body}>{formatValue(request.vehicleType)}</Text>
         {request.vehicleModel ? (
@@ -115,11 +158,16 @@ export default function RequestDetailsScreen({ navigation, route }) {
         <Text style={styles.label}>Breakdown type</Text>
         <Text style={styles.body}>{formatValue(request.breakdownType)}</Text>
         <Text style={styles.label}>Required service type</Text>
-        <Text style={styles.body}>{formatServiceType(request.requiredServiceType)}</Text>
+        <Text style={styles.body}>
+          {formatServiceType(request.requiredServiceType)}
+        </Text>
         <Text style={styles.label}>Urgency</Text>
         <Text style={styles.body}>{formatValue(request.urgencyLevel)}</Text>
         <Text style={styles.label}>Status</Text>
-        <StatusBadge status={request.status} tone={request.status === "completed" ? "success" : "info"} />
+        <StatusBadge
+          status={request.status}
+          tone={request.status === "completed" ? "success" : "info"}
+        />
         <Text style={styles.label}>Location</Text>
         <Text style={styles.body}>{request.location?.address}</Text>
         <Text style={styles.label}>Description</Text>
@@ -127,55 +175,85 @@ export default function RequestDetailsScreen({ navigation, route }) {
         {selectedProvider ? (
           <>
             <Text style={styles.label}>Selected provider</Text>
-            <Text style={styles.body}>{selectedProvider.businessName || selectedProvider}</Text>
-            <AppButton title="Track Request" onPress={() => navigation.navigate("RequestTracking", { requestId: request._id, request })} />
+            <Text style={styles.body}>
+              {selectedProvider.businessName || selectedProvider}
+            </Text>
+            <AppButton
+              title="Track Request"
+              onPress={() =>
+                navigation.navigate("RequestTracking", {
+                  requestId: request._id,
+                  request,
+                })
+              }
+            />
           </>
         ) : null}
         {!selectedProvider && request.status !== "cancelled" ? (
           <AppButton
             title="View Recommended Providers"
-            onPress={() => navigation.navigate("Recommendation", { requestId: request._id })}
+            onPress={() =>
+              navigation.navigate("Recommendation", { requestId: request._id })
+            }
           />
         ) : null}
         {request.status !== "completed" && request.status !== "cancelled" ? (
-          <AppButton title="Cancel Request" variant="danger" onPress={handleCancel} loading={actionLoading} />
+          <AppButton
+            title="Cancel Request"
+            variant="danger"
+            onPress={handleCancel}
+            loading={actionLoading}
+          />
         ) : null}
       </AppCard>
 
-      <AppButton title="Back to My Requests" variant="secondary" onPress={() => navigation.navigate("MyRequests")} />
+      {/* Return to the driver's request history. */}
+      <AppButton
+        title="Back to My Requests"
+        variant="secondary"
+        onPress={() => navigation.navigate("MyRequests")}
+      />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  cardHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm }, icon: { width: 46, height: 46, borderRadius: radii.md, backgroundColor: colors.blueLight, alignItems: "center", justifyContent: "center" },
+  cardHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  icon: {
+    width: 46,
+    height: 46,
+    borderRadius: radii.md,
+    backgroundColor: colors.blueLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   title: {
     color: COLORS.primaryDark,
     fontSize: 24,
-    fontWeight: "900"
+    fontWeight: "900",
   },
   cardTitle: {
     color: COLORS.text,
     fontSize: 17,
-    fontWeight: "900"
+    fontWeight: "900",
   },
   label: {
     color: COLORS.primaryDark,
-    fontWeight: "800"
+    fontWeight: "800",
   },
   body: {
     color: COLORS.muted,
     lineHeight: 21,
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   status: {
     color: COLORS.success,
     fontWeight: "900",
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   error: {
     color: COLORS.danger,
     fontWeight: "700",
-    lineHeight: 20
-  }
+    lineHeight: 20,
+  },
 });

@@ -10,7 +10,7 @@ import ScreenContainer from "../../components/ScreenContainer";
 import SymptomProgress from "../../components/symptom/SymptomProgress";
 import {
   getClarificationQuestions,
-  submitClarificationAnswers
+  submitClarificationAnswers,
 } from "../../services/requestService";
 import { startSelfAssistant } from "../../services/selfAssistantService";
 import {
@@ -18,12 +18,13 @@ import {
   buildSelfAssistantMechanicPrefill,
   resolveSelfAssistantRecommendation,
   routeSelfAssistantResponse,
-  selfAssistantClarificationQuestions
+  selfAssistantClarificationQuestions,
 } from "../../utils/selfAssistantFlow";
 import { COLORS } from "../../utils/constants";
 
 const MAX_ATTEMPTS = 1;
 
+// Preserve the original request data when the user edits symptoms.
 function buildRequestDraft(request, existingDraft) {
   if (existingDraft) return existingDraft;
   return {
@@ -32,26 +33,37 @@ function buildRequestDraft(request, existingDraft) {
     breakdownType: request?.breakdownType,
     urgencyLevel: request?.urgencyLevel,
     problemDescription: request?.problemDescription,
-    location: request?.location
+    location: request?.location,
   };
 }
 
 export default function AIClarificationScreen({ navigation, route }) {
-  const selfAssistantMode = route.params?.mode === "self_assistant" || route.params?.selfAssistantMode === true;
-  const [selfAssistantPayload, setSelfAssistantPayload] = useState(route.params?.selfAssistantPayload || null);
+  const selfAssistantMode =
+    route.params?.mode === "self_assistant" ||
+    route.params?.selfAssistantMode === true;
+  const [selfAssistantPayload, setSelfAssistantPayload] = useState(
+    route.params?.selfAssistantPayload || null,
+  );
   const requestId = route.params?.requestId;
   const request = route.params?.request;
   const requestDraft = buildRequestDraft(request, route.params?.requestDraft);
   const [prediction, setPrediction] = useState(
-    route.params?.aiPrediction || request?.aiPrediction || null
+    route.params?.aiPrediction || request?.aiPrediction || null,
   );
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [attempts, setAttempts] = useState(Number(selfAssistantMode ? route.params?.selfAssistantClarificationAttempts || 0 : request?.clarificationAttempts || 0));
+  const [attempts, setAttempts] = useState(
+    Number(
+      selfAssistantMode
+        ? route.params?.selfAssistantClarificationAttempts || 0
+        : request?.clarificationAttempts || 0,
+    ),
+  );
   const [phase, setPhase] = useState("loading");
   const [error, setError] = useState("");
 
+  // Load clarification questions for either the normal request or self-assistant flow.
   const loadQuestions = useCallback(async () => {
     if (selfAssistantMode) {
       if (!selfAssistantPayload) {
@@ -63,7 +75,9 @@ export default function AIClarificationScreen({ navigation, route }) {
         setPhase("maximum");
         return;
       }
-      setQuestions(selfAssistantClarificationQuestions(selfAssistantPayload).slice(0, 2));
+      setQuestions(
+        selfAssistantClarificationQuestions(selfAssistantPayload).slice(0, 2),
+      );
       setAnswers({});
       setQuestionIndex(0);
       setError("");
@@ -93,7 +107,10 @@ export default function AIClarificationScreen({ navigation, route }) {
         setPhase("result");
         return;
       }
-      if (response.clarificationAvailable === false || !response.questions?.length) {
+      if (
+        response.clarificationAvailable === false ||
+        !response.questions?.length
+      ) {
         setPhase("unavailable");
         return;
       }
@@ -111,47 +128,53 @@ export default function AIClarificationScreen({ navigation, route }) {
     loadQuestions();
   }, []);
 
+  // Navigate to provider recommendations using the current AI prediction.
   function continueToRecommendations(generalMechanicOnly = false) {
     navigation.replace("Recommendation", {
       requestId,
       request,
       aiPrediction: prediction,
-      generalMechanicOnly
+      generalMechanicOnly,
     });
   }
 
+  // Return the user to symptom capture for additional information.
   function editSymptoms() {
     if (selfAssistantMode) {
       navigation.navigate("GuidedSymptomCapture", {
         sourceRoute: "SelfBreakdownAssistant",
         vehicleType: selfAssistantPayload?.vehicleType,
         breakdownType: selfAssistantPayload?.breakdownType,
-        initialData: selfAssistantPayload?.guidedSymptoms
+        initialData: selfAssistantPayload?.guidedSymptoms,
       });
       return;
     }
     navigation.navigate("RequestMechanic", { prefill: requestDraft });
   }
 
+  // Start a standard mechanic request when self-troubleshooting cannot continue.
   function requestSelfAssistantMechanic() {
     navigation.navigate("RequestMechanic", {
       prefill: buildSelfAssistantMechanicPrefill(selfAssistantPayload || {}, {
         aiPrediction: prediction,
-        recommendedService: prediction?.requiredService
-      })
+        recommendedService: prediction?.requiredService,
+      }),
     });
   }
 
+  // Save the selected answer and clear any previous validation message.
   function selectAnswer(answer) {
     const question = questions[questionIndex];
     setAnswers((current) => ({ ...current, [question.id]: answer }));
     setError("");
   }
 
+  // Move to the previous clarification question when available.
   function goBack() {
     if (questionIndex > 0) setQuestionIndex((current) => current - 1);
   }
 
+  // Validate answers and submit the completed clarification flow.
   async function goNext() {
     const question = questions[questionIndex];
     if (!answers[question.id]) {
@@ -167,9 +190,16 @@ export default function AIClarificationScreen({ navigation, route }) {
     setPhase("submitting");
     try {
       if (selfAssistantMode) {
-        const updatedPayload = appendSelfAssistantClarification(selfAssistantPayload, questions, answers);
+        const updatedPayload = appendSelfAssistantClarification(
+          selfAssistantPayload,
+          questions,
+          answers,
+        );
         const response = await startSelfAssistant(updatedPayload);
-        const recommendation = resolveSelfAssistantRecommendation(response, updatedPayload);
+        const recommendation = resolveSelfAssistantRecommendation(
+          response,
+          updatedPayload,
+        );
         const completedPayload = {
           ...updatedPayload,
           predictedFault: recommendation.predictedFault,
@@ -178,8 +208,8 @@ export default function AIClarificationScreen({ navigation, route }) {
           fallbackUsed: recommendation.fallbackUsed,
           aiPredictionHistory: [
             ...(updatedPayload.aiPredictionHistory || []),
-            ...(response.aiPrediction ? [recommendation.aiPrediction] : [])
-          ]
+            ...(response.aiPrediction ? [recommendation.aiPrediction] : []),
+          ],
         };
         const nextAttempts = attempts + 1;
         setSelfAssistantPayload(completedPayload);
@@ -191,7 +221,7 @@ export default function AIClarificationScreen({ navigation, route }) {
           routeSelfAssistantResponse(navigation, response, completedPayload, {
             replace: true,
             resetFlow: true,
-            clarificationAttempts: nextAttempts
+            clarificationAttempts: nextAttempts,
           });
         }
         return;
@@ -200,40 +230,66 @@ export default function AIClarificationScreen({ navigation, route }) {
         requestId,
         questions.map((item) => ({
           questionId: item.id,
-          answer: answers[item.id]
-        }))
+          answer: answers[item.id],
+        })),
       );
       setPrediction(response.prediction);
       setAttempts(Number(response.clarificationAttempts || attempts + 1));
       setPhase("result");
     } catch (submitError) {
+      // Show a recoverable error when the updated recommendation cannot be submitted.
       setError("We couldn't update your recommendation right now.");
       setPhase("error");
     }
   }
 
-  function renderContinueOptions(currentLabel = "Continue with Current Recommendation") {
+  // Shared actions for result and error states.
+  function renderContinueOptions(
+    currentLabel = "Continue with Current Recommendation",
+  ) {
     return (
       <View style={styles.actions}>
-        <AppButton title={currentLabel} onPress={() => continueToRecommendations(false)} />
-        <AppButton title="Edit Symptoms" variant="secondary" onPress={editSymptoms} />
+        <AppButton
+          title={currentLabel}
+          onPress={() => continueToRecommendations(false)}
+        />
+        <AppButton
+          title="Edit Symptoms"
+          variant="secondary"
+          onPress={editSymptoms}
+        />
       </View>
     );
   }
 
   return (
     <ScreenContainer>
-      <ScreenHeader eyebrow="Smart assistant" title="We need a little more information" subtitle="Your symptoms could match more than one type of problem. Two quick answers may improve the recommendation." />
-      <InfoBanner tone="info" message="Choose the answer that feels closest. It is always okay to select Not Sure." />
+      {/* Clarification page header and user guidance. */}
+      <ScreenHeader
+        eyebrow="Smart assistant"
+        title="We need a little more information"
+        subtitle="Your symptoms could match more than one type of problem. Two quick answers may improve the recommendation."
+      />
+      <InfoBanner
+        tone="info"
+        message="Choose the answer that feels closest. It is always okay to select Not Sure."
+      />
 
+      {/* Initial question-loading state. */}
       {phase === "loading" ? (
-        <AppCard><LoadingState message="Preparing a few quick questions..." /></AppCard>
+        <AppCard>
+          <LoadingState message="Preparing a few quick questions..." />
+        </AppCard>
       ) : null}
 
+      {/* Submission-loading state after the final answer. */}
       {phase === "submitting" ? (
-        <AppCard><LoadingState message="Reviewing your updated symptoms..." /></AppCard>
+        <AppCard>
+          <LoadingState message="Reviewing your updated symptoms..." />
+        </AppCard>
       ) : null}
 
+      {/* Interactive clarification questions and answer navigation. */}
       {phase === "questions" && questions.length ? (
         <>
           <SymptomProgress
@@ -242,10 +298,13 @@ export default function AIClarificationScreen({ navigation, route }) {
             label={`Question ${questionIndex + 1} of ${questions.length}`}
           />
           <AppCard>
-            <Text style={styles.question}>{questions[questionIndex].question}</Text>
+            <Text style={styles.question}>
+              {questions[questionIndex].question}
+            </Text>
             <View style={styles.options}>
               {questions[questionIndex].options.map((option) => {
-                const selected = answers[questions[questionIndex].id] === option;
+                const selected =
+                  answers[questions[questionIndex].id] === option;
                 return (
                   <Pressable
                     accessibilityRole="radio"
@@ -255,11 +314,22 @@ export default function AIClarificationScreen({ navigation, route }) {
                     style={({ pressed }) => [
                       styles.option,
                       selected && styles.selectedOption,
-                      pressed && styles.pressedOption
+                      pressed && styles.pressedOption,
                     ]}
                   >
-                    <View style={[styles.radio, selected && styles.selectedRadio]}>{selected ? <Text style={styles.radioCheck}>✓</Text> : null}</View>
-                    <Text style={[styles.optionText, selected && styles.selectedOptionText]}>
+                    <View
+                      style={[styles.radio, selected && styles.selectedRadio]}
+                    >
+                      {selected ? (
+                        <Text style={styles.radioCheck}>✓</Text>
+                      ) : null}
+                    </View>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        selected && styles.selectedOptionText,
+                      ]}
+                    >
                       {option}
                     </Text>
                   </Pressable>
@@ -279,7 +349,11 @@ export default function AIClarificationScreen({ navigation, route }) {
             </View>
             <View style={styles.flex}>
               <AppButton
-                title={questionIndex === questions.length - 1 ? "Update Recommendation" : "Next"}
+                title={
+                  questionIndex === questions.length - 1
+                    ? "Update Recommendation"
+                    : "Next"
+                }
                 onPress={goNext}
               />
             </View>
@@ -287,6 +361,7 @@ export default function AIClarificationScreen({ navigation, route }) {
         </>
       ) : null}
 
+      {/* Updated recommendation for the normal request flow. */}
       {phase === "result" && !selfAssistantMode ? (
         <>
           <Text style={styles.sectionTitle}>Updated Result</Text>
@@ -303,20 +378,32 @@ export default function AIClarificationScreen({ navigation, route }) {
                 title="Low-confidence result"
                 message="We still cannot identify the problem with high confidence. This is the best available match and recommended service based on your symptoms."
               />
-              <AppButton title="Continue with Best Match" onPress={() => continueToRecommendations(false)} />
-              <AppButton title="Edit Symptoms" variant="secondary" onPress={editSymptoms} />
+              <AppButton
+                title="Continue with Best Match"
+                onPress={() => continueToRecommendations(false)}
+              />
+              <AppButton
+                title="Edit Symptoms"
+                variant="secondary"
+                onPress={editSymptoms}
+              />
             </>
           )}
         </>
       ) : null}
 
+      {/* Maximum-attempt result and escalation options. */}
       {phase === "maximum" ? (
         <>
-          <PredictionSummaryCard prediction={prediction} title="Best Available Recommendation" />
+          <PredictionSummaryCard
+            prediction={prediction}
+            title="Best Available Recommendation"
+          />
           {selfAssistantMode ? (
             <AppCard>
               <Text style={styles.cardTitle}>
-                We still don't have enough information to safely start self-troubleshooting.
+                We still don't have enough information to safely start
+                self-troubleshooting.
               </Text>
             </AppCard>
           ) : (
@@ -328,40 +415,83 @@ export default function AIClarificationScreen({ navigation, route }) {
           )}
           {selfAssistantMode ? (
             <>
-              <AppButton title="Add More Symptoms" variant="secondary" onPress={editSymptoms} />
-              <AppButton title="Request Mechanic Instead" onPress={requestSelfAssistantMechanic} />
+              <AppButton
+                title="Add More Symptoms"
+                variant="secondary"
+                onPress={editSymptoms}
+              />
+              <AppButton
+                title="Request Mechanic Instead"
+                onPress={requestSelfAssistantMechanic}
+              />
             </>
           ) : (
             <>
-              <AppButton title="Continue with Best Match" onPress={() => continueToRecommendations(false)} />
-              <AppButton title="Edit Symptoms" variant="secondary" onPress={editSymptoms} />
+              <AppButton
+                title="Continue with Best Match"
+                onPress={() => continueToRecommendations(false)}
+              />
+              <AppButton
+                title="Edit Symptoms"
+                variant="secondary"
+                onPress={editSymptoms}
+              />
             </>
           )}
         </>
       ) : null}
 
+      {/* Fallback when clarification questions are unavailable. */}
       {phase === "unavailable" && !selfAssistantMode ? (
         <>
           <PredictionSummaryCard prediction={prediction} />
           <AppCard>
-            <Text style={styles.cardTitle}>We could not generate additional questions right now.</Text>
+            <Text style={styles.cardTitle}>
+              We could not generate additional questions right now.
+            </Text>
             <Text style={styles.supportingText}>
-              You can continue with the current recommendation or add more symptoms manually.
+              You can continue with the current recommendation or add more
+              symptoms manually.
             </Text>
           </AppCard>
-          <AppButton title="Continue with Current Recommendation" onPress={() => continueToRecommendations(false)} />
-          <AppButton title="Add More Symptoms Manually" variant="secondary" onPress={editSymptoms} />
+          <AppButton
+            title="Continue with Current Recommendation"
+            onPress={() => continueToRecommendations(false)}
+          />
+          <AppButton
+            title="Add More Symptoms Manually"
+            variant="secondary"
+            onPress={editSymptoms}
+          />
         </>
       ) : null}
 
+      {/* Error state with retry and recovery actions. */}
       {phase === "error" ? (
         <>
           <PredictionSummaryCard prediction={prediction} />
           <AppCard>
-            <Text style={styles.error}>{error || "We couldn't load additional questions right now."}</Text>
+            <Text style={styles.error}>
+              {error || "We couldn't load additional questions right now."}
+            </Text>
             <AppButton title="Try Again" onPress={loadQuestions} />
           </AppCard>
-          {selfAssistantMode ? <><AppButton title="Edit Symptoms" variant="secondary" onPress={editSymptoms} /><AppButton title="Request Mechanic" variant="secondary" onPress={requestSelfAssistantMechanic} /></> : renderContinueOptions()}
+          {selfAssistantMode ? (
+            <>
+              <AppButton
+                title="Edit Symptoms"
+                variant="secondary"
+                onPress={editSymptoms}
+              />
+              <AppButton
+                title="Request Mechanic"
+                variant="secondary"
+                onPress={requestSelfAssistantMechanic}
+              />
+            </>
+          ) : (
+            renderContinueOptions()
+          )}
         </>
       ) : null}
     </ScreenContainer>
@@ -370,36 +500,36 @@ export default function AIClarificationScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   heading: {
-    gap: 7
+    gap: 7,
   },
   title: {
     color: COLORS.primaryDark,
     fontSize: 24,
     fontWeight: "900",
-    lineHeight: 31
+    lineHeight: 31,
   },
   subtitle: {
     color: COLORS.muted,
-    lineHeight: 21
+    lineHeight: 21,
   },
   centerText: {
     color: COLORS.muted,
     textAlign: "center",
-    lineHeight: 21
+    lineHeight: 21,
   },
   sectionTitle: {
     color: COLORS.primaryDark,
     fontSize: 22,
-    fontWeight: "900"
+    fontWeight: "900",
   },
   question: {
     color: COLORS.primaryDark,
     fontSize: 20,
     fontWeight: "800",
-    lineHeight: 28
+    lineHeight: 28,
   },
   options: {
-    gap: 10
+    gap: 10,
   },
   option: {
     minHeight: 58,
@@ -411,28 +541,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: COLORS.surface
+    backgroundColor: COLORS.surface,
   },
   selectedOption: {
     borderColor: COLORS.primary,
-    backgroundColor: "#edf7f7"
+    backgroundColor: "#edf7f7",
   },
   pressedOption: {
-    opacity: 0.78
+    opacity: 0.78,
   },
   radio: {
     width: 21,
     height: 21,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: COLORS.muted
+    borderColor: COLORS.muted,
   },
   selectedRadio: {
     borderWidth: 2,
     borderColor: COLORS.primary,
     backgroundColor: COLORS.primary,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   radioCheck: { color: COLORS.surface, fontSize: 12, fontWeight: "900" },
   optionText: {
@@ -440,34 +570,34 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: 16,
     fontWeight: "700",
-    lineHeight: 22
+    lineHeight: 22,
   },
   selectedOptionText: {
-    color: COLORS.primaryDark
+    color: COLORS.primaryDark,
   },
   navigationRow: {
     flexDirection: "row",
-    gap: 10
+    gap: 10,
   },
   flex: {
-    flex: 1
+    flex: 1,
   },
   actions: {
-    gap: 10
+    gap: 10,
   },
   cardTitle: {
     color: COLORS.primaryDark,
     fontSize: 18,
     fontWeight: "800",
-    lineHeight: 25
+    lineHeight: 25,
   },
   supportingText: {
     color: COLORS.muted,
-    lineHeight: 21
+    lineHeight: 21,
   },
   error: {
     color: COLORS.danger,
     fontWeight: "700",
-    lineHeight: 21
-  }
+    lineHeight: 21,
+  },
 });

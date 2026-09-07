@@ -1,13 +1,13 @@
 const OBSERVATION_GROUPS = ["see", "hear", "smell", "feel"];
-
+// Utility functions to normalize symptom capture data, ensuring consistent structure and removing empty or duplicate values.
 function cleanValue(value) {
   if (value === null || value === undefined) return undefined;
-
+// Remove empty strings and trim whitespace from string values.
   if (typeof value === "string") {
     const trimmed = value.trim();
     return trimmed || undefined;
   }
-
+// Recursively clean arrays and remove duplicates based on value identity.
   if (Array.isArray(value)) {
     const seen = new Set();
     return value.reduce((result, item) => {
@@ -22,7 +22,7 @@ function cleanValue(value) {
       return result;
     }, []);
   }
-
+// Recursively clean objects and remove keys with undefined values.
   if (typeof value === "object") {
     const source = value instanceof Map ? Object.fromEntries(value) : value;
     return Object.entries(source).reduce((result, [key, item]) => {
@@ -34,7 +34,7 @@ function cleanValue(value) {
 
   return value;
 }
-
+// Normalize symptom capture data, ensuring consistent structure and removing empty or duplicate values.
 function normalizeSymptomCapture(symptomCapture) {
   const source = symptomCapture && typeof symptomCapture === "object" ? symptomCapture : {};
   const observed = source.observedSymptoms && typeof source.observedSymptoms === "object"

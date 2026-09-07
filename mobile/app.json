@@ -5,13 +5,17 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "splash": {
-      "backgroundColor": "#0f766e"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
     "plugins": [
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0f766e"
+        }
+      ],
       [
         "expo-location",
         {
