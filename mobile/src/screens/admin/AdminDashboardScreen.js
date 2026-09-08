@@ -18,6 +18,7 @@ import {
 import { adminStyles, approvalTone, formatDate, titleCase } from "./adminUi";
 
 export default function AdminDashboardScreen({ navigation }) {
+  //user authentication context for logout and user info
   const { logout } = useAuth();
   const [stats, setStats] = useState(null);
   const [pending, setPending] = useState([]);
@@ -151,7 +152,7 @@ export default function AdminDashboardScreen({ navigation }) {
           />
         </AppCard>
       ) : null}
-      {/* provider approve reject card */}
+      {/* provider details */}
       {pending.slice(0, 6).map((provider) => (
         <AppCard key={provider.providerId}>
           <View style={styles.heading}>

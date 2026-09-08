@@ -80,7 +80,7 @@ export default function RegisterScreen({ navigation }) {
         <RoleCard
           icon="construct-outline"
           title="Service Provider"
-          description="Mechanic, garage, or towing"
+          description="Mechanic or garage"
           selected={serviceProviderSelected}
           onPress={() => setRole("mechanic")}
         />
@@ -155,6 +155,7 @@ export default function RegisterScreen({ navigation }) {
           onChangeText={setPhone}
           placeholder="071 234 5678"
           keyboardType="phone-pad"
+          maxLength={10}
           autoComplete="tel"
         />
         <AppInput
