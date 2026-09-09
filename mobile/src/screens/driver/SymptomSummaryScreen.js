@@ -36,6 +36,7 @@ export default function SymptomSummaryScreen({ navigation, route }) {
     setError("");
     const payload = buildSelfAssistantPayload(structuredSymptoms);
     try {
+      // Start the self-assistant flow with the captured symptoms and route to the appropriate next screen based on the response.
       const response = await startSelfAssistant(payload);
       routeSelfAssistantResponse(navigation, response, payload, {
         replace: true,

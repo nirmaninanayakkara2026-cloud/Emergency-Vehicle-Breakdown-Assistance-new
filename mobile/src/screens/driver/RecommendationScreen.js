@@ -99,6 +99,7 @@ export default function RecommendationScreen({ navigation, route }) {
         title="Recommended for You"
         subtitle="Based on your symptoms, location, and service availability."
       />
+      {/* AI prediction summary card with possible problem, recommended service, and confidence level. */}
       <PredictionSummaryCard prediction={aiPrediction} />
       {/* Estimated service cost returned with the recommendations. */}
       {result.estimatedCostRange ? (
@@ -252,6 +253,7 @@ export default function RecommendationScreen({ navigation, route }) {
               </View>
             ) : null}
             <AppButton
+            
               title="Select Provider"
               icon="arrow-forward"
               loading={selectingId === providerId}

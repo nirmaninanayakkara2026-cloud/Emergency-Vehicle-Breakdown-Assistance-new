@@ -18,6 +18,7 @@ import {
   formatServiceType,
 } from "../../utils/displayLabels";
 
+//request progress stages
 const TIMELINE = [
   ["provider_requested", "Request Sent", "paper-plane"],
   ["accepted", "Provider Accepted", "checkmark"],
@@ -26,6 +27,8 @@ const TIMELINE = [
   ["in_progress", "Repair in Progress", "construct"],
   ["completed", "Completed", "checkmark-done"],
 ];
+
+// Map request statuses to their corresponding index in the TIMELINE array for progress tracking.
 const STATUS_INDEX = {
   provider_requested: 0,
   recommended: 0,
@@ -96,7 +99,7 @@ export default function RequestTrackingScreen({ navigation, route }) {
         />
       </ScreenContainer>
     );
-
+  
   const activeIndex = STATUS_INDEX[request.status] ?? -1;
   const provider = request.selectedProviderId;
   return (
