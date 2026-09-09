@@ -156,6 +156,7 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
             This is optional. Select as many as needed.
           </Text>
           <View style={styles.observationTabs}>
+          {/* Render tabs for each observation category (see, hear, smell, feel). */}
             {OBSERVED_SYMPTOM_GROUPS.map((group) => {
               const selected = activeObservation === group.key;
               return (
@@ -193,6 +194,7 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
               );
             })}
           </View>
+          {/* Render the chips for the currently active observation category. */}
           {OBSERVED_SYMPTOM_GROUPS.filter(
             (group) => group.key === activeObservation,
           ).map((group) => (
@@ -237,6 +239,7 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
             placeholder="Tell us anything else you saw, heard, smelled or felt before the problem happened..."
             multiline
           />
+
           <Text style={styles.help}>Optional</Text>
         </AppCard>
       ) : null}

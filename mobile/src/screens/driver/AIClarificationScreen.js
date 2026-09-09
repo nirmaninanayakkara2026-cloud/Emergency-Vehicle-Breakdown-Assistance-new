@@ -21,7 +21,7 @@ import {
   selfAssistantClarificationQuestions,
 } from "../../utils/selfAssistantFlow";
 import { COLORS } from "../../utils/constants";
-
+// The user can complete only one clarification round.
 const MAX_ATTEMPTS = 1;
 
 // Preserve the original request data when the user edits symptoms.
@@ -65,6 +65,7 @@ export default function AIClarificationScreen({ navigation, route }) {
 
   // Load clarification questions for either the normal request or self-assistant flow.
   const loadQuestions = useCallback(async () => {
+    // Load clarification questions for the self-assistant flow.
     if (selfAssistantMode) {
       if (!selfAssistantPayload) {
         setError("Updated symptom details are missing.");
@@ -97,16 +98,19 @@ export default function AIClarificationScreen({ navigation, route }) {
     setError("");
     setPhase("loading");
     try {
+      // Load clarification questions from the backend for the normal request flow.
       const response = await getClarificationQuestions(requestId);
       if (response.maximumAttemptsReached) {
         setAttempts(MAX_ATTEMPTS);
         setPhase("maximum");
         return;
       }
+      // Handle the case where clarification is not needed or questions are unavailable.
       if (response.clarificationNeeded === false) {
         setPhase("result");
         return;
       }
+      // Handle the case where clarification questions are unavailable.
       if (
         response.clarificationAvailable === false ||
         !response.questions?.length
@@ -188,6 +192,7 @@ export default function AIClarificationScreen({ navigation, route }) {
 
     setError("");
     setPhase("submitting");
+    // Submit the completed clarification answers for either the normal request or self-assistant flow.
     try {
       if (selfAssistantMode) {
         const updatedPayload = appendSelfAssistantClarification(
@@ -195,11 +200,13 @@ export default function AIClarificationScreen({ navigation, route }) {
           questions,
           answers,
         );
+        // Submit the updated payload to the self-assistant service for a new recommendation.
         const response = await startSelfAssistant(updatedPayload);
         const recommendation = resolveSelfAssistantRecommendation(
           response,
           updatedPayload,
         );
+        // Update the payload with the new recommendation and AI prediction history.
         const completedPayload = {
           ...updatedPayload,
           predictedFault: recommendation.predictedFault,
@@ -211,13 +218,16 @@ export default function AIClarificationScreen({ navigation, route }) {
             ...(response.aiPrediction ? [recommendation.aiPrediction] : []),
           ],
         };
+        // Increment the clarification attempt count and update the state with the new recommendation.
         const nextAttempts = attempts + 1;
         setSelfAssistantPayload(completedPayload);
         setPrediction(recommendation.aiPrediction);
         setAttempts(nextAttempts);
+        // If the self-assistant service indicates that more information is required, transition to the maximum attempt state. Otherwise, route to the appropriate response screen with the updated payload and recommendation.
         if (response.status === "more_information_required") {
           setPhase("maximum");
         } else {
+          // Route to the appropriate response screen with the updated payload and recommendation.
           routeSelfAssistantResponse(navigation, response, completedPayload, {
             replace: true,
             resetFlow: true,
@@ -226,6 +236,7 @@ export default function AIClarificationScreen({ navigation, route }) {
         }
         return;
       }
+      // Submit the completed clarification answers to the backend for the normal request flow.
       const response = await submitClarificationAnswers(
         requestId,
         questions.map((item) => ({

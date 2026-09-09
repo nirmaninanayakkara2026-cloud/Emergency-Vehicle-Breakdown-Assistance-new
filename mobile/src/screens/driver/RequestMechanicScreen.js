@@ -75,7 +75,7 @@ export default function RequestMechanicScreen({ navigation, route }) {
       setGuidedSymptoms(null);
     setVehicleType(nextVehicleType);
   }
-
+  // Clear guided symptoms when the selected vehicle or problem changes.
   function changeBreakdownType(nextBreakdownType) {
     if (guidedSymptoms && guidedSymptoms.breakdownType !== nextBreakdownType) {
       setGuidedSymptoms(null);
@@ -112,12 +112,12 @@ export default function RequestMechanicScreen({ navigation, route }) {
         setLongitude(MOCK_LOCATION.longitude.toString());
         return;
       }
-
+      // Get the current position and update the latitude and longitude state.
       const position = await Location.getCurrentPositionAsync({});
       const coords = position.coords;
       setLatitude(coords.latitude.toString());
       setLongitude(coords.longitude.toString());
-
+      // Attempt to reverse geocode the coordinates to get a human-readable address.
       try {
         const places = await Location.reverseGeocodeAsync({
           latitude: coords.latitude,
@@ -161,6 +161,7 @@ export default function RequestMechanicScreen({ navigation, route }) {
     }
 
     setSubmitting(true);
+    // Build the request draft with all relevant information, including guided symptoms and any prefilled data.
     try {
       const requestDraft = {
         vehicleType,
@@ -194,6 +195,7 @@ export default function RequestMechanicScreen({ navigation, route }) {
             : undefined),
       };
       const request = await createBreakdownRequest(requestDraft);
+      // Route to the AI clarification screen if more information is needed, otherwise go to the recommendation screen.
       if (request.aiPrediction?.needsMoreInformation) {
         navigation.replace("AIClarification", {
           requestId: request._id,

@@ -118,6 +118,7 @@ export default function DriverHomeScreen({ navigation }) {
             </Pressable>
           }
         />
+        {/* Show the most recent active request or a placeholder if none exists. */}
         {recentRequest ? (
           <Pressable
             accessibilityRole="button"
@@ -127,6 +128,7 @@ export default function DriverHomeScreen({ navigation }) {
               })
             }
           >
+          {/* Display the most recent active request with its predicted fault, vehicle type, creation date, and status. */}
             <AppCard>
               <View style={styles.activityTop}>
                 <View style={styles.activityIcon}>
@@ -160,6 +162,7 @@ export default function DriverHomeScreen({ navigation }) {
           </Pressable>
         ) : (
           <AppCard>
+          {/* Show a placeholder message when there are no active requests, with an action to view request history. */}
             <EmptyState
               title="No active requests"
               message="You don't have an active roadside request."
