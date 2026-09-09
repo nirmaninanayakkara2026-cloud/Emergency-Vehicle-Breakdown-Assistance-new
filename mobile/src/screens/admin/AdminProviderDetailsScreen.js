@@ -126,7 +126,7 @@ export default function AdminProviderDetailsScreen({ route }) {
         </Text>
       </AppCard>
 
-      {/* Provider Profile */}
+      {/* shop owner details */}
       <AppCard>
         <Text style={styles.title}>
           {profile.providerType === "spare_parts_shop"
