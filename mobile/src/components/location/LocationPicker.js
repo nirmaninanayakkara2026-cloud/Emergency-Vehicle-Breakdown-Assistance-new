@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import Constants, { ExecutionEnvironment } from "expo-constants";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import AppButton from "../AppButton";
 import AppInput from "../AppInput";
@@ -46,10 +45,7 @@ export default function LocationPicker({
   const [locationError, setLocationError] = useState("");
   const [locationPermissionStatus, setLocationPermissionStatus] = useState(null);
   const selectedLocation = normalizeLocation(initialLocation);
-  const useOpenStreetMap = nativeMapFailed || (
-    Platform.OS === "android" &&
-    Constants.executionEnvironment === ExecutionEnvironment.StoreClient
-  );
+  const useOpenStreetMap = nativeMapFailed;
 
   useEffect(() => {
     if (!selectedLocation) return;
@@ -61,7 +57,7 @@ export default function LocationPicker({
   useEffect(() => {
     if (!mapLoading) return undefined;
     const timer = setTimeout(() => {
-      if (Platform.OS === "ios" && !useOpenStreetMap) {
+      if (!useOpenStreetMap) {
         setNativeMapFailed(true);
         setMapError("");
         return;
@@ -194,7 +190,7 @@ export default function LocationPicker({
           onPress={handleRetryMap}
         />
       ) : null}
-      {Platform.OS === "ios" && !useOpenStreetMap && !mapLoading ? (
+      {!useOpenStreetMap && !mapLoading ? (
         <AppButton
           title="Map blank? Use OpenStreetMap"
           variant="ghost"

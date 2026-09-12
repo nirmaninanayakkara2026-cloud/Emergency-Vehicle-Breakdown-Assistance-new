@@ -35,7 +35,7 @@ To check dependency compatibility, run `npx expo install --check` and `npx expo-
 
 For an installed Android build, set `GOOGLE_MAPS_API_KEY` in `mobile/.env` or the build environment. Enable Maps SDK for Android for that key and configure its Android package/signing certificate restrictions. `app.config.js` passes the key to the `react-native-maps` plugin. Rebuild and reinstall the native app after changing the key; restarting Metro alone does not update it.
 
-On iPhone, the provider location picker starts with native Apple Maps, including in Expo Go. If it does not become ready within 12 seconds, the picker switches to Leaflet and OpenStreetMap inside `react-native-webview`. Apple Maps can report readiness even when its tiles are blank; in that case, use **Map blank? Use OpenStreetMap**. The selected coordinates and address are preserved when switching. Android Expo Go starts with OpenStreetMap; Android native builds use Google Maps.
+On iPhone, the provider location picker starts with native Apple Maps, including in Expo Go. Android starts with Google Maps in both Expo Go and native builds. If the native map does not finish loading within 12 seconds, the picker switches to Leaflet and OpenStreetMap inside `react-native-webview`. A native map can report readiness even when its tiles are blank; in that case, use **Map blank? Use OpenStreetMap**. The selected coordinates and address are preserved when switching.
 
 Both map options support tapping, dragging the pin, saved locations, and the existing GPS/address controls. Internet access is required for Leaflet assets and map tiles. OpenStreetMap attribution remains visible, and tiles use the WebView's normal HTTP cache with no prefetching.
 
