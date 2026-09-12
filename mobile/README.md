@@ -31,6 +31,16 @@ npm start -- --clear
 Scan the new QR code with Expo Go. The phone and computer should be on the same network.
 To check dependency compatibility, run `npx expo install --check` and `npx expo-doctor`.
 
+## Maps in Android builds
+
+For an installed Android build, set `GOOGLE_MAPS_API_KEY` in `mobile/.env` or the build environment. Enable Maps SDK for Android for that key and configure its Android package/signing certificate restrictions. `app.config.js` passes the key to the `react-native-maps` plugin. Rebuild and reinstall the native app after changing the key; restarting Metro alone does not update it.
+
+On iPhone, the provider location picker starts with native Apple Maps, including in Expo Go. If it does not become ready within 12 seconds, the picker switches to Leaflet and OpenStreetMap inside `react-native-webview`. Apple Maps can report readiness even when its tiles are blank; in that case, use **Map blank? Use OpenStreetMap**. The selected coordinates and address are preserved when switching. Android Expo Go starts with OpenStreetMap; Android native builds use Google Maps.
+
+Both map options support tapping, dragging the pin, saved locations, and the existing GPS/address controls. Internet access is required for Leaflet assets and map tiles. OpenStreetMap attribution remains visible, and tiles use the WebView's normal HTTP cache with no prefetching.
+
+If the location map times out, use **Retry Map** after checking connectivity. The loading overlay clears after 12 seconds so it cannot permanently hide the map. Current-location selection also remains available.
+
 ## Completed Phase 1 Features
 
 - Backend authentication with role-based navigation.
@@ -68,7 +78,7 @@ To check dependency compatibility, run `npx expo install --check` and `npx expo-
 
 All app data is stored locally in `src/data`.
 
-- `mockProviders.js` contains mechanic, garage, towing, and spare parts provider data.
+- `mockProviders.js` contains mechanic, garage, and spare parts provider data.
 - `mockRequests.js` contains sample driver breakdown requests.
 - `mockSparePartsShops.js` contains nearby spare parts shop examples.
 - `troubleshootingGuides.js` contains local guide steps for common breakdown types.

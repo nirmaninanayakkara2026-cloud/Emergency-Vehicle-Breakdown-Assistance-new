@@ -136,7 +136,7 @@ export default function RecommendationScreen({ navigation, route }) {
           />
         </AppCard>
       ) : null}
-      {/* Empty state with retry and towing alternatives. */}
+      {/* Empty state with a retry action. */}
       {!error && providers.length === 0 ? (
         <AppCard>
           <EmptyState
@@ -148,12 +148,6 @@ export default function RecommendationScreen({ navigation, route }) {
             icon="location-outline"
             actionLabel="Try Again"
             onAction={loadRecommendations}
-            secondaryLabel="Request Towing"
-            onSecondary={() =>
-              navigation.navigate("RequestMechanic", {
-                prefill: { ...request, breakdownType: "towing_needed" },
-              })
-            }
           />
         </AppCard>
       ) : null}

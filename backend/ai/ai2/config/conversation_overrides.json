@@ -1,0 +1,46 @@
+{
+  "description": "Project-authored observation and verification wording. These entries do not authorize cleaning, disconnection, inflation, restarting or other repairs. A normal observation only permits asking about the already-observed outcome.",
+  "guides": {
+    "ai2_aktc_0036": {
+      "keywords": ["battery", "clicking", "dim lights", "cranks slowly", "won't start", "will not start", "not starting"],
+      "steps": {
+        "step_1": {
+          "simple_question": "Without touching anything: do the visible terminals look clean, or is there a crusty deposit? If you cannot see safely, choose Not Sure.",
+          "verify_results": ["clean_terminals"],
+          "verification_question": "Based on what you have already observed, is the starting problem now resolved? Do not start the engine just to answer this question.",
+          "escalation_reason": "The battery terminals need work that this guide does not approve for driver self-repair. Do not clean, tighten or disconnect them."
+        }
+      }
+    },
+    "ai2_aktc_0098": {
+      "keywords": ["tpms", "tyre pressure", "tire pressure", "pressure warning"],
+      "steps": {
+        "step_1": {
+          "simple_question": "Does the gauge reading match the pressure specified for your vehicle in its manual or tyre placard? If you cannot compare safely, choose Not Sure.",
+          "verify_results": ["correct_pressure"],
+          "verification_question": "Is the original tyre-pressure problem now resolved, with no remaining warning or visible tyre damage? Do not drive to test it.",
+          "escalation_reason": "The pressure is outside the specified range. This guide has no approved pressure-adjustment or puncture-repair procedure."
+        }
+      }
+    },
+    "ai2_aktc_0091": {
+      "keywords": ["washer", "washer fluid", "no spray", "weak spray", "windscreen washer", "windshield washer"],
+      "steps": {
+        "step_1": {
+          "simple_question": "Using only the visible level and your owner's manual, is there sufficient washer fluid, or is it low? Choose Not Sure if the reservoir is not safely visible.",
+          "verify_results": ["sufficient_fluid_level"],
+          "uncertain_next_step": "step_2",
+          "verification_question": "Based on what you have already observed, is the washer problem now resolved? Do not drive to test it.",
+          "escalation_reason": "The washer fluid is low. This source has no approved refill procedure for your vehicle."
+        },
+        "step_2": {
+          "instruction": "Without opening or touching the pump, recall whether washer fluid sprayed normally when you last used the washer. Do not dismantle parts or operate the vehicle to answer.",
+          "simple_question": "When you last used the washer, did it spray normally? If you cannot tell, choose Not Sure.",
+          "verify_results": ["pump_operates_correctly"],
+          "verification_question": "Is the original washer problem now resolved? Do not drive to test it.",
+          "escalation_reason": "The washer still needs a technical check that this guide does not approve for driver self-repair."
+        }
+      }
+    }
+  }
+}

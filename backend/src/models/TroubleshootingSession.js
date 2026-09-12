@@ -65,6 +65,17 @@ const troubleshootingSessionSchema = new mongoose.Schema(
     },
     currentInstructionConfirmedAt: { type: Date, default: null },
     completedSteps: { type: [completedStepSchema], default: [] },
+    messages: { type: [new mongoose.Schema({
+      role: { type: String, enum: ["user", "assistant"], required: true },
+      content: { type: String, required: true, maxlength: 2000 },
+      stepId: { type: String, default: null },
+      createdAt: { type: Date, default: Date.now }
+    }, { _id: false })], default: [] },
+    lastMessage: { type: String, default: "", maxlength: 2000 },
+    clarificationCount: { type: Number, default: 0 },
+    pendingInterpretation: { type: String, default: null },
+    resumeStep: { type: mongoose.Schema.Types.Mixed, default: null },
+    escalationReason: { type: String, default: null },
     safetyConfirmed: { type: Boolean, default: false },
     recommendedService: { type: String, default: "general_mechanic" },
     safetyWarning: { type: String, default: "" },
@@ -74,6 +85,7 @@ const troubleshootingSessionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
     toJSON: {
       transform(doc, ret) {
         delete ret.__v;

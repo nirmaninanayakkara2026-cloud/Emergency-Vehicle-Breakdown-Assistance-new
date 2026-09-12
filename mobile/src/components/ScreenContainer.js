@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "re
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing } from "../theme";
 
-export default function ScreenContainer({ children, scroll = true, refreshControl, contentStyle, keyboard = false }) {
+export default function ScreenContainer({ children, scroll = true, refreshControl, contentStyle, keyboard = false, removeClippedSubviews }) {
   const content = <View style={styles.content}>{children}</View>;
 
   return (
@@ -13,6 +13,7 @@ export default function ScreenContainer({ children, scroll = true, refreshContro
           <ScrollView
             contentContainerStyle={[styles.scrollContent, contentStyle]}
             refreshControl={refreshControl}
+            removeClippedSubviews={removeClippedSubviews}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >

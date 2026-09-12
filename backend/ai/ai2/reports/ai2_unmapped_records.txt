@@ -2,8 +2,13 @@ AI 2 EXCLUDED / UNMAPPED SOURCE RECORDS
 
 aktc_0014: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
 aktc_0016: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
+aktc_0037: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
+aktc_0038: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
 aktc_0039: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
 aktc_0041: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
 aktc_0044: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
 aktc_0047: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
+aktc_0057: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
+aktc_0060: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
+aktc_0072: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step
 aktc_0081: guide_available=false; professional_help_required=true; the source contains no non-invasive user-facing step

@@ -58,7 +58,7 @@ class AI2ApiTests(unittest.TestCase):
                 selected_result="not_sure",
             )
         )
-        self.assertEqual(response["status"], "professional_help_required")
+        self.assertEqual(response["status"], "clarification_required")
 
     def test_public_step_requires_action_confirmation_before_result(self) -> None:
         response = start_guide_endpoint(

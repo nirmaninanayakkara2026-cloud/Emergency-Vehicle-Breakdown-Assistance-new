@@ -9,8 +9,7 @@ const SERVICE_COST_RANGES = {
   transmission_mechanic: { min: 7000, max: 25000, currency: CURRENCY },
   steering_mechanic: { min: 4500, max: 16000, currency: CURRENCY },
   tire_mechanic: { min: 2000, max: 8000, currency: CURRENCY },
-  roadside_fuel_support: { min: 1500, max: 5000, currency: CURRENCY },
-  towing_service: { min: 3000, max: 12000, currency: CURRENCY }
+  roadside_fuel_support: { min: 1500, max: 5000, currency: CURRENCY }
 };
 
 function getServiceCostRange(serviceType) {

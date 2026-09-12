@@ -2,10 +2,10 @@
   "metadata": {
     "source_archive": "ai2_troubleshooting_archive.json",
     "archive_records": 99,
-    "usable_guides": 92,
-    "excluded_records": 7,
+    "usable_guides": 87,
+    "excluded_records": 12,
     "risk_policy": "deterministic_project_rules",
-    "branching_policy": "source_order_only_no_inferred_repair_outcomes"
+    "branching_policy": "source_order_with_explicit_observation_verification"
   },
   "guides": [
     {
@@ -42,7 +42,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -79,7 +81,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0002",
@@ -115,7 +118,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -152,7 +157,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0003",
@@ -188,7 +194,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -225,7 +233,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0004",
@@ -261,7 +270,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -298,7 +309,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0005",
@@ -334,7 +346,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -371,7 +385,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0006",
@@ -407,7 +422,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -444,7 +461,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0007",
@@ -480,7 +498,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -517,7 +537,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0008",
@@ -553,7 +574,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -590,7 +613,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0009",
@@ -626,7 +650,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -663,7 +689,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0010",
@@ -693,31 +720,6 @@
       "steps": [
         {
           "step_id": "step_1",
-          "source_instruction": "Check AC compressor clutch operation",
-          "user_instruction": "From a safe position and without removing parts, check AC compressor clutch operation. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, check AC compressor clutch operation. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "clutch_not_engaging",
-              "label": "Clutch not engaging",
-              "source_result": "Clutch not engaging",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "clutch_engages_properly",
-              "label": "Clutch engages properly",
-              "source_result": "Clutch engages properly",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
           "source_instruction": "Inspect AC compressor for leaks or damage",
           "user_instruction": "From a safe distance, look only for a clearly visible leak around the named area. Do not touch or identify the fluid yourself.",
           "instruction": "From a safe distance, look only for a clearly visible leak around the named area. Do not touch or identify the fluid yourself.",
@@ -739,7 +741,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -776,7 +780,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0011",
@@ -827,7 +832,9 @@
               "action": "continue",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         },
         {
           "step_id": "step_2",
@@ -852,7 +859,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -889,7 +898,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0012",
@@ -928,44 +938,21 @@
               "value": "mold_mildew_present",
               "label": "Mold/mildew present",
               "source_result": "Mold/mildew present",
-              "next_step": "step_2",
-              "action": "continue",
+              "next_step": null,
+              "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             },
             {
               "value": "clean_evaporator",
               "label": "Clean evaporator",
               "source_result": "Clean evaporator",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
-          "source_instruction": "Check AC evaporator temperature sensor",
-          "user_instruction": "From a safe position and without removing parts, check AC evaporator temperature sensor. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, check AC evaporator temperature sensor. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "faulty_sensor",
-              "label": "Faulty sensor",
-              "source_result": "Faulty sensor",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "good_sensor",
-              "label": "Good sensor",
-              "source_result": "Good sensor",
               "next_step": null,
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1002,7 +989,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0013",
@@ -1038,7 +1026,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1075,7 +1065,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0015",
@@ -1102,31 +1093,6 @@
       "steps": [
         {
           "step_id": "step_1",
-          "source_instruction": "Inspect and replace cabin air filter",
-          "user_instruction": "From a safe position and without removing parts, inspect and replace cabin air filter. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, inspect and replace cabin air filter. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "dirty_clogged_filter",
-              "label": "Dirty/clogged filter",
-              "source_result": "Dirty/clogged filter",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "clean_new_filter",
-              "label": "Clean/new filter",
-              "source_result": "Clean/new filter",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
           "source_instruction": "Check for debris in cabin air intake",
           "user_instruction": "From a safe position and without removing parts, check for debris in cabin air intake. Stop if the area is not clearly visible or safely accessible.",
           "instruction": "From a safe position and without removing parts, check for debris in cabin air intake. Stop if the area is not clearly visible or safely accessible.",
@@ -1148,7 +1114,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1185,7 +1153,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0017",
@@ -1236,7 +1205,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1273,7 +1244,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0018",
@@ -1324,7 +1296,9 @@
               "action": "continue",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         },
         {
           "step_id": "step_2",
@@ -1349,7 +1323,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1386,7 +1362,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0019",
@@ -1437,7 +1414,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1474,7 +1453,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0020",
@@ -1525,7 +1505,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1562,7 +1544,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0021",
@@ -1613,7 +1596,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1650,7 +1635,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0022",
@@ -1701,7 +1687,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1738,7 +1726,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0023",
@@ -1789,7 +1778,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1826,7 +1817,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0024",
@@ -1877,7 +1869,9 @@
               "action": "continue",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         },
         {
           "step_id": "step_2",
@@ -1902,7 +1896,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -1939,7 +1935,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0025",
@@ -1975,7 +1972,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2012,7 +2011,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0026",
@@ -2048,7 +2048,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2085,7 +2087,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0027",
@@ -2121,7 +2124,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2158,7 +2163,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0028",
@@ -2194,7 +2200,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2231,7 +2239,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0029",
@@ -2267,7 +2276,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2304,7 +2315,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0030",
@@ -2340,7 +2352,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2377,7 +2391,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0031",
@@ -2413,7 +2428,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2450,7 +2467,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0032",
@@ -2486,7 +2504,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2523,7 +2543,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0033",
@@ -2559,7 +2580,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2596,7 +2619,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0034",
@@ -2632,7 +2656,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2669,7 +2695,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0035",
@@ -2705,7 +2732,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -2742,7 +2771,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0036",
@@ -2783,17 +2813,21 @@
               "source_result": "Corroded terminals",
               "next_step": null,
               "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+              "escalation_reason": "The battery terminals need work that this guide does not approve for driver self-repair. Do not clean, tighten or disconnect them."
             },
             {
               "value": "clean_terminals",
               "label": "Clean terminals",
               "source_result": "Clean terminals",
               "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "action": "verify_resolution",
+              "branching_note": "Ask about the driver-observed outcome; never infer a repair from a normal check. next_step is used only if unresolved.",
+              "verification_question": "Based on what you have already observed, is the starting problem now resolved? Do not start the engine just to answer this question."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Without touching anything: do the visible terminals look clean, or is there a crusty deposit? If you cannot see safely, choose Not Sure."
         }
       ],
       "source_diagnosis_steps": [
@@ -2830,180 +2864,16 @@
       "recommended_service": "battery_electrical_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-    },
-    {
-      "id": "ai2_aktc_0037",
-      "source_record_id": "aktc_0037",
-      "source_data_source": "primary_automotive_fault_dataset",
-      "category": "Electrical System",
-      "subcategory": "Charging System",
-      "fault_category": "electrical_system_fault",
-      "title": "Charging System Safety Guide",
-      "symptoms": [
-        "Battery warning light on",
-        "Dim headlights"
-      ],
-      "guide_available": true,
-      "risk_level": "CAUTION",
-      "risk_reason": "The approved pathway is limited to a careful visual or basic check.",
-      "safety_warning": "This check requires additional care. Stop immediately if you notice smoke, a fuel or burning smell, leakage, excessive heat, exposed wiring, or anything unsafe.",
-      "before_you_begin": [
-        "Park the vehicle safely away from moving traffic.",
-        "Apply the parking brake.",
-        "Switch off the engine unless the approved step only asks you to observe an existing dashboard indication.",
-        "Keep away from traffic and moving vehicle parts.",
-        "Continue only if you understand the step.",
-        "Stop immediately if you feel unsure."
-      ],
-      "requires_safety_confirmation": true,
-      "steps": [
-        {
-          "step_id": "step_1",
-          "source_instruction": "Check alternator belt tension",
-          "user_instruction": "With the engine switched off, look only for clearly visible belt damage. Do not touch the belt or place your hands near moving parts.",
-          "instruction": "With the engine switched off, look only for clearly visible belt damage. Do not touch the belt or place your hands near moving parts.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "loose_belt",
-              "label": "Loose belt",
-              "source_result": "Loose belt",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "properly_tensioned_belt",
-              "label": "Properly tensioned belt",
-              "source_result": "Properly tensioned belt",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        }
-      ],
-      "source_diagnosis_steps": [
-        {
-          "step": "Test alternator output",
-          "result": [
-            "Low output",
-            "Normal output"
-          ]
-        },
-        {
-          "step": "Check alternator belt tension",
-          "result": [
-            "Loose belt",
-            "Properly tensioned belt"
-          ]
-        }
-      ],
-      "stop_conditions": [
-        "smoke",
-        "fire",
-        "strong fuel smell",
-        "visible fuel leak",
-        "burning smell",
-        "exposed damaged wiring",
-        "severe overheating",
-        "uncontrolled fluid leak",
-        "brake failure",
-        "steering failure",
-        "vehicle instability",
-        "user unsure",
-        "unexpected dangerous condition"
-      ],
-      "recommended_service": "battery_electrical_mechanic",
-      "professional_help_required": false,
-      "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-    },
-    {
-      "id": "ai2_aktc_0038",
-      "source_record_id": "aktc_0038",
-      "source_data_source": "primary_automotive_fault_dataset",
-      "category": "Electrical System",
-      "subcategory": "Check Engine Light Diagnosis",
-      "fault_category": "electrical_system_fault",
-      "title": "Check Engine Light Diagnosis Safety Guide",
-      "symptoms": [
-        "Check engine light on",
-        "Poor engine performance"
-      ],
-      "guide_available": true,
-      "risk_level": "LOW",
-      "risk_reason": "The approved user pathway is limited to a basic non-invasive observation.",
-      "safety_warning": "Use only the non-invasive observation shown. Stop if anything appears unsafe.",
-      "before_you_begin": [
-        "Park the vehicle safely away from moving traffic.",
-        "Apply the parking brake and keep the vehicle stationary.",
-        "Stop if you feel unsure or notice anything unsafe."
-      ],
-      "requires_safety_confirmation": false,
-      "steps": [
-        {
-          "step_id": "step_1",
-          "source_instruction": "Check sensors related to DTCs",
-          "user_instruction": "From a safe position and without removing parts, check sensors related to DTCs. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, check sensors related to DTCs. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "faulty_sensor",
-              "label": "Faulty sensor",
-              "source_result": "Faulty sensor",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "sensor_working_properly",
-              "label": "Sensor working properly",
-              "source_result": "Sensor working properly",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        }
-      ],
-      "source_diagnosis_steps": [
-        {
-          "step": "Scan for diagnostic trouble codes (DTCs)",
-          "result": [
-            "DTCs present",
-            "No DTCs"
-          ]
-        },
-        {
-          "step": "Check sensors related to DTCs",
-          "result": [
-            "Faulty sensor",
-            "Sensor working properly"
-          ]
-        }
-      ],
-      "stop_conditions": [
-        "smoke",
-        "fire",
-        "strong fuel smell",
-        "visible fuel leak",
-        "burning smell",
-        "exposed damaged wiring",
-        "severe overheating",
-        "uncontrolled fluid leak",
-        "brake failure",
-        "steering failure",
-        "vehicle instability",
-        "user unsure",
-        "unexpected dangerous condition"
-      ],
-      "recommended_service": "battery_electrical_mechanic",
-      "professional_help_required": false,
-      "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": [
+        "battery",
+        "clicking",
+        "dim lights",
+        "cranks slowly",
+        "won't start",
+        "will not start",
+        "not starting"
+      ]
     },
     {
       "id": "ai2_aktc_0040",
@@ -3051,7 +2921,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3088,7 +2960,8 @@
       "recommended_service": "battery_electrical_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0042",
@@ -3124,7 +2997,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3161,7 +3036,8 @@
       "recommended_service": "battery_electrical_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0043",
@@ -3197,7 +3073,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3234,7 +3112,8 @@
       "recommended_service": "battery_electrical_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0045",
@@ -3270,7 +3149,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3307,7 +3188,8 @@
       "recommended_service": "battery_electrical_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0046",
@@ -3355,7 +3237,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3392,7 +3276,8 @@
       "recommended_service": "battery_electrical_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0048",
@@ -3428,7 +3313,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3465,7 +3352,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0049",
@@ -3501,7 +3389,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3538,7 +3428,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0050",
@@ -3574,7 +3465,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3611,7 +3504,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0051",
@@ -3647,7 +3541,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3684,7 +3580,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0052",
@@ -3720,7 +3617,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3757,7 +3656,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0053",
@@ -3793,7 +3693,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3830,7 +3732,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0054",
@@ -3866,7 +3769,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3903,7 +3808,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0055",
@@ -3939,7 +3845,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -3976,7 +3884,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0056",
@@ -4012,7 +3921,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4049,120 +3960,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
-    },
-    {
-      "id": "ai2_aktc_0057",
-      "source_record_id": "aktc_0057",
-      "source_data_source": "primary_automotive_fault_dataset",
-      "category": "Engine Components",
-      "subcategory": "Balance Shaft",
-      "fault_category": "engine_system_fault",
-      "title": "Balance Shaft Safety Guide",
-      "symptoms": [
-        "Engine vibration",
-        "Rough idle"
-      ],
-      "guide_available": true,
-      "risk_level": "CAUTION",
-      "risk_reason": "The source procedure requires extra care and is restricted to safe observations.",
-      "safety_warning": "This check requires additional care. Stop immediately if you notice smoke, a fuel or burning smell, leakage, excessive heat, exposed wiring, or anything unsafe.",
-      "before_you_begin": [
-        "Park the vehicle safely away from moving traffic.",
-        "Apply the parking brake.",
-        "Switch off the engine unless the approved step only asks you to observe an existing dashboard indication.",
-        "Keep away from traffic and moving vehicle parts.",
-        "Continue only if you understand the step.",
-        "Stop immediately if you feel unsure."
-      ],
-      "requires_safety_confirmation": true,
-      "steps": [
-        {
-          "step_id": "step_1",
-          "source_instruction": "Inspect balance shaft for wear or damage",
-          "user_instruction": "From a safe position and without removing parts, inspect balance shaft for wear or damage. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, inspect balance shaft for wear or damage. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "worn_damaged_shaft",
-              "label": "Worn/damaged shaft",
-              "source_result": "Worn/damaged shaft",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "shaft_in_good_condition",
-              "label": "Shaft in good condition",
-              "source_result": "Shaft in good condition",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
-          "source_instruction": "Check balance shaft alignment",
-          "user_instruction": "From a safe position and without removing parts, check balance shaft alignment. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, check balance shaft alignment. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "misaligned_shaft",
-              "label": "Misaligned shaft",
-              "source_result": "Misaligned shaft",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "properly_aligned_shaft",
-              "label": "Properly aligned shaft",
-              "source_result": "Properly aligned shaft",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        }
-      ],
-      "source_diagnosis_steps": [
-        {
-          "step": "Inspect balance shaft for wear or damage",
-          "result": [
-            "Worn/damaged shaft",
-            "Shaft in good condition"
-          ]
-        },
-        {
-          "step": "Check balance shaft alignment",
-          "result": [
-            "Misaligned shaft",
-            "Properly aligned shaft"
-          ]
-        }
-      ],
-      "stop_conditions": [
-        "smoke",
-        "fire",
-        "strong fuel smell",
-        "visible fuel leak",
-        "burning smell",
-        "exposed damaged wiring",
-        "severe overheating",
-        "uncontrolled fluid leak",
-        "brake failure",
-        "steering failure",
-        "vehicle instability",
-        "user unsure",
-        "unexpected dangerous condition"
-      ],
-      "recommended_service": "engine_mechanic",
-      "professional_help_required": false,
-      "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0058",
@@ -4192,31 +3991,6 @@
       "steps": [
         {
           "step_id": "step_1",
-          "source_instruction": "Check boost pressure with gauge",
-          "user_instruction": "From a safe position and without removing parts, check boost pressure with gauge. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, check boost pressure with gauge. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "low_boost_pressure",
-              "label": "Low boost pressure",
-              "source_result": "Low boost pressure",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "normal_boost_pressure",
-              "label": "Normal boost pressure",
-              "source_result": "Normal boost pressure",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
           "source_instruction": "Inspect intercooler for leaks or damage",
           "user_instruction": "From a safe distance, look only for a clearly visible leak around the named area. Do not touch or identify the fluid yourself.",
           "instruction": "From a safe distance, look only for a clearly visible leak around the named area. Do not touch or identify the fluid yourself.",
@@ -4238,7 +4012,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4275,7 +4051,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0059",
@@ -4311,7 +4088,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4348,95 +4127,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
-    },
-    {
-      "id": "ai2_aktc_0060",
-      "source_record_id": "aktc_0060",
-      "source_data_source": "primary_automotive_fault_dataset",
-      "category": "Engine Components",
-      "subcategory": "Diesel Glow Plug",
-      "fault_category": "engine_system_fault",
-      "title": "Diesel Glow Plug Safety Guide",
-      "symptoms": [
-        "Hard starting in cold weather",
-        "Glow plug indicator light stays on"
-      ],
-      "guide_available": true,
-      "risk_level": "CAUTION",
-      "risk_reason": "The source procedure requires extra care and is restricted to safe observations.",
-      "safety_warning": "This check requires additional care. Stop immediately if you notice smoke, a fuel or burning smell, leakage, excessive heat, exposed wiring, or anything unsafe.",
-      "before_you_begin": [
-        "Park the vehicle safely away from moving traffic.",
-        "Apply the parking brake.",
-        "Switch off the engine unless the approved step only asks you to observe an existing dashboard indication.",
-        "Keep away from traffic and moving vehicle parts.",
-        "Continue only if you understand the step.",
-        "Stop immediately if you feel unsure."
-      ],
-      "requires_safety_confirmation": true,
-      "steps": [
-        {
-          "step_id": "step_1",
-          "source_instruction": "Inspect glow plug for carbon buildup",
-          "user_instruction": "From a safe position and without removing parts, inspect glow plug for carbon buildup. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, inspect glow plug for carbon buildup. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "carbon_buildup",
-              "label": "Carbon buildup",
-              "source_result": "Carbon buildup",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "clean_plug",
-              "label": "Clean plug",
-              "source_result": "Clean plug",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        }
-      ],
-      "source_diagnosis_steps": [
-        {
-          "step": "Test glow plug resistance",
-          "result": [
-            "High resistance",
-            "Normal resistance"
-          ]
-        },
-        {
-          "step": "Inspect glow plug for carbon buildup",
-          "result": [
-            "Carbon buildup",
-            "Clean plug"
-          ]
-        }
-      ],
-      "stop_conditions": [
-        "smoke",
-        "fire",
-        "strong fuel smell",
-        "visible fuel leak",
-        "burning smell",
-        "exposed damaged wiring",
-        "severe overheating",
-        "uncontrolled fluid leak",
-        "brake failure",
-        "steering failure",
-        "vehicle instability",
-        "user unsure",
-        "unexpected dangerous condition"
-      ],
-      "recommended_service": "engine_mechanic",
-      "professional_help_required": false,
-      "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0061",
@@ -4472,7 +4164,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4509,7 +4203,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0062",
@@ -4545,7 +4240,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4582,7 +4279,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0063",
@@ -4618,7 +4316,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4655,7 +4355,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0064",
@@ -4691,7 +4392,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4728,7 +4431,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0065",
@@ -4764,7 +4468,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4801,7 +4507,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0066",
@@ -4837,7 +4544,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4874,7 +4583,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0067",
@@ -4910,7 +4620,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -4947,7 +4659,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0068",
@@ -4983,7 +4696,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5020,7 +4735,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0069",
@@ -5056,7 +4772,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5093,7 +4811,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0070",
@@ -5132,44 +4851,21 @@
               "value": "cut_worn_belt",
               "label": "Cut/worn belt",
               "source_result": "Cut/worn belt",
-              "next_step": "step_2",
-              "action": "continue",
+              "next_step": null,
+              "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             },
             {
               "value": "belt_in_good_condition",
               "label": "Belt in good condition",
               "source_result": "Belt in good condition",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
-          "source_instruction": "Check belt tension and alignment",
-          "user_instruction": "With the engine switched off, look only for clearly visible belt damage. Do not touch the belt or place your hands near moving parts.",
-          "instruction": "With the engine switched off, look only for clearly visible belt damage. Do not touch the belt or place your hands near moving parts.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "loose_misaligned_belt",
-              "label": "Loose/misaligned belt",
-              "source_result": "Loose/misaligned belt",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "properly_tensioned_aligned_belt",
-              "label": "Properly tensioned/aligned belt",
-              "source_result": "Properly tensioned/aligned belt",
               "next_step": null,
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5206,7 +4902,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0071",
@@ -5253,7 +4950,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5290,95 +4989,8 @@
       "recommended_service": "battery_electrical_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-    },
-    {
-      "id": "ai2_aktc_0072",
-      "source_record_id": "aktc_0072",
-      "source_data_source": "primary_automotive_fault_dataset",
-      "category": "Electrical System",
-      "subcategory": "Battery Charging",
-      "fault_category": "electrical_system_fault",
-      "title": "Battery Charging Safety Guide",
-      "symptoms": [
-        "Battery warning light on",
-        "Low voltage"
-      ],
-      "guide_available": true,
-      "risk_level": "CAUTION",
-      "risk_reason": "The approved pathway is limited to a careful visual or basic check.",
-      "safety_warning": "This check requires additional care. Stop immediately if you notice smoke, a fuel or burning smell, leakage, excessive heat, exposed wiring, or anything unsafe.",
-      "before_you_begin": [
-        "Park the vehicle safely away from moving traffic.",
-        "Apply the parking brake.",
-        "Switch off the engine unless the approved step only asks you to observe an existing dashboard indication.",
-        "Keep away from traffic and moving vehicle parts.",
-        "Continue only if you understand the step.",
-        "Stop immediately if you feel unsure."
-      ],
-      "requires_safety_confirmation": true,
-      "steps": [
-        {
-          "step_id": "step_1",
-          "source_instruction": "Inspect alternator for proper operation",
-          "user_instruction": "From a safe position and without removing parts, inspect alternator for proper operation. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, inspect alternator for proper operation. Stop if the area is not clearly visible or safely accessible.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "faulty_alternator",
-              "label": "Faulty alternator",
-              "source_result": "Faulty alternator",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "alternator_working_correctly",
-              "label": "Alternator working correctly",
-              "source_result": "Alternator working correctly",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        }
-      ],
-      "source_diagnosis_steps": [
-        {
-          "step": "Test battery voltage",
-          "result": [
-            "Low voltage",
-            "Normal voltage"
-          ]
-        },
-        {
-          "step": "Inspect alternator for proper operation",
-          "result": [
-            "Faulty alternator",
-            "Alternator working correctly"
-          ]
-        }
-      ],
-      "stop_conditions": [
-        "smoke",
-        "fire",
-        "strong fuel smell",
-        "visible fuel leak",
-        "burning smell",
-        "exposed damaged wiring",
-        "severe overheating",
-        "uncontrolled fluid leak",
-        "brake failure",
-        "steering failure",
-        "vehicle instability",
-        "user unsure",
-        "unexpected dangerous condition"
-      ],
-      "recommended_service": "battery_electrical_mechanic",
-      "professional_help_required": false,
-      "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0073",
@@ -5417,44 +5029,21 @@
               "value": "cut_worn_belt",
               "label": "Cut/worn belt",
               "source_result": "Cut/worn belt",
-              "next_step": "step_2",
-              "action": "continue",
+              "next_step": null,
+              "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             },
             {
               "value": "belt_in_good_condition",
               "label": "Belt in good condition",
               "source_result": "Belt in good condition",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
-          "source_instruction": "Check belt tension and alignment",
-          "user_instruction": "With the engine switched off, look only for clearly visible belt damage. Do not touch the belt or place your hands near moving parts.",
-          "instruction": "With the engine switched off, look only for clearly visible belt damage. Do not touch the belt or place your hands near moving parts.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "loose_misaligned_belt",
-              "label": "Loose/misaligned belt",
-              "source_result": "Loose/misaligned belt",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "properly_tensioned_aligned_belt",
-              "label": "Properly tensioned/aligned belt",
-              "source_result": "Properly tensioned/aligned belt",
               "next_step": null,
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5491,7 +5080,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0074",
@@ -5526,7 +5116,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5563,7 +5155,8 @@
       "recommended_service": "steering_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0075",
@@ -5599,7 +5192,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5636,7 +5231,8 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0076",
@@ -5687,7 +5283,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5724,7 +5322,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0077",
@@ -5760,7 +5359,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5797,7 +5398,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0078",
@@ -5848,7 +5450,9 @@
               "action": "continue",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         },
         {
           "step_id": "step_2",
@@ -5873,7 +5477,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5910,7 +5516,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0079",
@@ -5946,7 +5553,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -5983,7 +5592,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0080",
@@ -6019,7 +5629,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6056,7 +5668,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0082",
@@ -6092,7 +5705,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6129,7 +5744,8 @@
       "recommended_service": "fuel_system_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0083",
@@ -6165,7 +5781,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6202,7 +5820,8 @@
       "recommended_service": "fuel_system_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0084",
@@ -6238,7 +5857,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6275,7 +5896,8 @@
       "recommended_service": "fuel_system_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0085",
@@ -6311,7 +5933,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6348,7 +5972,8 @@
       "recommended_service": "fuel_system_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0086",
@@ -6384,7 +6009,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6421,7 +6048,8 @@
       "recommended_service": "fuel_system_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0087",
@@ -6457,7 +6085,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6494,7 +6124,8 @@
       "recommended_service": "brake_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0088",
@@ -6545,7 +6176,9 @@
               "action": "continue",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         },
         {
           "step_id": "step_2",
@@ -6570,7 +6203,9 @@
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6607,7 +6242,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0089",
@@ -6643,7 +6279,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6680,7 +6318,8 @@
       "recommended_service": "steering_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0090",
@@ -6719,44 +6358,21 @@
               "value": "leaking_damaged_radiator",
               "label": "Leaking/damaged radiator",
               "source_result": "Leaking/damaged radiator",
-              "next_step": "step_2",
-              "action": "continue",
+              "next_step": null,
+              "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             },
             {
               "value": "radiator_in_good_condition",
               "label": "Radiator in good condition",
               "source_result": "Radiator in good condition",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            }
-          ]
-        },
-        {
-          "step_id": "step_2",
-          "source_instruction": "Check radiator cap for proper seal",
-          "user_instruction": "Wait until the engine is completely cool. From a safe position, look only for the visible condition described by the source check. Do not open a hot or pressurized cap.",
-          "instruction": "Wait until the engine is completely cool. From a safe position, look only for the visible condition described by the source check. Do not open a hot or pressurized cap.",
-          "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
-          "possible_results": [
-            {
-              "value": "loose_broken_cap",
-              "label": "Loose/broken cap",
-              "source_result": "Loose/broken cap",
-              "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
-            },
-            {
-              "value": "cap_seals_properly",
-              "label": "Cap seals properly",
-              "source_result": "Cap seals properly",
               "next_step": null,
               "action": "request_mechanic",
               "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6793,7 +6409,8 @@
       "recommended_service": "engine_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0091",
@@ -6829,25 +6446,30 @@
               "value": "low_fluid_level",
               "label": "Low fluid level",
               "source_result": "Low fluid level",
-              "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "next_step": null,
+              "action": "request_mechanic",
+              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+              "escalation_reason": "The washer fluid is low. This source has no approved refill procedure for your vehicle."
             },
             {
               "value": "sufficient_fluid_level",
               "label": "Sufficient fluid level",
               "source_result": "Sufficient fluid level",
               "next_step": "step_2",
-              "action": "continue",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "action": "verify_resolution",
+              "branching_note": "Ask about the driver-observed outcome; never infer a repair from a normal check. next_step is used only if unresolved.",
+              "verification_question": "Based on what you have already observed, is the washer problem now resolved? Do not drive to test it."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Using only the visible level and your owner's manual, is there sufficient washer fluid, or is it low? Choose Not Sure if the reservoir is not safely visible.",
+          "uncertain_next_step": "step_2"
         },
         {
           "step_id": "step_2",
           "source_instruction": "Inspect washer fluid pump for operation",
-          "user_instruction": "From a safe position and without removing parts, inspect washer fluid pump for operation. Stop if the area is not clearly visible or safely accessible.",
-          "instruction": "From a safe position and without removing parts, inspect washer fluid pump for operation. Stop if the area is not clearly visible or safely accessible.",
+          "user_instruction": "Without opening or touching the pump, recall whether washer fluid sprayed normally when you last used the washer. Do not dismantle parts or operate the vehicle to answer.",
+          "instruction": "Without opening or touching the pump, recall whether washer fluid sprayed normally when you last used the washer. Do not dismantle parts or operate the vehicle to answer.",
           "question": "Which source result best matches what you safely observed? Stop if you are unsure.",
           "possible_results": [
             {
@@ -6856,17 +6478,21 @@
               "source_result": "Faulty pump",
               "next_step": null,
               "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+              "escalation_reason": "The washer still needs a technical check that this guide does not approve for driver self-repair."
             },
             {
               "value": "pump_operates_correctly",
               "label": "Pump operates correctly",
               "source_result": "Pump operates correctly",
               "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "action": "verify_resolution",
+              "branching_note": "Ask about the driver-observed outcome; never infer a repair from a normal check. next_step is used only if unresolved.",
+              "verification_question": "Is the original washer problem now resolved? Do not drive to test it."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "When you last used the washer, did it spray normally? If you cannot tell, choose Not Sure."
         }
       ],
       "source_diagnosis_steps": [
@@ -6903,7 +6529,15 @@
       "recommended_service": "general_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": [
+        "washer",
+        "washer fluid",
+        "no spray",
+        "weak spray",
+        "windscreen washer",
+        "windshield washer"
+      ]
     },
     {
       "id": "ai2_aktc_0092",
@@ -6939,7 +6573,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -6976,7 +6612,8 @@
       "recommended_service": "transmission_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0093",
@@ -7012,7 +6649,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -7049,7 +6688,8 @@
       "recommended_service": "transmission_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0094",
@@ -7085,7 +6725,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -7122,7 +6764,8 @@
       "recommended_service": "transmission_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0095",
@@ -7158,7 +6801,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -7195,7 +6840,8 @@
       "recommended_service": "transmission_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0096",
@@ -7231,7 +6877,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -7268,7 +6916,8 @@
       "recommended_service": "transmission_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0097",
@@ -7304,7 +6953,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -7341,7 +6992,8 @@
       "recommended_service": "tire_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     },
     {
       "id": "ai2_aktc_0098",
@@ -7379,17 +7031,21 @@
               "source_result": "Low/high pressure",
               "next_step": null,
               "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+              "escalation_reason": "The pressure is outside the specified range. This guide has no approved pressure-adjustment or puncture-repair procedure."
             },
             {
               "value": "correct_pressure",
               "label": "Correct pressure",
               "source_result": "Correct pressure",
               "next_step": null,
-              "action": "request_mechanic",
-              "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+              "action": "verify_resolution",
+              "branching_note": "Ask about the driver-observed outcome; never infer a repair from a normal check. next_step is used only if unresolved.",
+              "verification_question": "Is the original tyre-pressure problem now resolved, with no remaining warning or visible tyre damage? Do not drive to test it."
             }
-          ]
+          ],
+          "kind": "CHECK",
+          "simple_question": "Does the gauge reading match the pressure specified for your vehicle in its manual or tyre placard? If you cannot compare safely, choose Not Sure."
         }
       ],
       "source_diagnosis_steps": [
@@ -7426,7 +7082,13 @@
       "recommended_service": "tire_mechanic",
       "professional_help_required": false,
       "branching_complete": false,
-      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred."
+      "branching_note": "The source supplies an ordered step and result options but does not define result-specific branching. Source order is preserved; no repair outcome is inferred.",
+      "matching_keywords": [
+        "tpms",
+        "tyre pressure",
+        "tire pressure",
+        "pressure warning"
+      ]
     },
     {
       "id": "ai2_aktc_0099",
@@ -7462,7 +7124,9 @@
               "action": "request_mechanic",
               "branching_note": "Deterministic HIGH-risk safety escalation."
             }
-          ]
+          ],
+          "kind": "ESCALATE",
+          "simple_question": "Choose the closest observation below. You do not need to guess or touch anything."
         }
       ],
       "source_diagnosis_steps": [
@@ -7499,7 +7163,8 @@
       "recommended_service": "tire_mechanic",
       "professional_help_required": true,
       "branching_complete": true,
-      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures."
+      "branching_note": "Deterministic HIGH-risk escalation replaces hazardous user-facing procedures.",
+      "matching_keywords": []
     }
   ]
 }

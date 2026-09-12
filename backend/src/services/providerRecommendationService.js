@@ -1,4 +1,5 @@
 const ProviderProfile = require("../models/ProviderProfile");
+const { PROVIDER_TYPES } = require("../utils/domainConstants");
 const { getServiceCostRange } = require("../config/serviceCostRanges");
 const { getRejectedProviderIds } = require("./requestAssignmentService");
 const { APPROVED_PROVIDER_QUERY, isProviderApproved } = require("../utils/providerApproval");
@@ -20,11 +21,10 @@ const SERVICE_ALIASES = {
   transmission_mechanic: ["transmission_mechanic", "transmission"],
   steering_mechanic: ["steering_mechanic", "steering"],
   tire_mechanic: ["tire_mechanic", "tire", "tyre"],
-  roadside_fuel_support: ["roadside_fuel_support", "fuel_support"],
-  towing_service: ["towing_service", "towing"]
+  roadside_fuel_support: ["roadside_fuel_support", "fuel_support"]
 };
 
-const FALLBACK_PRIORITY = ["garage", "general", "towing"];
+const FALLBACK_PRIORITY = ["garage", "general"];
 
 function toRadians(value) {
   return (Number(value) * Math.PI) / 180;
@@ -50,7 +50,8 @@ function providerServices(provider) {
   ].map((item) => String(item).toLowerCase()))];
 }
 
-function getMatchTier(provider, requiredServiceType, breakdownType) {
+function getMatchTier(provider, requiredServiceType) {
+  if (!PROVIDER_TYPES.includes(provider.providerType)) return "unrelated";
   const services = providerServices(provider);
   const aliases = SERVICE_ALIASES[requiredServiceType] || [requiredServiceType];
   if (services.some((service) => aliases.includes(service))) return "exact";
@@ -59,17 +60,11 @@ function getMatchTier(provider, requiredServiceType, breakdownType) {
   if (provider.providerType === "garage" && (isGeneral || services.length === 0)) return "garage";
   if (["mechanic", "garage"].includes(provider.providerType) && isGeneral) return "general";
 
-  const towingAppropriate = requiredServiceType === "towing_service" ||
-    ["accident", "towing_needed"].includes(breakdownType);
-  if (towingAppropriate && provider.providerType === "towing_service" &&
-      services.some((service) => ["towing", "towing_service"].includes(service))) {
-    return "towing";
-  }
   return "unrelated";
 }
 
 function serviceMatchScore(tier) {
-  return { exact: 40, garage: 25, general: 22, towing: 20 }[tier] || 0;
+  return { exact: 40, garage: 25, general: 22 }[tier] || 0;
 }
 
 function distanceScore(distanceKm) {
@@ -113,7 +108,6 @@ function buildWhyRecommended(provider, distanceKm, tier) {
   if (tier === "exact") reasons.push("Matches the required service");
   else if (tier === "garage") reasons.push("Compatible garage alternative");
   else if (tier === "general") reasons.push("General mechanic alternative");
-  else if (tier === "towing") reasons.push("Suitable towing alternative");
   reasons.push(`${distanceKm.toFixed(1)} km away`);
   if (Number(provider.averageRating) >= 4) reasons.push("Highly rated");
   reasons.push("Currently available");
@@ -138,7 +132,7 @@ function rankProviders(providers, input) {
 
     const distanceKm = calculateDistanceKm(driverLocation, provider.location);
     if (distanceKm > Number(provider.serviceRadiusKm || 0)) return null;
-    const tier = getMatchTier(provider, input.requiredServiceType, input.breakdownType);
+    const tier = getMatchTier(provider, input.requiredServiceType);
     if (tier === "unrelated") return null;
     const score = scoreProvider(provider, distanceKm, tier);
     return {
@@ -201,8 +195,7 @@ async function getProviderRecommendations(input) {
         ? "No specialist is currently available. Showing suitable alternative providers."
         : "Suitable providers found."
       : "No suitable provider is currently available nearby.",
-    canIncreaseSearchRadius: ranked.providers.length === 0,
-    canRequestTowing: ranked.providers.length === 0
+    canIncreaseSearchRadius: ranked.providers.length === 0
   };
 }
 

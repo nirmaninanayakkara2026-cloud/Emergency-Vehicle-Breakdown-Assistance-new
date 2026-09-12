@@ -5,7 +5,6 @@ const USER_ROLES = [
   "driver",
   "mechanic",
   "garage",
-  "towing_service",
   "spare_parts_shop",
   "admin"
 ];

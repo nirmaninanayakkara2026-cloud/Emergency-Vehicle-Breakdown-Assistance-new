@@ -1,8 +1,9 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
+import AppInput from "../../components/AppInput";
 import ScreenContainer from "../../components/ScreenContainer";
 import InfoBanner from "../../components/ui/InfoBanner";
 import ScreenHeader from "../../components/ui/ScreenHeader";
@@ -10,9 +11,11 @@ import {
   confirmTroubleshootingAction,
   submitTroubleshootingStep,
   triggerStopCondition,
+  sendTroubleshootingMessage,
 } from "../../services/selfAssistantService";
 import { colors, radii, spacing, typography } from "../../theme";
 import { formatFaultLabel } from "../../utils/displayLabels";
+import { conversationState } from "../../utils/selfAssistantFlow";
 
 const UNSAFE_CONDITIONS = [
   { label: "Smoke", value: "smoke" },
@@ -25,6 +28,9 @@ const UNSAFE_CONDITIONS = [
 ];
 
 function restoredMessages(session, aiPrediction, currentStep) {
+  if (session?.messages?.length) {
+    return session.messages.map(({ role, content }) => ({ role, text: content }));
+  }
   // Rebuild the conversation when an existing troubleshooting session is resumed.
   const messages = aiPrediction?.faultLabel
     ? [
@@ -53,19 +59,41 @@ function restoredMessages(session, aiPrediction, currentStep) {
   return messages;
 }
 
+function getAnswerOptions(session) {
+  if (session.pendingInterpretation === "danger_confirmation") {
+    return [
+      { value: "danger_yes", label: "Yes, there is an unsafe condition" },
+      { value: "danger_no", label: "No, I am not reporting danger" },
+    ];
+  }
+  if (session.status === "awaiting_resolution_confirmation") {
+    return [
+      { value: "resolved", label: "Yes, resolved with no danger signs" },
+      { value: "unresolved", label: "No, the problem remains" },
+      { value: "not_sure", label: "Not Sure" },
+    ];
+  }
+  const options = session.currentStep?.possible_results || [];
+  return options.some((option) => option.value === "not_sure")
+    ? options
+    : [...options, { value: "not_sure", label: "Not Sure" }];
+}
+
 export default function TroubleshootingConversationScreen({
   navigation,
   route,
 }) {
-  // Restore the session and track the current troubleshooting phase.
+  // Keep the backend session in one place; derive the step and phase from it.
   const { sessionId, aiPrediction, prefill } = route.params || {};
   const initialSession = route.params?.session || {};
   const initialStep = route.params?.currentStep || initialSession.currentStep;
-  const [activeSession, setActiveSession] = useState(initialSession);
-  const [currentStep, setCurrentStep] = useState(initialStep);
-  const [currentPhase, setCurrentPhase] = useState(
-    route.params?.currentPhase || initialSession.currentPhase || "instruction",
-  );
+  const [activeSession, setActiveSession] = useState(() => ({
+    ...initialSession,
+    currentStep: initialStep,
+    currentPhase: route.params?.currentPhase || initialSession.currentPhase || "instruction",
+  }));
+  const currentStep = activeSession.currentStep;
+  const currentPhase = activeSession.currentPhase;
   const [messages, setMessages] = useState(() =>
     restoredMessages(initialSession, aiPrediction, initialStep),
   );
@@ -73,16 +101,25 @@ export default function TroubleshootingConversationScreen({
   const [cannotContinue, setCannotContinue] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [draftMessage, setDraftMessage] = useState("");
   const submittingRef = useRef(false);
 
-  const answerOptions = useMemo(() => {
-    const approved = currentStep?.possible_results || [];
-    return approved.some((item) => item.value === "not_sure")
-      ? approved
-      : [...approved, { value: "not_sure", label: "Not Sure" }];
-  }, [currentStep]);
-
+  const answerOptions = getAnswerOptions(activeSession);
   const checkNumber = (activeSession?.completedSteps?.length || 0) + 1;
+  const checkingResolution = activeSession.status === "awaiting_resolution_confirmation";
+  const confirmingInterpretation = Boolean(
+    activeSession.pendingInterpretation &&
+    activeSession.pendingInterpretation !== "danger_confirmation",
+  );
+  const showInstruction =
+    currentStep && currentPhase === "instruction" && !cannotContinue;
+  const showAnswers =
+    ((currentStep && currentPhase === "result") || checkingResolution) && !cannotContinue;
+  const question = activeSession.lastMessage || currentStep?.result_question ||
+    currentStep?.question || "Great. What did you observe?";
+  let phaseLabel = "Action";
+  if (checkingResolution) phaseLabel = "Resolution";
+  else if (currentPhase === "result") phaseLabel = "Observation";
 
   // Route completed or stopped sessions to the result screen.
   function showResult(response) {
@@ -92,29 +129,71 @@ export default function TroubleshootingConversationScreen({
       aiPrediction,
       prefill,
       status: response.status,
-      message:
-        response.status === "resolved"
-          ? "That completes the basic troubleshooting steps."
-          : response.message,
+      message: response.message,
       recommendedService: response.recommendedService,
       riskLevel: route.params?.riskLevel || activeSession?.riskLevel,
     });
   }
 
-  // Confirm that the driver completed the current instruction.
-  async function confirmAction() {
-    if (!currentStep || submittingRef.current) return;
+  // Every successful request updates the screen through this function.
+  function applyResponse(response, fallbackMessages = []) {
+    if (["resolved", "professional_help_required"].includes(response.status)) {
+      showResult(response);
+      return;
+    }
+    const session = response.session || activeSession;
+    setActiveSession({
+      ...session,
+      currentStep: response.currentStep || response.nextStep || session.currentStep || null,
+      currentPhase: response.currentPhase || session.currentPhase || "result",
+    });
+    if (session.messages?.length) {
+      setMessages(restoredMessages(session));
+    } else {
+      const reply = response.message ? [{ role: "assistant", text: response.message }] : [];
+      setMessages((items) => [...items, ...fallbackMessages, ...reply]);
+    }
+  }
+
+  // Share loading, errors and double-tap protection across chat requests.
+  async function runRequest(request, fallbackMessages = []) {
+    if (submittingRef.current) return null;
     submittingRef.current = true;
     setLoading(true);
     setError("");
     try {
-      const response = await confirmTroubleshootingAction(
-        sessionId,
-        currentStep.step_id,
-      );
-      setActiveSession(response.session || activeSession);
-      setMessages((items) => [
-        ...items,
+      const response = await request();
+      if (response.status === "troubleshooting_unavailable") {
+        setError("The service is temporarily unavailable. Your current check is saved; please try again.");
+        return null;
+      }
+      applyResponse(response, fallbackMessages);
+      return response;
+    } catch (requestError) {
+      setError(requestError.message);
+      return null;
+    } finally {
+      submittingRef.current = false;
+      setLoading(false);
+    }
+  }
+
+  async function sendMessage(selectedResult) {
+    const message = draftMessage.trim();
+    if (!selectedResult && !message) return;
+    const response = await runRequest(() => sendTroubleshootingMessage(sessionId, {
+      ...(selectedResult ? { selectedResult } : { message }),
+      stepId: activeSession.currentStepId || null,
+      expectedState: conversationState(activeSession),
+    }));
+    if (response?.success) setDraftMessage("");
+  }
+
+  function confirmAction() {
+    if (!currentStep) return;
+    return runRequest(
+      () => confirmTroubleshootingAction(sessionId, currentStep.step_id),
+      [
         { role: "user", text: "Done – I Checked" },
         {
           role: "assistant",
@@ -123,70 +202,25 @@ export default function TroubleshootingConversationScreen({
             currentStep.question ||
             "Great. What did you observe?",
         },
-      ]);
-      setCurrentPhase("result");
-    } catch (actionError) {
-      setError(actionError.message);
-    } finally {
-      submittingRef.current = false;
-      setLoading(false);
-    }
+      ],
+    );
   }
 
   // Submit the driver's observation and load the next approved step.
-  async function chooseAnswer(option) {
-    if (!currentStep || currentPhase !== "result" || submittingRef.current)
-      return;
-    submittingRef.current = true;
-    setCurrentPhase("processing");
-    setLoading(true);
-    setError("");
-    setMessages((items) => [...items, { role: "user", text: option.label }]);
-    try {
-      const response = await submitTroubleshootingStep(
-        sessionId,
-        currentStep.step_id,
-        option.value,
-      );
-      if (response.status === "in_progress" && response.nextStep) {
-        setActiveSession(response.session || activeSession);
-        setCurrentStep(response.nextStep);
-        setMessages((items) => [
-          ...items,
-          {
-            role: "assistant",
-            text: "Okay. Let's continue with the next check.",
-          },
-          { role: "assistant", text: response.nextStep.instruction },
-        ]);
-        setCurrentPhase("instruction");
-      } else {
-        setCurrentPhase("completed");
-        showResult(response);
-      }
-    } catch (stepError) {
-      setError(stepError.message);
-      setCurrentPhase("result");
-    } finally {
-      submittingRef.current = false;
-      setLoading(false);
+  function chooseAnswer(option) {
+    if (checkingResolution || activeSession.pendingInterpretation) {
+      return sendMessage(option.value);
     }
+    if (!currentStep || currentPhase !== "result") return;
+    return runRequest(
+      () => submitTroubleshootingStep(sessionId, currentStep.step_id, option.value),
+      [{ role: "user", text: option.label }],
+    );
   }
 
   // Stop the flow when the driver reports an unsafe condition.
-  async function stopForCondition(condition) {
-    if (submittingRef.current) return;
-    submittingRef.current = true;
-    setLoading(true);
-    setError("");
-    try {
-      showResult(await triggerStopCondition(sessionId, condition));
-    } catch (stopError) {
-      setError(stopError.message);
-    } finally {
-      submittingRef.current = false;
-      setLoading(false);
-    }
+  function stopForCondition(condition) {
+    return runRequest(() => triggerStopCondition(sessionId, condition));
   }
 
   // Escalate directly to a mechanic while preserving the request draft.
@@ -217,11 +251,7 @@ export default function TroubleshootingConversationScreen({
       <View style={styles.checkHeader}>
         <Text style={styles.checkLabel}>Check {checkNumber}</Text>
         <Text style={styles.phaseLabel}>
-          {currentPhase === "result"
-            ? "Observation"
-            : currentPhase === "processing"
-              ? "Reviewing"
-              : "Action"}
+          {loading ? "Reviewing" : phaseLabel}
         </Text>
       </View>
 
@@ -257,7 +287,7 @@ export default function TroubleshootingConversationScreen({
       ))}
 
       {/* Approved instruction and completion controls. */}
-      {currentStep && currentPhase === "instruction" && !cannotContinue ? (
+      {showInstruction ? (
         <AppCard style={styles.actionCard}>
           <Text style={styles.overline}>First, do this:</Text>
           <Text style={styles.instruction}>{currentStep.instruction}</Text>
@@ -301,13 +331,17 @@ export default function TroubleshootingConversationScreen({
       ) : null}
 
       {/* Observation question and safe answer options. */}
-      {currentStep && currentPhase === "result" && !cannotContinue ? (
+      {showAnswers ? (
         <AppCard>
           <Text style={styles.question}>
-            {currentStep.result_question ||
-              currentStep.question ||
-              "Great. What did you observe?"}
+            {question}
           </Text>
+          {confirmingInterpretation ? (
+            <>
+              <AppButton title="Yes, that is what I meant" disabled={loading} onPress={() => sendMessage("confirm_interpretation")} />
+              <AppButton title="No, let me clarify" variant="secondary" disabled={loading} onPress={() => sendMessage("reject_interpretation")} />
+            </>
+          ) : null}
           <Text style={styles.help}>Choose only what you safely observed.</Text>
           {answerOptions.map((option) => (
             <Pressable
@@ -330,8 +364,21 @@ export default function TroubleshootingConversationScreen({
         </AppCard>
       ) : null}
 
+      <AppCard>
+        <AppInput
+          label="Tell me what you noticed"
+          placeholder="Describe your observation or ask for a clearer explanation"
+          value={draftMessage}
+          onChangeText={setDraftMessage}
+          maxLength={1000}
+          editable={!loading}
+          multiline
+        />
+        <AppButton title="Send Message" onPress={() => sendMessage()} disabled={loading || !draftMessage.trim()} loading={loading} />
+      </AppCard>
+
       {/* Processing and submission error feedback. */}
-      {currentPhase === "processing" ? (
+      {loading ? (
         <InfoBanner
           tone="info"
           message="Reviewing your observation and loading the next approved check..."

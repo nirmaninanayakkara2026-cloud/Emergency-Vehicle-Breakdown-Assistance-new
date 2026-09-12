@@ -7,6 +7,7 @@ import json
 import re
 from pathlib import Path
 from typing import Any
+from ai2.services.safety import detect_danger
 
 
 AI2_ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +42,9 @@ def _public_step(step: dict[str, Any]) -> dict[str, Any]:
     )
     return {
         "step_id": step["step_id"],
+        "kind": step.get("kind", "CHECK"),
+        "uncertain_next_step": step.get("uncertain_next_step"),
+        "simple_question": step.get("simple_question", "Choose the closest observation. Do not guess or touch anything."),
         "instruction": step.get("user_instruction") or step["instruction"],
         "requires_action_confirmation": True,
         "result_question": result_question,
@@ -94,10 +98,24 @@ def _professional_response(
     }
 
 
-def get_guide_for_fault(fault_category: str) -> dict[str, Any] | None:
-    """Return the first approved public guide for an exact fault category."""
+def get_guide_for_fault(fault_category: str, symptom_text: str = "", breakdown_type: str = "") -> dict[str, Any] | None:
+    """Rank source symptoms and explicit matching phrases within the fault category."""
     guides = _GUIDES_BY_FAULT.get(str(fault_category), [])
-    return _public_guide(guides[0]) if guides else None
+    if not guides:
+        return None
+    context = _normalize(f"{symptom_text or ''} {breakdown_type or ''}").replace("tyre", "tire")
+    if not context:
+        return _public_guide(guides[0])  # Legacy callers without symptom context.
+    ignored = {"the", "a", "is", "on", "from", "when", "with", "and", "of", "in", "car", "vehicle", "problem", "fault", "system"}
+    words = set(context.split("_")) - ignored
+    def score(guide):
+        phrases = guide.get("matching_keywords", [])
+        exact = sum(5 for phrase in phrases if f"_{_normalize(phrase).replace('tyre', 'tire')}_" in f"_{context}_")
+        title = set(_normalize(guide["subcategory"]).replace("tyre", "tire").split("_")) - ignored
+        symptoms = set(_normalize(" ".join(guide["symptoms"])).replace("tyre", "tire").split("_")) - ignored
+        return exact + 3 * len(words & title) + len(words & symptoms)
+    ranked = sorted(guides, key=lambda guide: (-score(guide), guide["id"]))
+    return _public_guide(ranked[0]) if score(ranked[0]) > 0 else None
 
 
 def get_guide_by_id(guide_id: str) -> dict[str, Any] | None:
@@ -157,10 +175,6 @@ def process_step_result(
         return _professional_response(guide)
 
     normalized_result = _normalize(selected_result)
-    if normalized_result in {"not_sure", "unsure", "user_unsure", "i_am_not_sure"}:
-        return _professional_response(
-            guide, "The driver is unsure, so troubleshooting has stopped."
-        )
     stop_response = check_stop_condition(guide_id, selected_result)
     if stop_response["triggered"]:
         return {key: value for key, value in stop_response.items() if key != "triggered"}
@@ -173,6 +187,12 @@ def process_step_result(
             "status": "invalid_step",
             "message": "The requested troubleshooting step does not exist.",
         }
+    if normalized_result in {"not_sure", "unsure", "user_unsure", "i_am_not_sure"}:
+        return {"status": "clarification_required", "message": _public_step(source_step)["simple_question"]}
+    if normalized_result == "skip_unsure" and source_step.get("uncertain_next_step"):
+        alternative = get_current_step(guide_id, source_step["uncertain_next_step"])
+        if alternative:
+            return {"status": "in_progress", "current_step": alternative}
     result = next(
         (
             item
@@ -192,6 +212,12 @@ def process_step_result(
         }
 
     action = result["action"]
+    if action == "verify_resolution":
+        return {
+            "status": "awaiting_resolution_confirmation",
+            "message": result["verification_question"],
+            "next_step": get_current_step(guide_id, result["next_step"]) if result["next_step"] else None,
+        }
     if action == "continue" and result["next_step"]:
         next_step = get_current_step(guide_id, result["next_step"])
         if next_step is None:
@@ -201,10 +227,10 @@ def process_step_result(
         return {"status": "in_progress", "current_step": next_step}
     if action == "resolved":
         return {"status": "resolved", "message": "The approved pathway is complete."}
-    if action in {"request_mechanic", "request_towing", "stop"}:
+    if action in {"request_mechanic", "stop"}:
         return _professional_response(
             guide,
-            "The approved self-check is complete. Professional assistance is recommended.",
+            result.get("escalation_reason", "The available approved checks cannot resolve this issue. Professional assistance is recommended."),
         )
     return _professional_response(guide)
 
@@ -214,15 +240,8 @@ def check_stop_condition(guide_id: str, reported_condition: str) -> dict[str, An
     if not guide:
         response = _professional_response(None)
         return {"triggered": True, **response}
-    reported = _normalize(reported_condition)
-    matched = next(
-        (
-            condition
-            for condition in guide["stop_conditions"]
-            if _normalize(condition) in reported or reported in _normalize(condition)
-        ),
-        None,
-    )
+    danger = detect_danger(reported_condition)
+    matched = danger["id"] if danger else None
     if matched:
         response = _professional_response(
             guide,

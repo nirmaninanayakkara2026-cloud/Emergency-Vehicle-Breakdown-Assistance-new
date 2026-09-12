@@ -106,7 +106,6 @@ Supported user roles:
 - `driver`
 - `mechanic`
 - `garage`
-- `towing_service`
 - `spare_parts_shop`
 - `admin`
 
@@ -203,7 +202,6 @@ Provider profile routes use provider roles only:
 
 - `mechanic`
 - `garage`
-- `towing_service`
 - `spare_parts_shop`
 
 ### Create Provider Profile
@@ -316,8 +314,7 @@ Mapping:
 - `engine_overheating` -> `engine_mechanic`
 - `brake_problem` -> `brake_mechanic`
 - `fuel_issue` -> `roadside_fuel_support`
-- `accident` -> `towing_service`
-- `towing_needed` -> `towing_service`
+- `accident` -> `general_mechanic`
 - `other` -> `general_mechanic`
 
 ### Create Breakdown Request

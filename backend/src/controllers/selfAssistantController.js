@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const TroubleshootingSession = require("../models/TroubleshootingSession");
 const structuredProblemRoutingService = require("../services/structuredProblemRoutingService");
 const ai2Service = require("../services/ai2TroubleshootingService");
+const conversation = require("../services/troubleshootingStateService");
+const language = require("../services/troubleshootingLanguageService");
+const { detectDanger, dangerMessage } = require("../services/troubleshootingSafetyService");
 const { buildDiagnosticText } = require("../utils/buildDiagnosticText");
 const { normalizeSymptomCapture } = require("../utils/symptomNormalizer");
 const { mapBreakdownToServiceType, VEHICLE_TYPES } = require("../utils/domainConstants");
@@ -111,6 +114,21 @@ async function startSelfAssistant(req, res, next) {
       throw new Error("Symptom information is required");
     }
 
+    const danger = detectDanger([suppliedText, buildDiagnosticText({
+      vehicleType, breakdownType, symptomCapture, problemDescription: req.body.problemDescription
+    })].join("\n"));
+    if (danger) {
+      const session = new TroubleshootingSession({
+        driverId: req.user._id, vehicleType, breakdownType, symptomCapture, diagnosticInputText,
+        predictedFault: predictionSnapshot({ faultLabel: "Safety concern reported", needsMoreInformation: false }),
+        riskLevel: "HIGH", recommendedService: mapBreakdownToServiceType(breakdownType)
+      });
+      conversation.record(session, "user", diagnosticInputText);
+      conversation.escalate(session, danger.id, dangerMessage(danger));
+      await session.save();
+      return res.status(201).json(conversation.payload(session, { riskLevel: "HIGH" }));
+    }
+
     const aiPrediction = await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
       breakdownType,
       diagnosticInputText,
@@ -144,6 +162,8 @@ async function startSelfAssistant(req, res, next) {
         diagnosticInputText,
         predictedFault: predictionSnapshot(aiPrediction),
         status: "professional_help_required",
+        escalationReason: "no_matching_approved_guide",
+        lastMessage: "No validated self-troubleshooting guide matches these symptoms.",
         recommendedService: guideResult.recommended_service || "general_mechanic",
         completedAt: new Date()
       });
@@ -169,13 +189,16 @@ async function startSelfAssistant(req, res, next) {
       riskLevel: guide.risk_level,
       recommendedService: guide.recommended_service,
       safetyWarning: guide.safety_warning,
-      beforeYouBegin: guide.before_you_begin
+      beforeYouBegin: guide.before_you_begin,
+      messages: [{ role: "user", content: diagnosticInputText.slice(0, 2000), createdAt: new Date() }]
     };
 
     if (guide.risk_level === "HIGH" || guide.professional_help_required) {
       const session = await TroubleshootingSession.create({
         ...baseSession,
         status: "professional_help_required",
+        escalationReason: "high_risk_guide",
+        lastMessage: "This issue may be unsafe to troubleshoot without professional assistance.",
         completedAt: new Date()
       });
       return res.status(201).json({
@@ -219,6 +242,8 @@ async function startSelfAssistant(req, res, next) {
       currentStepId: startResult.current_step.step_id,
       currentStep: startResult.current_step,
       currentPhase: "instruction",
+      lastMessage: startResult.current_step.instruction,
+      messages: [...baseSession.messages, { role: "assistant", content: startResult.current_step.instruction, createdAt: new Date() }],
       startedAt: new Date()
     });
     return res.status(201).json({
@@ -231,6 +256,7 @@ async function startSelfAssistant(req, res, next) {
       session: sessionPayload(session)
     });
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -257,6 +283,7 @@ async function confirmSafety(req, res, next) {
     session.currentPhase = "instruction";
     session.currentInstructionConfirmedAt = null;
     session.startedAt = new Date();
+    conversation.record(session, "assistant", result.current_step.instruction);
     await session.save();
     return res.status(200).json({
       success: true,
@@ -265,6 +292,7 @@ async function confirmSafety(req, res, next) {
       session: sessionPayload(session)
     });
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -292,15 +320,12 @@ async function confirmStepAction(req, res, next) {
     }
     session.currentPhase = "result";
     session.currentInstructionConfirmedAt = new Date();
+    conversation.record(session, "user", "Done - I Checked");
+    conversation.record(session, "assistant", session.currentStep?.result_question || session.currentStep?.question || "What did you observe?");
     await session.save();
-    return res.status(200).json({
-      success: true,
-      status: "in_progress",
-      currentPhase: "result",
-      currentStep: session.currentStep,
-      session: sessionPayload(session)
-    });
+    return res.status(200).json(conversation.payload(session));
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -314,6 +339,13 @@ async function submitStep(req, res, next) {
     }
     const stepId = String(req.body.stepId || "");
     const selectedResult = String(req.body.selectedResult || "");
+    const danger = detectDanger(selectedResult);
+    if (danger) {
+      conversation.record(session, "user", selectedResult);
+      conversation.escalate(session, danger.id, dangerMessage(danger));
+      await session.save();
+      return res.status(200).json(conversation.payload(session));
+    }
     if (!stepId || stepId !== session.currentStepId || !selectedResult) {
       res.status(400);
       throw new Error("The current step and selected result are required");
@@ -322,51 +354,155 @@ async function submitStep(req, res, next) {
       res.status(409);
       throw new Error("Confirm the approved instruction before selecting a result");
     }
-    const result = await ai2Service.processStep(
-      session.guideId,
-      stepId,
-      selectedResult
-    );
-    if (result.status === "troubleshooting_unavailable") return unavailableResponse(res);
-    const currentStep = session.currentStep || {};
-    const selectedOption = (currentStep.possible_results || []).find(
-      (item) => item.value === selectedResult
-    );
-    session.completedSteps.push({
-      stepId,
-      instruction: currentStep.instruction || "",
-      instructionConfirmed: true,
-      selectedResult,
-      resultLabel: selectedOption?.label || (selectedResult === "not_sure" ? "Not Sure" : selectedResult),
-      completedAt: new Date()
-    });
-    if (result.status === "in_progress" && result.next_step) {
-      session.currentStepId = result.next_step.step_id;
-      session.currentStep = result.next_step;
-      session.currentPhase = "instruction";
-      session.currentInstructionConfirmedAt = null;
-    } else if (result.status === "resolved") {
-      session.status = "awaiting_resolution_confirmation";
-      session.currentStepId = null;
-      session.currentStep = null;
-      session.currentPhase = "completed";
+    const result = await applySelection(session, selectedResult, res);
+    if (!result) return;
+    await session.save();
+    return res.status(200).json(conversation.payload(session));
+  } catch (error) {
+    if (error.name === "VersionError") res.status(409);
+    return next(error);
+  }
+}
+
+async function applySelection(session, selectedResult, res, recordAnswer = true) {
+  const option = conversation.optionsFor(session).find((item) => item.value === selectedResult);
+  if (!option) {
+    res.status(400);
+    throw new Error("Choose a current approved answer");
+  }
+  if (recordAnswer) conversation.record(session, "user", option.label);
+  if (selectedResult === "danger_yes") {
+    conversation.escalate(session, "driver_confirmed_danger", "Stop troubleshooting and keep clear of the unsafe area. Professional assistance is required.");
+  } else if (selectedResult === "danger_no") {
+    session.pendingInterpretation = null;
+    conversation.record(session, "assistant", "Thank you for clarifying. Please choose the observation that matches the current question.");
+  } else if (selectedResult === "not_sure") {
+    if (session.status === "in_progress" && session.clarificationCount >= 1 && session.currentStep?.uncertain_next_step) {
+      const alternative = await ai2Service.processStep(session.guideId, session.currentStepId, "skip_unsure");
+      if (alternative.status === "troubleshooting_unavailable") {
+        unavailableResponse(res);
+        return false;
+      }
+      conversation.applyStepResult(session, alternative, "not_sure");
+    } else conversation.clarify(session);
+  } else if (session.status === "awaiting_resolution_confirmation") {
+    conversation.resolve(session, selectedResult === "resolved");
+  } else {
+    const result = await ai2Service.processStep(session.guideId, session.currentStepId, selectedResult);
+    if (result.status === "troubleshooting_unavailable") {
+      unavailableResponse(res);
+      return false;
+    }
+    if (["invalid_step", "invalid_result"].includes(result.status)) {
+      res.status(400);
+      throw new Error(result.message || "The approved answer was rejected");
+    }
+    conversation.applyStepResult(session, result, selectedResult);
+  }
+  return true;
+}
+
+function normalizeReply(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+async function sendMessage(req, res, next) {
+  try {
+    const session = await findOwnedSession(req, res);
+    const message = typeof req.body.message === "string" ? req.body.message.trim() : "";
+    const selectedResult = typeof req.body.selectedResult === "string" ? req.body.selectedResult : "";
+    if ((!message && !selectedResult) || message.length > 1000 || selectedResult.length > 200) {
+      res.status(400);
+      throw new Error("Send a message of 1 to 1000 characters or a current answer");
+    }
+    if (TERMINAL_STATUSES.has(session.status)) return res.status(200).json(conversation.payload(session));
+    // Raw text is always checked before state checks, parsing, or a model call.
+    const danger = detectDanger(message || selectedResult);
+    if (danger) {
+      conversation.record(session, "user", message || selectedResult);
+      conversation.escalate(session, danger.id, dangerMessage(danger));
+      await session.save();
+      return res.status(200).json(conversation.payload(session));
+    }
+    if (!["in_progress", "awaiting_resolution_confirmation"].includes(session.status)) {
+      res.status(409);
+      throw new Error("Complete the safety confirmation before troubleshooting");
+    }
+    if (req.body.expectedState !== conversation.stateOf(session) ||
+      (req.body.stepId || null) !== (session.currentStepId || null)) {
+      res.status(409);
+      throw new Error("This conversation has changed. Reopen the session to see the current question.");
+    }
+    if (selectedResult) {
+      let answer = selectedResult;
+      if (answer === "confirm_interpretation") {
+        answer = session.pendingInterpretation;
+        if (!answer) {
+          res.status(409);
+          throw new Error("There is no pending interpretation to confirm");
+        }
+      }
+      if (session.pendingInterpretation === "danger_confirmation" && !["danger_yes", "danger_no"].includes(answer)) {
+        res.status(409);
+        throw new Error("Please clarify the possible unsafe condition first");
+      }
+      if (answer === "reject_interpretation") {
+        session.pendingInterpretation = null;
+        conversation.record(session, "user", "That is not what I meant");
+        conversation.record(session, "assistant", "Please choose the closest answer below, or describe what you observed.");
+      } else if (!(await applySelection(session, answer, res))) return;
     } else {
-      session.status = "professional_help_required";
-      session.currentStepId = null;
-      session.currentStep = null;
-      session.currentPhase = "completed";
-      session.completedAt = new Date();
+      conversation.record(session, "user", message);
+      const options = conversation.optionsFor(session);
+      const normalized = normalizeReply(message);
+      let exact = options.find((item) => [normalizeReply(item.value), normalizeReply(item.label)].includes(normalized));
+      if (session.status === "awaiting_resolution_confirmation" && session.pendingInterpretation !== "danger_confirmation") {
+        const yes = ["yes", "yes it started", "it works now", "problem resolved", "yes it is resolved"].includes(normalized);
+        const no = ["no", "still not working", "no still not working", "it still does not work", "no still not starting"].includes(normalized);
+        if (yes || no) exact = options.find((item) => item.value === (yes ? "resolved" : "unresolved"));
+      }
+      const unsure = ["not sure", "unsure", "i am not sure", "i don t know", "i dont know", "i cannot tell"].includes(normalized);
+      if (session.currentPhase === "instruction" && session.status === "in_progress") {
+        // Text cannot silently bypass the explicit action-confirmation control.
+        if (unsure) conversation.clarify(session);
+        else conversation.record(session, "assistant", `${session.currentStep.instruction}\nWhen you have completed only this approved check, select Done - I Checked. If it is unclear, you can stop without touching anything.`);
+      } else if (session.pendingInterpretation === "danger_confirmation" && !exact) {
+        conversation.record(session, "assistant", "Please answer the safety question below before continuing. If you cannot rule out danger, choose Yes.");
+      } else if (unsure) {
+        if (!(await applySelection(session, "not_sure", res, false))) return;
+      } else if (exact) {
+        if (!(await applySelection(session, exact.value, res, false))) return;
+      } else {
+        const interpretation = await language.interpretMessage({
+          state: conversation.stateOf(session), options, latestMessage: message,
+          symptom: session.diagnosticInputText,
+          instruction: session.currentStep?.instruction || "Do not operate the vehicle to answer the resolution question.",
+          question: session.currentStep?.result_question || session.lastMessage,
+          completedSteps: session.completedSteps, history: session.messages
+        });
+        session.pendingInterpretation = null;
+        if (interpretation.available && interpretation.intent === "answer" && options.some((item) => item.value === interpretation.selectedResult)) {
+          const option = options.find((item) => item.value === interpretation.selectedResult);
+          // A model interpretation is a proposal. Only the driver's confirmation changes state.
+          session.pendingInterpretation = option.value;
+          conversation.record(session, "assistant", `Did you mean: "${option.label}"? Please confirm or choose a different answer below.`);
+        } else if (interpretation.available && interpretation.intent === "possible_danger") {
+          const validated = detectDanger(message);
+          if (validated) conversation.escalate(session, validated.id, dangerMessage(validated));
+          else {
+            // Backend policy holds the flow until the driver explicitly clarifies the concern.
+            session.pendingInterpretation = "danger_confirmation";
+            conversation.record(session, "assistant", "Your reply may describe an unsafe condition. Do not perform another check. Are you reporting danger or an unsafe location?");
+          }
+        } else {
+          conversation.clarify(session);
+        }
+      }
     }
     await session.save();
-    return res.status(200).json({
-      success: true,
-      status: result.status,
-      nextStep: result.next_step,
-      message: result.message,
-      recommendedService: result.recommended_service || session.recommendedService,
-      session: sessionPayload(session)
-    });
+    return res.status(200).json(conversation.payload(session));
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -378,24 +514,21 @@ async function stopSession(req, res, next) {
       return res.status(200).json({ success: true, status: session.status, session: sessionPayload(session) });
     }
     const condition = String(req.body.condition || "User requested professional assistance").slice(0, 200);
-    const result = session.guideId
-      ? await ai2Service.checkStopCondition(session.guideId, condition)
-      : null;
-    session.status = "professional_help_required";
-    session.currentStepId = null;
-    session.currentStep = null;
-    session.currentPhase = "completed";
-    session.completedAt = new Date();
+    conversation.record(session, "user", condition);
+    const danger = detectDanger(condition);
+    conversation.escalate(session, danger?.id || "driver_requested_assistance", danger ? dangerMessage(danger) : "Troubleshooting stopped at your request. Professional assistance is available.");
     await session.save();
     return res.status(200).json({
       success: true,
       stop: true,
       status: "professional_help_required",
-      message: result?.message || "Troubleshooting stopped. Professional assistance is recommended.",
+      message: session.lastMessage,
+      escalationReason: session.escalationReason,
       recommendedService: session.recommendedService,
       session: sessionPayload(session)
     });
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -407,15 +540,21 @@ async function setResult(req, res, next) {
       res.status(409);
       throw new Error("Only a completed troubleshooting session can be marked resolved");
     }
-    const resolved = req.body.resolved === true;
-    session.status = resolved ? "resolved" : "professional_help_required";
-    session.currentStepId = null;
-    session.currentStep = null;
-    session.currentPhase = "completed";
-    session.completedAt = new Date();
+    if (typeof req.body.resolved !== "boolean") {
+      res.status(400);
+      throw new Error("An explicit resolution answer is required");
+    }
+    if (session.pendingInterpretation === "danger_confirmation") {
+      res.status(409);
+      throw new Error("Please clarify the possible unsafe condition first");
+    }
+    if (session.status === "resolved") return res.status(200).json(conversation.payload(session));
+    conversation.record(session, "user", req.body.resolved ? "The problem is resolved, with no danger signs" : "The problem remains");
+    conversation.resolve(session, req.body.resolved);
     await session.save();
-    return res.status(200).json({ success: true, status: session.status, session: sessionPayload(session) });
+    return res.status(200).json(conversation.payload(session));
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -433,6 +572,7 @@ async function cancelSession(req, res, next) {
     }
     return res.status(200).json({ success: true, status: session.status, session: sessionPayload(session) });
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -442,6 +582,7 @@ async function getSession(req, res, next) {
     const session = await findOwnedSession(req, res);
     return res.status(200).json({ success: true, session: sessionPayload(session) });
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -453,6 +594,7 @@ async function getHistory(req, res, next) {
       .limit(5);
     return res.status(200).json({ success: true, sessions });
   } catch (error) {
+    if (error.name === "VersionError") res.status(409);
     return next(error);
   }
 }
@@ -466,5 +608,6 @@ module.exports = {
   setResult,
   startSelfAssistant,
   stopSession,
-  submitStep
+  submitStep,
+  sendMessage
 };

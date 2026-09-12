@@ -19,6 +19,7 @@ SERVICE_MAPPING_PATH = AI2_ROOT / "config" / "service_mapping.json"
 KNOWLEDGE_PATH = AI2_ROOT / "knowledge" / "troubleshooting_knowledge_base.json"
 AUDIT_PATH = AI2_ROOT / "reports" / "ai2_knowledge_audit.txt"
 UNMAPPED_PATH = AI2_ROOT / "reports" / "ai2_unmapped_records.txt"
+CONVERSATION_PATH = AI2_ROOT / "config" / "conversation_overrides.json"
 
 
 def load_json(path: Path) -> Any:
@@ -112,6 +113,18 @@ def is_safe_source_step(source_instruction: str) -> bool:
     lowered = source_instruction.strip().lower()
     unsafe_prefixes = ("test ", "measure ", "perform ", "adjust ", "replace ", "scan ")
     unsafe_phrases = (
+        "inspect and replace",
+        "check ac compressor clutch operation",
+        "check ac evaporator temperature sensor",
+        "check sensors related to dtcs",
+        "inspect balance shaft",
+        "check balance shaft",
+        "inspect glow plug",
+        "check alternator belt tension",
+        "check belt tension and alignment",
+        "inspect alternator for proper operation",
+        "check boost pressure with gauge",
+        "check radiator cap for proper seal",
         "pressure test",
         "check pressure at",
         "check valve clearance",
@@ -236,7 +249,7 @@ def build_guide(
         warning = "Use only the non-invasive observation shown. Stop if anything appears unsafe."
         before = rules["low_before_you_begin"]
 
-    return {
+    guide = {
         "id": f"ai2_{record['record_id']}",
         "source_record_id": record["record_id"],
         "source_data_source": record.get("data_source"),
@@ -263,6 +276,26 @@ def build_guide(
             else rules["incomplete_branching_note"]
         ),
     }
+    override = load_json(CONVERSATION_PATH)["guides"].get(guide["id"], {})
+    guide["matching_keywords"] = override.get("keywords", [])
+    for step in guide["steps"]:
+        approved = override.get("steps", {}).get(step["step_id"], {})
+        step["kind"] = "ESCALATE" if risk == "HIGH" else "CHECK"
+        step["simple_question"] = approved.get("simple_question", "Choose the closest observation below. You do not need to guess or touch anything.")
+        if approved.get("uncertain_next_step"):
+            step["uncertain_next_step"] = approved["uncertain_next_step"]
+        if approved.get("instruction"):
+            step["instruction"] = step["user_instruction"] = approved["instruction"]
+        for option in step["possible_results"]:
+            if option["value"] in approved.get("verify_results", []):
+                option["action"] = "verify_resolution"
+                option["verification_question"] = approved["verification_question"]
+                option["branching_note"] = "Ask about the driver-observed outcome; never infer a repair from a normal check. next_step is used only if unresolved."
+            elif approved:
+                option["action"] = "request_mechanic"
+                option["next_step"] = None
+                option["escalation_reason"] = approved["escalation_reason"]
+    return guide
 
 
 def is_usable(record: dict[str, Any], services: dict[str, str]) -> tuple[bool, str]:
@@ -330,7 +363,8 @@ def write_reports(
             "SAFETY POLICY",
             "Risk levels are produced only by deterministic project rules.",
             "HIGH-risk source procedures are retained only in source_diagnosis_steps and are not returned as user-facing steps.",
-            "LOW and CAUTION paths preserve source order because the archive contains no result-specific branching.",
+            "LOW and CAUTION paths preserve source order except for explicit conversation_overrides.json verification and escalation branches.",
+            "Normal observations can ask about the original problem; only explicit driver confirmation in the Node state manager records resolution.",
             "No result is treated as a completed repair because the source does not establish repair outcomes.",
         ]
     )
@@ -385,7 +419,7 @@ def main() -> None:
             "usable_guides": len(guides),
             "excluded_records": len(excluded),
             "risk_policy": "deterministic_project_rules",
-            "branching_policy": "source_order_only_no_inferred_repair_outcomes",
+            "branching_policy": "source_order_with_explicit_observation_verification",
         },
         "guides": guides,
     }

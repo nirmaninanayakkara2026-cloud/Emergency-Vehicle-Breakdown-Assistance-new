@@ -19,7 +19,7 @@ export const SERVICE_LABELS = {
   general_mechanic: "General Mechanic", engine_mechanic: "Engine Mechanic", brake_mechanic: "Brake Mechanic",
   battery_electrical_mechanic: "Battery / Electrical Mechanic", fuel_system_mechanic: "Fuel System Mechanic",
   transmission_mechanic: "Transmission Mechanic", steering_mechanic: "Steering Mechanic",
-  tire_mechanic: "Tyre Mechanic", towing: "Towing Service", fuel_support: "Fuel Support", spare_parts: "Spare Parts"
+  tire_mechanic: "Tyre Mechanic", fuel_support: "Fuel Support", spare_parts: "Spare Parts"
 };
 export const RISK_LABELS = { low: "Basic Check", caution: "Continue With Care", high: "Professional Help Recommended" };
 export function formatFaultLabel(value, fallback) { return FAULT_LABELS[value] || fallback || titleCase(value) || "Further inspection required"; }

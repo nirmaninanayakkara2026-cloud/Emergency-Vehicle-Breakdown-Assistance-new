@@ -174,23 +174,12 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
         prefill,
         aiPrediction,
       });
-    } else if (item.status === "in_progress") {
+    } else if (["in_progress", "awaiting_resolution_confirmation"].includes(item.status)) {
       navigation.navigate("TroubleshootingConversation", {
         sessionId: item._id,
         session: item,
         currentStep: item.currentStep,
         currentPhase: item.currentPhase,
-        riskLevel: item.riskLevel,
-        prefill,
-        aiPrediction,
-      });
-    } else if (item.status === "awaiting_resolution_confirmation") {
-      navigation.navigate("SelfAssistantResult", {
-        sessionId: item._id,
-        session: item,
-        status: "resolved",
-        message: "That completes the basic troubleshooting steps.",
-        recommendedService: item.recommendedService,
         riskLevel: item.riskLevel,
         prefill,
         aiPrediction,

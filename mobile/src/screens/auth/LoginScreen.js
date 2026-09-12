@@ -64,6 +64,9 @@ export default function LoginScreen({ navigation }) {
           onChangeText={setPassword}
           placeholder="Enter your password"
           secureTextEntry
+          showPasswordToggle
+          autoCapitalize="none"
+          autoCorrect={false}
           autoComplete="password"
         />
         {error ? <InfoBanner tone="danger" message={error} /> : null}

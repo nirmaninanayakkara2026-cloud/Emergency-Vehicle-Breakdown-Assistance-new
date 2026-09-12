@@ -84,6 +84,8 @@ def validate_knowledge_base(
         total_steps += len(steps)
         for step in steps:
             step_id = step.get("step_id")
+            if step.get("uncertain_next_step") and step["uncertain_next_step"] not in step_id_set:
+                errors.append(f"{guide_id}/{step_id}: invalid independent clarification step")
             instruction = step.get("instruction") or step.get("user_instruction")
             if not instruction or not str(instruction).strip():
                 errors.append(f"{guide_id}/{step_id}: empty user-facing instruction")
@@ -107,6 +109,11 @@ def validate_knowledge_base(
                         f"{guide_id}/{step_id}/{value}: invalid action {option.get('action')}"
                     )
                 next_step = option.get("next_step")
+                if option.get("action") == "verify_resolution":
+                    if risk == "HIGH" or not option.get("verification_question"):
+                        errors.append(f"{guide_id}/{step_id}: invalid resolution verification")
+                if option.get("action") == "resolved":
+                    errors.append(f"{guide_id}/{step_id}: source observations cannot directly resolve a session")
                 if next_step is not None and next_step not in step_id_set:
                     errors.append(
                         f"{guide_id}/{step_id}/{value}: orphan next_step {next_step}"

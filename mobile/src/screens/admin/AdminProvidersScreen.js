@@ -24,7 +24,6 @@ const providerTypes = [
   { label: "All provider types", value: "" },
   { label: "Mechanic", value: "mechanic" },
   { label: "Garage", value: "garage" },
-  { label: "Towing Service", value: "towing_service" },
   { label: "Spare Parts Shop", value: "spare_parts_shop" },
 ];
 

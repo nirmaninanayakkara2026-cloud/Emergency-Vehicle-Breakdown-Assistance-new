@@ -61,6 +61,10 @@ function isClarificationConfigured() {
   );
 }
 
+function createOpenAIClient() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 10000, maxRetries: 1 });
+}
+
 function sanitizeText(value, maximumLength = 2000) {
   return String(value || "")
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted email]")
@@ -127,11 +131,7 @@ async function generateClarificationQuestions(
   }
 
   try {
-    const openai = client || new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-      timeout: 10000,
-      maxRetries: 1
-    });
+    const openai = client || createOpenAIClient();
     const response = await openai.responses.create({
       model: selectedModel,
       instructions: SYSTEM_INSTRUCTION,
@@ -162,5 +162,6 @@ module.exports = {
   generateClarificationQuestions,
   isClarificationConfigured,
   normalizeQuestions,
-  sanitizeText
+  sanitizeText,
+  createOpenAIClient
 };

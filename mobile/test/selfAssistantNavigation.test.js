@@ -23,7 +23,8 @@ const {
   buildSelfAssistantPayload,
   resolveSelfAssistantRecommendation,
   routeSelfAssistantResponse,
-  selfAssistantClarificationQuestions
+  selfAssistantClarificationQuestions,
+  conversationState
 } = require("../src/utils/selfAssistantFlow");
 const {
   buildStructuredSymptomPayload,
@@ -180,8 +181,8 @@ test("both problem selectors use the shared responsive accessible grid", () => {
   assert.match(grid, /numberOfLines=\{2\}/);
   assert.match(grid, /accessibilityRole="radio"/);
   assert.match(grid, /accessibilityLabel=\{option\.label\}/);
-  assert.match(requestScreen, /<MainProblemGrid options=\{BREAKDOWN_TYPES\}/);
-  assert.match(selfScreen, /<MainProblemGrid options=\{SYMPTOM_BREAKDOWN_TYPES\}/);
+  assert.match(requestScreen, /<MainProblemGrid\s+options=\{BREAKDOWN_TYPES\}/);
+  assert.match(selfScreen, /<MainProblemGrid\s+options=\{SYMPTOM_BREAKDOWN_TYPES\}/);
 });
 
 test("engine problem guided capture includes every requested symptom and timing choice", () => {
@@ -238,6 +239,9 @@ test("low confidence opens clarification in self-assistant mode", () => {
 
 for (const [status, expectedScreen] of [
   ["ready_to_start", "TroubleshootingConversation"],
+  ["in_progress", "TroubleshootingConversation"],
+  ["awaiting_resolution_confirmation", "TroubleshootingConversation"],
+  ["resolved", "SelfAssistantResult"],
   ["awaiting_safety_confirmation", "SelfAssistantSafety"],
   ["professional_help_required", "SelfAssistantResult"],
   ["troubleshooting_unavailable", "SelfAssistantResult"]
@@ -358,7 +362,7 @@ test("self-assistant clarification reruns the start endpoint", () => {
   assert.match(source, /routeSelfAssistantResponse/);
   assert.doesNotMatch(source, /Answer One More Question/);
   assert.doesNotMatch(source, /selfAssistantClarificationQuestions\(updatedPayload/);
-  assert.match(source, /We still don't have enough information to safely start self-troubleshooting\./);
+  assert.match(source, /We still don't have enough information to safely start\s+self-troubleshooting\./);
   assert.match(source, /title="Add More Symptoms"/);
   assert.match(source, /title="Request Mechanic Instead"/);
 });
@@ -367,8 +371,8 @@ test("request mechanic submits the carried post-clarification service", () => {
   const screen = fs.readFileSync(path.join(sourceRoot, "screens/driver/RequestMechanicScreen.js"), "utf8");
   const service = fs.readFileSync(path.join(sourceRoot, "services/requestService.js"), "utf8");
   assert.match(screen, /requiredService: prefill\.requiredService \|\| prefill\.requiredServiceType/);
-  assert.match(screen, /diagnosticInputText: prefill\.diagnosticInputText/);
-  assert.match(screen, /symptomCapture: prefill\.symptomCapture/);
+  assert.match(screen, /diagnosticInputText:\s+prefill\.diagnosticInputText/);
+  assert.match(screen, /symptomCapture:\s+prefill\.symptomCapture/);
   assert.match(service, /requiredService: payload\.requiredService/);
   assert.match(service, /predictedFault: payload\.predictedFault/);
 });
@@ -379,12 +383,12 @@ test("AI 2 conversation enforces instruction then confirmation then result", () 
   assert.match(screen, /currentPhase.*"instruction"/s);
   assert.match(screen, /currentPhase === "instruction"/);
   assert.match(screen, /title="Done – I Checked"/);
-  assert.match(screen, /confirmTroubleshootingAction\(sessionId, currentStep\.step_id\)/);
-  assert.match(screen, /setCurrentPhase\("result"\)/);
+  assert.match(screen, /confirmTroubleshootingAction\(\s*sessionId,\s*currentStep\.step_id,?\s*\)/);
+  assert.match(screen, /const currentPhase = activeSession\.currentPhase/);
   assert.match(screen, /currentPhase === "result"/);
   assert.match(screen, /submitTroubleshootingStep/);
-  assert.match(screen, /setCurrentPhase\("processing"\)/);
-  assert.match(screen, /setCurrentPhase\("instruction"\)/);
+  assert.match(screen, /async function runRequest/);
+  assert.match(screen, /currentPhase: response.currentPhase \|\| session.currentPhase/);
   assert.match(service, /action-confirm/);
 });
 
@@ -395,7 +399,7 @@ test("AI 2 conversation preserves all safety and escalation controls", () => {
   assert.match(screen, /value: "not_sure", label: "Not Sure"/);
   assert.match(screen, /I Noticed Something Unsafe/);
   assert.match(screen, /Stop & Request Mechanic/);
-  assert.match(screen, /response\.nextStep\.instruction/);
+  assert.match(screen, /response\.currentStep \|\| response\.nextStep/);
   assert.doesNotMatch(screen, /source_instruction|source record|dataset fields/i);
 });
 
@@ -405,5 +409,25 @@ test("completed AI 2 flow asks the driver to confirm real-world resolution", () 
   assert.match(source, /Is the vehicle problem now resolved\?/);
   assert.match(source, /Yes – Problem Resolved/);
   assert.match(source, /No – I Still Need Help/);
-  assert.match(source, /riskLevel === "HIGH"/);
+  assert.match(source, /title="Request Mechanic"/);
+});
+
+test("resumed conversation state distinguishes clarification, pending verification, and completed repair", () => {
+  assert.equal(conversationState({ status: "in_progress", currentPhase: "instruction" }), "TROUBLESHOOTING");
+  assert.equal(conversationState({ status: "in_progress", currentPhase: "result" }), "VERIFYING_ACTION");
+  assert.equal(conversationState({ status: "in_progress", currentPhase: "result", clarificationCount: 1 }), "CLARIFICATION");
+  assert.equal(conversationState({ status: "in_progress", pendingInterpretation: "clean_terminals" }), "CLARIFICATION");
+  assert.equal(conversationState({ status: "awaiting_resolution_confirmation" }), "CHECKING_RESOLUTION");
+  assert.equal(conversationState({ status: "resolved" }), "RESOLVED");
+});
+
+test("conversation sends messages with current state and retains driver confirmation for model interpretations", () => {
+  const screen = fs.readFileSync(path.join(sourceRoot, "screens/driver/TroubleshootingConversationScreen.js"), "utf8");
+  assert.match(screen, /sendTroubleshootingMessage/);
+  assert.match(screen, /expectedState: conversationState\(activeSession\)/);
+  assert.match(screen, /confirm_interpretation/);
+  assert.match(screen, /session\.messages\.map/);
+  const resultScreen = fs.readFileSync(path.join(sourceRoot, "screens/driver/SelfAssistantResultScreen.js"), "utf8");
+  assert.match(resultScreen, /service && !completed/);
+  assert.match(resultScreen, /confirmedResolved/);
 });

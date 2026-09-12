@@ -2,14 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import AppButton from "../AppButton";
 import AppInput from "../AppInput";
 import InfoBanner from "../ui/InfoBanner";
+import OpenStreetMapView from "./OpenStreetMapView";
 import { colors, radii, shadows, spacing, typography } from "../../theme";
 import {
   formatGeocodedAddress,
-  isValidLocation,
   normalizeLocation,
   regionForLocation,
   SRI_LANKA_REGION
@@ -39,10 +40,16 @@ export default function LocationPicker({
   const [mapRegion, setMapRegion] = useState(() => regionForLocation(initialLocation));
   const [locationLoading, setLocationLoading] = useState(false);
   const [mapLoading, setMapLoading] = useState(true);
+  const [mapAttempt, setMapAttempt] = useState(0);
+  const [nativeMapFailed, setNativeMapFailed] = useState(false);
   const [mapError, setMapError] = useState("");
   const [locationError, setLocationError] = useState("");
   const [locationPermissionStatus, setLocationPermissionStatus] = useState(null);
   const selectedLocation = normalizeLocation(initialLocation);
+  const useOpenStreetMap = nativeMapFailed || (
+    Platform.OS === "android" &&
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+  );
 
   useEffect(() => {
     if (!selectedLocation) return;
@@ -54,15 +61,21 @@ export default function LocationPicker({
   useEffect(() => {
     if (!mapLoading) return undefined;
     const timer = setTimeout(() => {
+      if (Platform.OS === "ios" && !useOpenStreetMap) {
+        setNativeMapFailed(true);
+        setMapError("");
+        return;
+      }
+      setMapLoading(false);
       setMapError("The map is taking longer than expected to load. Check your connection and try again.");
     }, 12000);
     return () => clearTimeout(timer);
-  }, [mapLoading]);
+  }, [mapLoading, useOpenStreetMap, mapAttempt]);
 
   async function updateAddressFromCoordinates(coordinates) {
     const requestId = ++geocodeRequestRef.current;
     try {
-      const places = await Location.reverseGeocodeAsync(coordinates);
+      const places = await withTimeout(Location.reverseGeocodeAsync(coordinates), 10000);
       if (requestId !== geocodeRequestRef.current) return;
       const formattedAddress = formatGeocodedAddress(places[0]);
       if (formattedAddress) onAddressChange(formattedAddress);
@@ -124,6 +137,28 @@ export default function LocationPicker({
     onAddressChange(nextAddress);
   }
 
+  function handleMapLoaded() {
+    setMapLoading(false);
+    setMapError("");
+  }
+
+  function handleRetryMap() {
+    setMapError("");
+    setMapLoading(true);
+    setMapAttempt((attempt) => attempt + 1);
+  }
+
+  function handleMapError() {
+    setMapLoading(false);
+    setMapError("The map couldn't load. Check your internet connection and tap Retry Map.");
+  }
+
+  function handleUseFallback() {
+    setMapError("");
+    setMapLoading(true);
+    setNativeMapFailed(true);
+  }
+
   return (
     <View style={styles.container}>
       <AppInput
@@ -151,10 +186,35 @@ export default function LocationPicker({
         />
       ) : null}
       {mapError ? <InfoBanner tone="warning" message={mapError} /> : null}
+      {!mapLoading ? (
+        <AppButton
+          title="Retry Map"
+          icon="refresh-outline"
+          variant="secondary"
+          onPress={handleRetryMap}
+        />
+      ) : null}
+      {Platform.OS === "ios" && !useOpenStreetMap && !mapLoading ? (
+        <AppButton
+          title="Map blank? Use OpenStreetMap"
+          variant="ghost"
+          onPress={handleUseFallback}
+        />
+      ) : null}
 
       <Text style={styles.instruction}>Tap the map or drag the pin to set your service location.</Text>
-      <View style={styles.mapShell}>
+      <View style={styles.mapShell} collapsable={false}>
+        {useOpenStreetMap ? (
+          <OpenStreetMapView
+            key={mapAttempt}
+            location={selectedLocation}
+            onSelect={selectLocation}
+            onReady={handleMapLoaded}
+            onError={handleMapError}
+          />
+        ) : (
         <MapView
+          key={mapAttempt}
           ref={mapRef}
           style={styles.map}
           provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
@@ -162,10 +222,9 @@ export default function LocationPicker({
           onRegionChangeComplete={setMapRegion}
           onPress={handleMapPress}
           onMapReady={() => {
-            setMapLoading(false);
-            setMapError("");
+            if (Platform.OS !== "android") handleMapLoaded();
           }}
-          loadingEnabled
+          onMapLoaded={handleMapLoaded}
           accessibilityLabel="Service location map"
         >
           {selectedLocation ? (
@@ -177,6 +236,7 @@ export default function LocationPicker({
             />
           ) : null}
         </MapView>
+        )}
         {mapLoading ? (
           <View style={styles.mapLoading} pointerEvents="none">
             <ActivityIndicator color={colors.teal} />
@@ -223,7 +283,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: colors.softSurface
   },
-  map: { ...StyleSheet.absoluteFillObject },
+  map: { width: "100%", height: "100%" },
   mapLoading: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
@@ -235,7 +295,7 @@ const styles = StyleSheet.create({
   floatingLocation: {
     position: "absolute",
     right: 12,
-    bottom: 12,
+    bottom: 30,
     width: 46,
     height: 46,
     alignItems: "center",

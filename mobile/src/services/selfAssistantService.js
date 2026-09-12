@@ -32,6 +32,10 @@ export function submitTroubleshootingStep(sessionId, stepId, selectedResult) {
   return request(() => api.post(`/self-assistant/${sessionId}/step`, { stepId, selectedResult }));
 }
 
+export function sendTroubleshootingMessage(sessionId, data) {
+  return request(() => api.post(`/self-assistant/${sessionId}/message`, data));
+}
+
 export function triggerStopCondition(sessionId, condition) {
   return request(() => api.post(`/self-assistant/${sessionId}/stop`, { condition }));
 }

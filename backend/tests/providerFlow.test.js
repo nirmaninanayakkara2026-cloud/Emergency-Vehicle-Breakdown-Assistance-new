@@ -190,7 +190,7 @@ test("rejected provider is not recommended again", () => {
   assert.equal(result.providers.length, 0);
 });
 
-test("no-provider response is non-failing and offers retry/towing", async () => {
+test("no-provider response is non-failing and offers retry", async () => {
   const originalFind = ProviderProfile.find;
   ProviderProfile.find = async () => [];
   try {
@@ -203,7 +203,6 @@ test("no-provider response is non-failing and offers retry/towing", async () => 
     });
     assert.deepEqual(result.providers, []);
     assert.equal(result.canIncreaseSearchRadius, true);
-    assert.equal(result.canRequestTowing, true);
   } finally {
     ProviderProfile.find = originalFind;
   }

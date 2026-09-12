@@ -1,0 +1,5036 @@
+{
+  "generatedAt": "2026-09-11T17:25:14.882Z",
+  "scope": "All active guides and approved answer branches; all original archive symptom examples; bounded uncertainty and safety wording probes. Car sessions, real Python and Node code; MongoDB and GPT are isolated substitutes.",
+  "guides": [
+    {
+      "id": "ai2_aktc_0001",
+      "title": "ABS Control Module",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0002",
+      "title": "ABS Wheel Speed Sensor",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0003",
+      "title": "Brake Booster",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0004",
+      "title": "Brake Caliper",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0005",
+      "title": "Brake Hose",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0006",
+      "title": "Brake Master Cylinder",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0007",
+      "title": "Brake Pad",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0008",
+      "title": "Brake Rotor",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0009",
+      "title": "Brake Shoe & Drum",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0010",
+      "title": "AC Compressor",
+      "fault": "air_conditioning_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0011",
+      "title": "AC Condenser",
+      "fault": "air_conditioning_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 4,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0012",
+      "title": "AC Evaporator",
+      "fault": "air_conditioning_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0013",
+      "title": "AC Recharge",
+      "fault": "air_conditioning_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0015",
+      "title": "Cabin Air Filter",
+      "fault": "air_conditioning_fault",
+      "risk": "LOW",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0017",
+      "title": "Heater Blower Motor Resistor",
+      "fault": "air_conditioning_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0018",
+      "title": "Coolant/Antifreeze",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 4,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0019",
+      "title": "Coolant Leak Diagnosis",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0020",
+      "title": "Engine Cooling System",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0021",
+      "title": "Heater Core",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0022",
+      "title": "Heater Hose",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0023",
+      "title": "Radiator/Cooling Fan",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0024",
+      "title": "Radiator Hose",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 4,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0025",
+      "title": "Water Pump",
+      "fault": "cooling_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0026",
+      "title": "Bevel Gears",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0027",
+      "title": "Center Differential",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0028",
+      "title": "Clutch Cable",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0029",
+      "title": "Clutch Slave Cylinder",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0030",
+      "title": "Differential",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0031",
+      "title": "Live Axle",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0032",
+      "title": "Rigid Axle",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0033",
+      "title": "Slushbox",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0034",
+      "title": "Universal Joint",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0035",
+      "title": "Viscous Coupling",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0036",
+      "title": "Battery Replacement",
+      "fault": "electrical_system_fault",
+      "risk": "CAUTION",
+      "classification": "can_confirm_resolution",
+      "terminalPaths": 3,
+      "resolvedPaths": 1
+    },
+    {
+      "id": "ai2_aktc_0040",
+      "title": "Door Window Regulator",
+      "fault": "electrical_system_fault",
+      "risk": "LOW",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0042",
+      "title": "Ignition Distributor Cap",
+      "fault": "electrical_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0043",
+      "title": "Ignition Wire Set",
+      "fault": "electrical_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0045",
+      "title": "Starter Motor",
+      "fault": "electrical_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0046",
+      "title": "Windshield Washer Pump",
+      "fault": "electrical_system_fault",
+      "risk": "LOW",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0048",
+      "title": "Canister Purge Valve",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0049",
+      "title": "Catalytic Converter",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0050",
+      "title": "Charcoal Canister",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0051",
+      "title": "Exhaust Manifold",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0052",
+      "title": "Exhaust Manifold Gasket",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0053",
+      "title": "Fuel Tank Pressure Sensor",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0054",
+      "title": "Knock Sensor",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0055",
+      "title": "M.A.P. Sensor",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0056",
+      "title": "Oxygen Sensor",
+      "fault": "emissions_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0058",
+      "title": "Boost Pressure",
+      "fault": "engine_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0059",
+      "title": "Diesel Injection Pump",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0061",
+      "title": "Engine Mounts",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0062",
+      "title": "Exhaust Valve",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0063",
+      "title": "Fuel Injector",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0064",
+      "title": "Idle Air Control Valve",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0065",
+      "title": "Intake Valve",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0066",
+      "title": "Oil Pump",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0067",
+      "title": "Piston Rings",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0068",
+      "title": "Timing Belt",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0069",
+      "title": "Valve Cover Gasket",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0070",
+      "title": "Fan Belt",
+      "fault": "engine_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0071",
+      "title": "Horn",
+      "fault": "electrical_system_fault",
+      "risk": "LOW",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0073",
+      "title": "Engine Belt",
+      "fault": "engine_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0074",
+      "title": "Steering Noise",
+      "fault": "steering_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0075",
+      "title": "Shaft and Tires",
+      "fault": "drivetrain_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0076",
+      "title": "Air Filter",
+      "fault": "engine_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0077",
+      "title": "Engine Control Unit (ECU)",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0078",
+      "title": "Engine Oil",
+      "fault": "engine_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 4,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0079",
+      "title": "Fuel Filter",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0080",
+      "title": "PCV Valve",
+      "fault": "engine_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0082",
+      "title": "Fuel Injector",
+      "fault": "fuel_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0083",
+      "title": "Fuel Pressure Regulator",
+      "fault": "fuel_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0084",
+      "title": "Fuel Pump",
+      "fault": "fuel_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0085",
+      "title": "Fuel Tank",
+      "fault": "fuel_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0086",
+      "title": "Throttle Position Sensor",
+      "fault": "fuel_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0087",
+      "title": "Brake Fluid",
+      "fault": "brake_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0088",
+      "title": "Coolant Reservoir",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 4,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0089",
+      "title": "Power Steering Fluid",
+      "fault": "steering_system_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0090",
+      "title": "Radiator",
+      "fault": "cooling_system_fault",
+      "risk": "CAUTION",
+      "classification": "checks_then_professional_help",
+      "terminalPaths": 2,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0091",
+      "title": "Windshield Washer Fluid",
+      "fault": "visibility_system_fault",
+      "risk": "LOW",
+      "classification": "can_confirm_resolution",
+      "terminalPaths": 5,
+      "resolvedPaths": 2
+    },
+    {
+      "id": "ai2_aktc_0092",
+      "title": "Clutch Master Cylinder",
+      "fault": "transmission_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0093",
+      "title": "Torque Converter",
+      "fault": "transmission_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0094",
+      "title": "Transmission Fluid",
+      "fault": "transmission_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0095",
+      "title": "Transmission Filter",
+      "fault": "transmission_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0096",
+      "title": "Transmission Solenoid",
+      "fault": "transmission_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0097",
+      "title": "Wheel Bearing",
+      "fault": "wheel_tire_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    },
+    {
+      "id": "ai2_aktc_0098",
+      "title": "Tire Pressure Monitoring System (TPMS)",
+      "fault": "wheel_tire_fault",
+      "risk": "LOW",
+      "classification": "can_confirm_resolution",
+      "terminalPaths": 3,
+      "resolvedPaths": 1
+    },
+    {
+      "id": "ai2_aktc_0099",
+      "title": "Wheel Hub",
+      "fault": "wheel_tire_fault",
+      "risk": "HIGH",
+      "classification": "immediate_professional_help",
+      "terminalPaths": 1,
+      "resolvedPaths": 0
+    }
+  ],
+  "paths": [
+    {
+      "guideId": "ai2_aktc_0001",
+      "title": "ABS Control Module",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0002",
+      "title": "ABS Wheel Speed Sensor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0003",
+      "title": "Brake Booster",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0004",
+      "title": "Brake Caliper",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0005",
+      "title": "Brake Hose",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0006",
+      "title": "Brake Master Cylinder",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0007",
+      "title": "Brake Pad",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0008",
+      "title": "Brake Rotor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0009",
+      "title": "Brake Shoe & Drum",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0010",
+      "title": "AC Compressor",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "leaking_damaged_compressor",
+          "label": "Leaking/damaged compressor"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0010",
+      "title": "AC Compressor",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "intact_compressor",
+          "label": "Intact compressor"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0011",
+      "title": "AC Condenser",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "debris_blockage_present",
+          "label": "Debris/blockage present"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "leaking_condenser",
+          "label": "Leaking condenser"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0011",
+      "title": "AC Condenser",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "debris_blockage_present",
+          "label": "Debris/blockage present"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks",
+          "label": "No leaks"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0011",
+      "title": "AC Condenser",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_clear_condenser",
+          "label": "Clean/clear condenser"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "leaking_condenser",
+          "label": "Leaking condenser"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0011",
+      "title": "AC Condenser",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_clear_condenser",
+          "label": "Clean/clear condenser"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks",
+          "label": "No leaks"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0012",
+      "title": "AC Evaporator",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "mold_mildew_present",
+          "label": "Mold/mildew present"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0012",
+      "title": "AC Evaporator",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_evaporator",
+          "label": "Clean evaporator"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0013",
+      "title": "AC Recharge",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0015",
+      "title": "Cabin Air Filter",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "debris_in_intake",
+          "label": "Debris in intake"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0015",
+      "title": "Cabin Air Filter",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clear_intake",
+          "label": "Clear intake"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0017",
+      "title": "Heater Blower Motor Resistor",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "overheated_burned_resistor",
+          "label": "Overheated/burned resistor"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "overheating",
+      "message": "Stop troubleshooting and keep clear of the unsafe area. Do not operate or repair the vehicle. Professional assistance is required."
+    },
+    {
+      "guideId": "ai2_aktc_0017",
+      "title": "Heater Blower Motor Resistor",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "good_condition_resistor",
+          "label": "Good condition resistor"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0018",
+      "title": "Coolant/Antifreeze",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_dirty_coolant",
+          "label": "Low/dirty coolant"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "leaking_radiator_hoses",
+          "label": "Leaking radiator/hoses"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0018",
+      "title": "Coolant/Antifreeze",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_dirty_coolant",
+          "label": "Low/dirty coolant"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks",
+          "label": "No leaks"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0018",
+      "title": "Coolant/Antifreeze",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_clean_coolant",
+          "label": "Sufficient/clean coolant"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "leaking_radiator_hoses",
+          "label": "Leaking radiator/hoses"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0018",
+      "title": "Coolant/Antifreeze",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_clean_coolant",
+          "label": "Sufficient/clean coolant"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks",
+          "label": "No leaks"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0019",
+      "title": "Coolant Leak Diagnosis",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "leaking_component_found",
+          "label": "Leaking component found"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0019",
+      "title": "Coolant Leak Diagnosis",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "components_are_intact",
+          "label": "Components are intact"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0020",
+      "title": "Engine Cooling System",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "blocked_damaged_radiator",
+          "label": "Blocked/damaged radiator"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0020",
+      "title": "Engine Cooling System",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clear_intact_radiator",
+          "label": "Clear/intact radiator"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0021",
+      "title": "Heater Core",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "leaking_heater_core",
+          "label": "Leaking heater core"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0021",
+      "title": "Heater Core",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "no_leaks_detected",
+          "label": "No leaks detected"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0022",
+      "title": "Heater Hose",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "loose_damaged_connections",
+          "label": "Loose/damaged connections"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0022",
+      "title": "Heater Hose",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "secure_intact_connections",
+          "label": "Secure/intact connections"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0023",
+      "title": "Radiator/Cooling Fan",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "faulty_motor_relay",
+          "label": "Faulty motor/relay"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0023",
+      "title": "Radiator/Cooling Fan",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "motor_relay_functioning_properly",
+          "label": "Motor/relay functioning properly"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0024",
+      "title": "Radiator Hose",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "damaged_hoses_found",
+          "label": "Damaged hoses found"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "leaking_connections",
+          "label": "Leaking connections"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0024",
+      "title": "Radiator Hose",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "damaged_hoses_found",
+          "label": "Damaged hoses found"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks_detected",
+          "label": "No leaks detected"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0024",
+      "title": "Radiator Hose",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "hoses_are_in_good_condition",
+          "label": "Hoses are in good condition"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "leaking_connections",
+          "label": "Leaking connections"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0024",
+      "title": "Radiator Hose",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "hoses_are_in_good_condition",
+          "label": "Hoses are in good condition"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks_detected",
+          "label": "No leaks detected"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0025",
+      "title": "Water Pump",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0026",
+      "title": "Bevel Gears",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0027",
+      "title": "Center Differential",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0028",
+      "title": "Clutch Cable",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0029",
+      "title": "Clutch Slave Cylinder",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0030",
+      "title": "Differential",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0031",
+      "title": "Live Axle",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0032",
+      "title": "Rigid Axle",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0033",
+      "title": "Slushbox",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0034",
+      "title": "Universal Joint",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0035",
+      "title": "Viscous Coupling",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0036",
+      "title": "Battery Replacement",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "corroded_terminals",
+          "label": "Corroded terminals"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The battery terminals need work that this guide does not approve for driver self-repair. Do not clean, tighten or disconnect them."
+    },
+    {
+      "guideId": "ai2_aktc_0036",
+      "title": "Battery Replacement",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_terminals",
+          "label": "Clean terminals"
+        },
+        {
+          "phase": "resolution",
+          "answer": "resolved"
+        }
+      ],
+      "outcome": "resolved",
+      "reason": null,
+      "message": "You confirmed that the original problem is resolved. This check is complete."
+    },
+    {
+      "guideId": "ai2_aktc_0036",
+      "title": "Battery Replacement",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_terminals",
+          "label": "Clean terminals"
+        },
+        {
+          "phase": "resolution",
+          "answer": "unresolved"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "approved_steps_exhausted",
+      "message": "The problem remains after all available approved checks. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0040",
+      "title": "Door Window Regulator",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "misaligned_window",
+          "label": "Misaligned window"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0040",
+      "title": "Door Window Regulator",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "properly_aligned_window",
+          "label": "Properly aligned window"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0042",
+      "title": "Ignition Distributor Cap",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0043",
+      "title": "Ignition Wire Set",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0045",
+      "title": "Starter Motor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0046",
+      "title": "Windshield Washer Pump",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clogged_damaged_pump",
+          "label": "Clogged/damaged pump"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0046",
+      "title": "Windshield Washer Pump",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_intact_pump",
+          "label": "Clean/intact pump"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0048",
+      "title": "Canister Purge Valve",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0049",
+      "title": "Catalytic Converter",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0050",
+      "title": "Charcoal Canister",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0051",
+      "title": "Exhaust Manifold",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0052",
+      "title": "Exhaust Manifold Gasket",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0053",
+      "title": "Fuel Tank Pressure Sensor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0054",
+      "title": "Knock Sensor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0055",
+      "title": "M.A.P. Sensor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0056",
+      "title": "Oxygen Sensor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0058",
+      "title": "Boost Pressure",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "leaking_damaged_intercooler",
+          "label": "Leaking/damaged intercooler"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0058",
+      "title": "Boost Pressure",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "intact_intercooler",
+          "label": "Intact intercooler"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0059",
+      "title": "Diesel Injection Pump",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0061",
+      "title": "Engine Mounts",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0062",
+      "title": "Exhaust Valve",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0063",
+      "title": "Fuel Injector",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0064",
+      "title": "Idle Air Control Valve",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0065",
+      "title": "Intake Valve",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0066",
+      "title": "Oil Pump",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0067",
+      "title": "Piston Rings",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0068",
+      "title": "Timing Belt",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0069",
+      "title": "Valve Cover Gasket",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0070",
+      "title": "Fan Belt",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "cut_worn_belt",
+          "label": "Cut/worn belt"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0070",
+      "title": "Fan Belt",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "belt_in_good_condition",
+          "label": "Belt in good condition"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0071",
+      "title": "Horn",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "blown_fuse",
+          "label": "Blown fuse"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0071",
+      "title": "Horn",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "fuse_intact",
+          "label": "Fuse intact"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0073",
+      "title": "Engine Belt",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "cut_worn_belt",
+          "label": "Cut/worn belt"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0073",
+      "title": "Engine Belt",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "belt_in_good_condition",
+          "label": "Belt in good condition"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0074",
+      "title": "Steering Noise",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0075",
+      "title": "Shaft and Tires",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0076",
+      "title": "Air Filter",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clogged_dirty_filter",
+          "label": "Clogged/dirty filter"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0076",
+      "title": "Air Filter",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_filter",
+          "label": "Clean filter"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0077",
+      "title": "Engine Control Unit (ECU)",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0078",
+      "title": "Engine Oil",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_dirty_oil",
+          "label": "Low/dirty oil"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "oil_leaks_present",
+          "label": "Oil leaks present"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0078",
+      "title": "Engine Oil",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_dirty_oil",
+          "label": "Low/dirty oil"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks_detected",
+          "label": "No leaks detected"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0078",
+      "title": "Engine Oil",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_sufficient_oil",
+          "label": "Clean/sufficient oil"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "oil_leaks_present",
+          "label": "Oil leaks present"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0078",
+      "title": "Engine Oil",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "clean_sufficient_oil",
+          "label": "Clean/sufficient oil"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "no_leaks_detected",
+          "label": "No leaks detected"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0079",
+      "title": "Fuel Filter",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0080",
+      "title": "PCV Valve",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0082",
+      "title": "Fuel Injector",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0083",
+      "title": "Fuel Pressure Regulator",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0084",
+      "title": "Fuel Pump",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0085",
+      "title": "Fuel Tank",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0086",
+      "title": "Throttle Position Sensor",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0087",
+      "title": "Brake Fluid",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0088",
+      "title": "Coolant Reservoir",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_coolant_level",
+          "label": "Low coolant level"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "cracked_leaking_reservoir",
+          "label": "Cracked/leaking reservoir"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0088",
+      "title": "Coolant Reservoir",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_coolant_level",
+          "label": "Low coolant level"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "intact_reservoir",
+          "label": "Intact reservoir"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0088",
+      "title": "Coolant Reservoir",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_coolant_level",
+          "label": "Sufficient coolant level"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "cracked_leaking_reservoir",
+          "label": "Cracked/leaking reservoir"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0088",
+      "title": "Coolant Reservoir",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_coolant_level",
+          "label": "Sufficient coolant level"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "intact_reservoir",
+          "label": "Intact reservoir"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0089",
+      "title": "Power Steering Fluid",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0090",
+      "title": "Radiator",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "leaking_damaged_radiator",
+          "label": "Leaking/damaged radiator"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0090",
+      "title": "Radiator",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "radiator_in_good_condition",
+          "label": "Radiator in good condition"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The available approved checks cannot resolve this issue. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0091",
+      "title": "Windshield Washer Fluid",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_fluid_level",
+          "label": "Low fluid level"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The washer fluid is low. This source has no approved refill procedure for your vehicle."
+    },
+    {
+      "guideId": "ai2_aktc_0091",
+      "title": "Windshield Washer Fluid",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_fluid_level",
+          "label": "Sufficient fluid level"
+        },
+        {
+          "phase": "resolution",
+          "answer": "resolved"
+        }
+      ],
+      "outcome": "resolved",
+      "reason": null,
+      "message": "You confirmed that the original problem is resolved. This check is complete."
+    },
+    {
+      "guideId": "ai2_aktc_0091",
+      "title": "Windshield Washer Fluid",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_fluid_level",
+          "label": "Sufficient fluid level"
+        },
+        {
+          "phase": "resolution",
+          "answer": "unresolved"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "faulty_pump",
+          "label": "Faulty pump"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The washer still needs a technical check that this guide does not approve for driver self-repair."
+    },
+    {
+      "guideId": "ai2_aktc_0091",
+      "title": "Windshield Washer Fluid",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_fluid_level",
+          "label": "Sufficient fluid level"
+        },
+        {
+          "phase": "resolution",
+          "answer": "unresolved"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "pump_operates_correctly",
+          "label": "Pump operates correctly"
+        },
+        {
+          "phase": "resolution",
+          "answer": "resolved"
+        }
+      ],
+      "outcome": "resolved",
+      "reason": null,
+      "message": "You confirmed that the original problem is resolved. This check is complete."
+    },
+    {
+      "guideId": "ai2_aktc_0091",
+      "title": "Windshield Washer Fluid",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "sufficient_fluid_level",
+          "label": "Sufficient fluid level"
+        },
+        {
+          "phase": "resolution",
+          "answer": "unresolved"
+        },
+        {
+          "phase": "observation",
+          "stepId": "step_2",
+          "answer": "pump_operates_correctly",
+          "label": "Pump operates correctly"
+        },
+        {
+          "phase": "resolution",
+          "answer": "unresolved"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "approved_steps_exhausted",
+      "message": "The problem remains after all available approved checks. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0092",
+      "title": "Clutch Master Cylinder",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0093",
+      "title": "Torque Converter",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0094",
+      "title": "Transmission Fluid",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0095",
+      "title": "Transmission Filter",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0096",
+      "title": "Transmission Solenoid",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0097",
+      "title": "Wheel Bearing",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    },
+    {
+      "guideId": "ai2_aktc_0098",
+      "title": "Tire Pressure Monitoring System (TPMS)",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "low_high_pressure",
+          "label": "Low/high pressure"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "no_approved_self_repair",
+      "message": "The pressure is outside the specified range. This guide has no approved pressure-adjustment or puncture-repair procedure."
+    },
+    {
+      "guideId": "ai2_aktc_0098",
+      "title": "Tire Pressure Monitoring System (TPMS)",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "correct_pressure",
+          "label": "Correct pressure"
+        },
+        {
+          "phase": "resolution",
+          "answer": "resolved"
+        }
+      ],
+      "outcome": "resolved",
+      "reason": null,
+      "message": "You confirmed that the original problem is resolved. This check is complete."
+    },
+    {
+      "guideId": "ai2_aktc_0098",
+      "title": "Tire Pressure Monitoring System (TPMS)",
+      "choices": [
+        {
+          "phase": "observation",
+          "stepId": "step_1",
+          "answer": "correct_pressure",
+          "label": "Correct pressure"
+        },
+        {
+          "phase": "resolution",
+          "answer": "unresolved"
+        }
+      ],
+      "outcome": "professional_help_required",
+      "reason": "approved_steps_exhausted",
+      "message": "The problem remains after all available approved checks. Professional assistance is recommended."
+    },
+    {
+      "guideId": "ai2_aktc_0099",
+      "title": "Wheel Hub",
+      "choices": [],
+      "outcome": "professional_help_required",
+      "reason": "high_risk_guide"
+    }
+  ],
+  "uncertainty": [
+    {
+      "key": "ai2_aktc_0010/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0011/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0011/step_2",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0012/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0015/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0017/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0018/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0018/step_2",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0019/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0020/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0021/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0022/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0023/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0024/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0024/step_2",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0036/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0040/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0046/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0058/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0070/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0071/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0073/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0076/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0078/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0078/step_2",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0088/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0088/step_2",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0090/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0091/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "TROUBLESHOOTING",
+          "status": "in_progress",
+          "stepId": "step_2"
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0091/step_2",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_2"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0098/step_1",
+      "results": [
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "CLARIFICATION",
+          "status": "in_progress",
+          "stepId": "step_1"
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0036/step_1",
+      "results": [
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0091/step_1",
+      "results": [
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0091/step_1,step_2",
+      "results": [
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    },
+    {
+      "key": "ai2_aktc_0098/step_1",
+      "results": [
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "CHECKING_RESOLUTION",
+          "status": "awaiting_resolution_confirmation",
+          "stepId": null
+        },
+        {
+          "state": "ESCALATED",
+          "status": "professional_help_required",
+          "stepId": null
+        }
+      ]
+    }
+  ],
+  "entryCases": [
+    {
+      "sourceId": "aktc_0001",
+      "title": "ABS Control Module",
+      "expectedFault": "brake_system_fault",
+      "text": "ABS warning light on. Brake pedal pulsation",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "ABS Control Module",
+      "selectedGuideId": "ai2_aktc_0001",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0002",
+      "title": "ABS Wheel Speed Sensor",
+      "expectedFault": "brake_system_fault",
+      "text": "ABS light stays on. Erratic speedometer",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "ABS Wheel Speed Sensor",
+      "selectedGuideId": "ai2_aktc_0002",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0003",
+      "title": "Brake Booster",
+      "expectedFault": "brake_system_fault",
+      "text": "Spongy brake pedal. Hard brake pedal",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Booster",
+      "selectedGuideId": "ai2_aktc_0003",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0004",
+      "title": "Brake Caliper",
+      "expectedFault": "brake_system_fault",
+      "text": "Brake pulling to one side. Brake dragging",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Caliper",
+      "selectedGuideId": "ai2_aktc_0004",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0005",
+      "title": "Brake Hose",
+      "expectedFault": "brake_system_fault",
+      "text": "Brake fluid leak. Soft brake pedal",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Fluid",
+      "selectedGuideId": "ai2_aktc_0087",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0006",
+      "title": "Brake Master Cylinder",
+      "expectedFault": "brake_system_fault",
+      "text": "Spongy brake pedal. Brake fluid leaks",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Master Cylinder",
+      "selectedGuideId": "ai2_aktc_0006",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0007",
+      "title": "Brake Pad",
+      "expectedFault": "brake_system_fault",
+      "text": "Squealing brakes. Brake pedal pulsation",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Pad",
+      "selectedGuideId": "ai2_aktc_0007",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0008",
+      "title": "Brake Rotor",
+      "expectedFault": "brake_system_fault",
+      "text": "Brake pedal pulsation. Steering wheel vibration",
+      "breakdownType": "brake_problem",
+      "modelFault": "steering_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Rotor",
+      "selectedGuideId": "ai2_aktc_0008",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0009",
+      "title": "Brake Shoe & Drum",
+      "expectedFault": "brake_system_fault",
+      "text": "Spongy brake pedal. Brake dragging",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Shoe & Drum",
+      "selectedGuideId": "ai2_aktc_0009",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0010",
+      "title": "AC Compressor",
+      "expectedFault": "air_conditioning_fault",
+      "text": "No cold air from vents. Loud noise when AC is on",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0011",
+      "title": "AC Condenser",
+      "expectedFault": "air_conditioning_fault",
+      "text": "Warm air from AC vents. AC system not cooling",
+      "breakdownType": "other",
+      "modelFault": "cooling_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Radiator/Cooling Fan",
+      "selectedGuideId": "ai2_aktc_0023",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0012",
+      "title": "AC Evaporator",
+      "expectedFault": "air_conditioning_fault",
+      "text": "Musty odor from vents. Weak airflow from vents",
+      "breakdownType": "other",
+      "modelFault": "electrical_system_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0013",
+      "title": "AC Recharge",
+      "expectedFault": "air_conditioning_fault",
+      "text": "Warm air from vents. Low AC system pressure",
+      "breakdownType": "other",
+      "modelFault": "wheel_tire_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0014",
+      "title": "Air Conditioning Diagnosis",
+      "expectedFault": "air_conditioning_fault",
+      "text": "AC system not working. Unusual noise from AC system",
+      "breakdownType": "other",
+      "modelFault": "electrical_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Starter Motor",
+      "selectedGuideId": "ai2_aktc_0045",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0015",
+      "title": "Cabin Air Filter",
+      "expectedFault": "air_conditioning_fault",
+      "text": "Musty odor from vents. Reduced airflow from vents",
+      "breakdownType": "other",
+      "modelFault": "fuel_system_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0016",
+      "title": "Heater Blower Motor",
+      "expectedFault": "air_conditioning_fault",
+      "text": "No air from vents. Loud noise from HVAC system",
+      "breakdownType": "other",
+      "modelFault": "electrical_system_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0017",
+      "title": "Heater Blower Motor Resistor",
+      "expectedFault": "air_conditioning_fault",
+      "text": "HVAC fan speed erratic. HVAC fan only works on certain settings",
+      "breakdownType": "other",
+      "modelFault": "electrical_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "no_matching_approved_guide"
+    },
+    {
+      "sourceId": "aktc_0018",
+      "title": "Coolant/Antifreeze",
+      "expectedFault": "cooling_system_fault",
+      "text": "Engine overheating. Coolant leaks under the vehicle",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0019",
+      "title": "Coolant Leak Diagnosis",
+      "expectedFault": "cooling_system_fault",
+      "text": "Visible coolant puddle under vehicle. Coolant odor in cabin",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0020",
+      "title": "Engine Cooling System",
+      "expectedFault": "cooling_system_fault",
+      "text": "Engine overheating. Temperature gauge in red zone",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0021",
+      "title": "Heater Core",
+      "expectedFault": "cooling_system_fault",
+      "text": "No heat from vents. Sweet smell in cabin",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0022",
+      "title": "Heater Hose",
+      "expectedFault": "cooling_system_fault",
+      "text": "Coolant odor in cabin. Visible coolant leak under vehicle",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0023",
+      "title": "Radiator/Cooling Fan",
+      "expectedFault": "cooling_system_fault",
+      "text": "Engine overheating. AC not cooling at idle",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0024",
+      "title": "Radiator Hose",
+      "expectedFault": "cooling_system_fault",
+      "text": "Coolant leak under vehicle. Visible wear/cracks on hoses",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0025",
+      "title": "Water Pump",
+      "expectedFault": "cooling_system_fault",
+      "text": "Engine overheating. Coolant leak near front of engine",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0026",
+      "title": "Bevel Gears",
+      "expectedFault": "drivetrain_fault",
+      "text": "Whining noise from drivetrain. Difficulty shifting gears",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Bevel Gears",
+      "selectedGuideId": "ai2_aktc_0026",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0027",
+      "title": "Center Differential",
+      "expectedFault": "drivetrain_fault",
+      "text": "Vehicle binding on turns. Noise from drivetrain while turning",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Center Differential",
+      "selectedGuideId": "ai2_aktc_0027",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0028",
+      "title": "Clutch Cable",
+      "expectedFault": "drivetrain_fault",
+      "text": "Clutch pedal feels loose. Difficulty engaging gears",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0029",
+      "title": "Clutch Slave Cylinder",
+      "expectedFault": "drivetrain_fault",
+      "text": "Clutch pedal feels spongy. Fluid leak near clutch pedal",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0030",
+      "title": "Differential",
+      "expectedFault": "drivetrain_fault",
+      "text": "Whining noise from rear end. Vehicle vibration at high speeds",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Differential",
+      "selectedGuideId": "ai2_aktc_0030",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0031",
+      "title": "Live Axle",
+      "expectedFault": "drivetrain_fault",
+      "text": "Axle noise while turning. Vehicle leans to one side",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Live Axle",
+      "selectedGuideId": "ai2_aktc_0031",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0032",
+      "title": "Rigid Axle",
+      "expectedFault": "drivetrain_fault",
+      "text": "Vehicle bounces over bumps. Loud noise from rear axle",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Rigid Axle",
+      "selectedGuideId": "ai2_aktc_0032",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0033",
+      "title": "Slushbox",
+      "expectedFault": "drivetrain_fault",
+      "text": "Transmission slipping. Delay in gear engagement",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Slushbox",
+      "selectedGuideId": "ai2_aktc_0033",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0034",
+      "title": "Universal Joint",
+      "expectedFault": "drivetrain_fault",
+      "text": "Driveline vibration. Clunking noise when shifting",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Universal Joint",
+      "selectedGuideId": "ai2_aktc_0034",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0035",
+      "title": "Viscous Coupling",
+      "expectedFault": "drivetrain_fault",
+      "text": "Vehicle binding during turns. Noise from drivetrain while turning",
+      "breakdownType": "other",
+      "modelFault": "drivetrain_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Viscous Coupling",
+      "selectedGuideId": "ai2_aktc_0035",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0036",
+      "title": "Battery Replacement",
+      "expectedFault": "electrical_system_fault",
+      "text": "Engine cranks slowly. Clicking sound when starting",
+      "breakdownType": "electrical_problem",
+      "modelFault": "engine_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Battery Replacement",
+      "selectedGuideId": "ai2_aktc_0036",
+      "selectedGuideCanResolve": true,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0037",
+      "title": "Charging System",
+      "expectedFault": "electrical_system_fault",
+      "text": "Battery warning light on. Dim headlights",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Battery Replacement",
+      "selectedGuideId": "ai2_aktc_0036",
+      "selectedGuideCanResolve": true,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0038",
+      "title": "Check Engine Light Diagnosis",
+      "expectedFault": "electrical_system_fault",
+      "text": "Check engine light on. Poor engine performance",
+      "breakdownType": "electrical_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Ignition Wire Set",
+      "selectedGuideId": "ai2_aktc_0043",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0039",
+      "title": "Door Window Motor",
+      "expectedFault": "electrical_system_fault",
+      "text": "Window does not move. Window moves intermittently",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "ready_to_start",
+      "selectedGuide": "Door Window Regulator",
+      "selectedGuideId": "ai2_aktc_0040",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0040",
+      "title": "Door Window Regulator",
+      "expectedFault": "electrical_system_fault",
+      "text": "Window off track. Window stuck in one position",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "ready_to_start",
+      "selectedGuide": "Door Window Regulator",
+      "selectedGuideId": "ai2_aktc_0040",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0041",
+      "title": "Headlamp Bulb",
+      "expectedFault": "electrical_system_fault",
+      "text": "Headlight not working. Dim headlight",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Starter Motor",
+      "selectedGuideId": "ai2_aktc_0045",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0042",
+      "title": "Ignition Distributor Cap",
+      "expectedFault": "electrical_system_fault",
+      "text": "Engine misfires. Difficulty starting engine",
+      "breakdownType": "electrical_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Ignition Distributor Cap",
+      "selectedGuideId": "ai2_aktc_0042",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0043",
+      "title": "Ignition Wire Set",
+      "expectedFault": "electrical_system_fault",
+      "text": "Engine misfires. Poor fuel economy",
+      "breakdownType": "electrical_problem",
+      "modelFault": "fuel_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Ignition Wire Set",
+      "selectedGuideId": "ai2_aktc_0043",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0044",
+      "title": "Power Door Lock Actuator",
+      "expectedFault": "electrical_system_fault",
+      "text": "Door lock not responding. Clicking sound from door",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Battery Replacement",
+      "selectedGuideId": "ai2_aktc_0036",
+      "selectedGuideCanResolve": true,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0045",
+      "title": "Starter Motor",
+      "expectedFault": "electrical_system_fault",
+      "text": "Engine does not crank. Clicking sound when key is turned",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Battery Replacement",
+      "selectedGuideId": "ai2_aktc_0036",
+      "selectedGuideCanResolve": true,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0046",
+      "title": "Windshield Washer Pump",
+      "expectedFault": "electrical_system_fault",
+      "text": "No washer fluid spray. Weak washer fluid spray",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "ready_to_start",
+      "selectedGuide": "Windshield Washer Pump",
+      "selectedGuideId": "ai2_aktc_0046",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0047",
+      "title": "Wiper Motor",
+      "expectedFault": "electrical_system_fault",
+      "text": "Wipers not working. Wipers operate intermittently",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Starter Motor",
+      "selectedGuideId": "ai2_aktc_0045",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0048",
+      "title": "Canister Purge Valve",
+      "expectedFault": "emissions_system_fault",
+      "text": "Check engine light on. Rough idle",
+      "breakdownType": "other",
+      "modelFault": "engine_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Engine Oil",
+      "selectedGuideId": "ai2_aktc_0078",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0049",
+      "title": "Catalytic Converter",
+      "expectedFault": "emissions_system_fault",
+      "text": "Rotten egg smell from exhaust. Check engine light on",
+      "breakdownType": "other",
+      "modelFault": "engine_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Engine Oil",
+      "selectedGuideId": "ai2_aktc_0078",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0050",
+      "title": "Charcoal Canister",
+      "expectedFault": "emissions_system_fault",
+      "text": "Fuel odor from vehicle. Check engine light on",
+      "breakdownType": "other",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "fuel_hazard"
+    },
+    {
+      "sourceId": "aktc_0051",
+      "title": "Exhaust Manifold",
+      "expectedFault": "emissions_system_fault",
+      "text": "Loud exhaust noise. Exhaust smell in cabin",
+      "breakdownType": "other",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Exhaust Valve",
+      "selectedGuideId": "ai2_aktc_0062",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0052",
+      "title": "Exhaust Manifold Gasket",
+      "expectedFault": "emissions_system_fault",
+      "text": "Loud exhaust noise. Visible exhaust leaks",
+      "breakdownType": "other",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Exhaust Valve",
+      "selectedGuideId": "ai2_aktc_0062",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0053",
+      "title": "Fuel Tank Pressure Sensor",
+      "expectedFault": "emissions_system_fault",
+      "text": "Check engine light on. Gas cap warning light",
+      "breakdownType": "other",
+      "modelFault": "fuel_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Injector",
+      "selectedGuideId": "ai2_aktc_0082",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0054",
+      "title": "Knock Sensor",
+      "expectedFault": "emissions_system_fault",
+      "text": "Engine knocking/pinging. Poor fuel economy",
+      "breakdownType": "other",
+      "modelFault": "fuel_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Injector",
+      "selectedGuideId": "ai2_aktc_0082",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0055",
+      "title": "M.A.P. Sensor",
+      "expectedFault": "emissions_system_fault",
+      "text": "Check engine light on. Rough idle",
+      "breakdownType": "other",
+      "modelFault": "engine_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Engine Oil",
+      "selectedGuideId": "ai2_aktc_0078",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0056",
+      "title": "Oxygen Sensor",
+      "expectedFault": "emissions_system_fault",
+      "text": "Check engine light on. Poor fuel economy",
+      "breakdownType": "other",
+      "modelFault": "fuel_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Injector",
+      "selectedGuideId": "ai2_aktc_0082",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0057",
+      "title": "Balance Shaft",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine vibration. Rough idle",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Engine Mounts",
+      "selectedGuideId": "ai2_aktc_0061",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0058",
+      "title": "Boost Pressure",
+      "expectedFault": "engine_system_fault",
+      "text": "Loss of power. Turbo lag",
+      "breakdownType": "engine_problem",
+      "modelFault": "drivetrain_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0059",
+      "title": "Diesel Injection Pump",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine misfires. Black smoke from exhaust",
+      "breakdownType": "engine_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "smoke_or_fire"
+    },
+    {
+      "sourceId": "aktc_0060",
+      "title": "Diesel Glow Plug",
+      "expectedFault": "engine_system_fault",
+      "text": "Hard starting in cold weather. Glow plug indicator light stays on",
+      "breakdownType": "engine_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0061",
+      "title": "Engine Mounts",
+      "expectedFault": "engine_system_fault",
+      "text": "Excessive engine movement. Clunking noise when accelerating",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Engine Mounts",
+      "selectedGuideId": "ai2_aktc_0061",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0062",
+      "title": "Exhaust Valve",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine misfires. Rough idle",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Engine Control Unit (ECU)",
+      "selectedGuideId": "ai2_aktc_0077",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0063",
+      "title": "Fuel Injector",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine misfires. Poor fuel economy",
+      "breakdownType": "engine_problem",
+      "modelFault": "fuel_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Injector",
+      "selectedGuideId": "ai2_aktc_0082",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0064",
+      "title": "Idle Air Control Valve",
+      "expectedFault": "engine_system_fault",
+      "text": "Erratic idle speed. Stalling at idle",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0065",
+      "title": "Intake Valve",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine misfires. Rough idle",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Engine Control Unit (ECU)",
+      "selectedGuideId": "ai2_aktc_0077",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0066",
+      "title": "Oil Pump",
+      "expectedFault": "engine_system_fault",
+      "text": "Low oil pressure warning light. Engine knocking noise",
+      "breakdownType": "engine_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "critical_indicator"
+    },
+    {
+      "sourceId": "aktc_0067",
+      "title": "Piston Rings",
+      "expectedFault": "engine_system_fault",
+      "text": "Blue smoke from exhaust. Loss of engine power",
+      "breakdownType": "engine_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "smoke_or_fire"
+    },
+    {
+      "sourceId": "aktc_0068",
+      "title": "Timing Belt",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine misfires. Engine won't start",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Timing Belt",
+      "selectedGuideId": "ai2_aktc_0068",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0069",
+      "title": "Valve Cover Gasket",
+      "expectedFault": "engine_system_fault",
+      "text": "Oil leak around valve cover. Burning oil smell from engine bay",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Valve Cover Gasket",
+      "selectedGuideId": "ai2_aktc_0069",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0070",
+      "title": "Fan Belt",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine overheating. Squealing noise from engine bay",
+      "breakdownType": "engine_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0071",
+      "title": "Horn",
+      "expectedFault": "electrical_system_fault",
+      "text": "No sound when horn button pressed",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "ready_to_start",
+      "selectedGuide": "Horn",
+      "selectedGuideId": "ai2_aktc_0071",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0072",
+      "title": "Battery Charging",
+      "expectedFault": "electrical_system_fault",
+      "text": "Battery warning light on. Low voltage",
+      "breakdownType": "electrical_problem",
+      "modelFault": "electrical_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Battery Replacement",
+      "selectedGuideId": "ai2_aktc_0036",
+      "selectedGuideCanResolve": true,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0073",
+      "title": "Engine Belt",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine performance issues. Squealing noise from engine bay",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Engine Belt",
+      "selectedGuideId": "ai2_aktc_0073",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0074",
+      "title": "Steering Noise",
+      "expectedFault": "steering_system_fault",
+      "text": "Noise when turning steering wheel",
+      "breakdownType": "steering_problem",
+      "modelFault": "steering_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Steering Noise",
+      "selectedGuideId": "ai2_aktc_0074",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0075",
+      "title": "Shaft and Tires",
+      "expectedFault": "drivetrain_fault",
+      "text": "Uneven tire wear. Vibration while driving",
+      "breakdownType": "other",
+      "modelFault": "wheel_tire_fault",
+      "status": "ready_to_start",
+      "selectedGuide": "Tire Pressure Monitoring System (TPMS)",
+      "selectedGuideId": "ai2_aktc_0098",
+      "selectedGuideCanResolve": true,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0076",
+      "title": "Air Filter",
+      "expectedFault": "engine_system_fault",
+      "text": "Decreased engine performance. Black smoke from exhaust",
+      "breakdownType": "engine_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "smoke_or_fire"
+    },
+    {
+      "sourceId": "aktc_0077",
+      "title": "Engine Control Unit (ECU)",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine misfires. Poor fuel economy",
+      "breakdownType": "engine_problem",
+      "modelFault": "fuel_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Injector",
+      "selectedGuideId": "ai2_aktc_0082",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0078",
+      "title": "Engine Oil",
+      "expectedFault": "engine_system_fault",
+      "text": "Low oil pressure warning light. Loud engine noise",
+      "breakdownType": "engine_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "critical_indicator"
+    },
+    {
+      "sourceId": "aktc_0079",
+      "title": "Fuel Filter",
+      "expectedFault": "engine_system_fault",
+      "text": "Engine stalls at high speeds. Poor acceleration",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Filter",
+      "selectedGuideId": "ai2_aktc_0079",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0080",
+      "title": "PCV Valve",
+      "expectedFault": "engine_system_fault",
+      "text": "Oil leaks. Rough idle",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "awaiting_safety_confirmation",
+      "selectedGuide": "Engine Oil",
+      "selectedGuideId": "ai2_aktc_0078",
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0081",
+      "title": "Throttle Body",
+      "expectedFault": "engine_system_fault",
+      "text": "Poor acceleration. Stalling at idle",
+      "breakdownType": "engine_problem",
+      "modelFault": "engine_system_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0082",
+      "title": "Fuel Injector",
+      "expectedFault": "fuel_system_fault",
+      "text": "Engine misfires. Poor fuel economy",
+      "breakdownType": "fuel_problem",
+      "modelFault": "fuel_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Injector",
+      "selectedGuideId": "ai2_aktc_0082",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0083",
+      "title": "Fuel Pressure Regulator",
+      "expectedFault": "fuel_system_fault",
+      "text": "Engine stalls. Black smoke from exhaust",
+      "breakdownType": "fuel_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "smoke_or_fire"
+    },
+    {
+      "sourceId": "aktc_0084",
+      "title": "Fuel Pump",
+      "expectedFault": "fuel_system_fault",
+      "text": "Engine sputters at high speeds. Loss of power",
+      "breakdownType": "fuel_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Fuel Pump",
+      "selectedGuideId": "ai2_aktc_0084",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0085",
+      "title": "Fuel Tank",
+      "expectedFault": "fuel_system_fault",
+      "text": "Fuel odor inside vehicle. Visible fuel leak under vehicle",
+      "breakdownType": "fuel_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "fuel_hazard"
+    },
+    {
+      "sourceId": "aktc_0086",
+      "title": "Throttle Position Sensor",
+      "expectedFault": "fuel_system_fault",
+      "text": "Engine hesitates on acceleration. Stalling at idle",
+      "breakdownType": "fuel_problem",
+      "modelFault": "engine_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Throttle Position Sensor",
+      "selectedGuideId": "ai2_aktc_0086",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0087",
+      "title": "Brake Fluid",
+      "expectedFault": "brake_system_fault",
+      "text": "Soft brake pedal. Brake warning light on",
+      "breakdownType": "brake_problem",
+      "modelFault": "brake_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Brake Fluid",
+      "selectedGuideId": "ai2_aktc_0087",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0088",
+      "title": "Coolant Reservoir",
+      "expectedFault": "cooling_system_fault",
+      "text": "Engine overheating. Low coolant warning light",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0089",
+      "title": "Power Steering Fluid",
+      "expectedFault": "steering_system_fault",
+      "text": "Whining noise when turning. Stiff steering wheel",
+      "breakdownType": "steering_problem",
+      "modelFault": "steering_system_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Steering Noise",
+      "selectedGuideId": "ai2_aktc_0074",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0090",
+      "title": "Radiator",
+      "expectedFault": "cooling_system_fault",
+      "text": "Engine overheating. Coolant leak",
+      "breakdownType": "engine_overheating",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0091",
+      "title": "Windshield Washer Fluid",
+      "expectedFault": "visibility_system_fault",
+      "text": "No washer fluid spray. Weak washer fluid spray",
+      "breakdownType": "other",
+      "modelFault": "electrical_system_fault",
+      "status": "more_information_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0092",
+      "title": "Clutch Master Cylinder",
+      "expectedFault": "transmission_fault",
+      "text": "Soft clutch pedal. Clutch slipping",
+      "breakdownType": "transmission_problem",
+      "modelFault": "transmission_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Clutch Master Cylinder",
+      "selectedGuideId": "ai2_aktc_0092",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0093",
+      "title": "Torque Converter",
+      "expectedFault": "transmission_fault",
+      "text": "Slipping gears. Shuddering during acceleration",
+      "breakdownType": "transmission_problem",
+      "modelFault": "transmission_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Transmission Fluid",
+      "selectedGuideId": "ai2_aktc_0094",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0094",
+      "title": "Transmission Fluid",
+      "expectedFault": "transmission_fault",
+      "text": "Gears slipping. Transmission overheating",
+      "breakdownType": "transmission_problem",
+      "modelFault": null,
+      "status": "professional_help_required",
+      "selectedGuide": null,
+      "selectedGuideId": null,
+      "selectedGuideCanResolve": false,
+      "reason": "overheating"
+    },
+    {
+      "sourceId": "aktc_0095",
+      "title": "Transmission Filter",
+      "expectedFault": "transmission_fault",
+      "text": "Delayed shifting. Transmission slipping",
+      "breakdownType": "transmission_problem",
+      "modelFault": "transmission_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Transmission Filter",
+      "selectedGuideId": "ai2_aktc_0095",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0096",
+      "title": "Transmission Solenoid",
+      "expectedFault": "transmission_fault",
+      "text": "Erratic shifting. Transmission won't shift gears",
+      "breakdownType": "transmission_problem",
+      "modelFault": "transmission_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Transmission Solenoid",
+      "selectedGuideId": "ai2_aktc_0096",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0097",
+      "title": "Wheel Bearing",
+      "expectedFault": "wheel_tire_fault",
+      "text": "Grinding noise from wheels. Uneven tire wear",
+      "breakdownType": "flat_tyre",
+      "modelFault": "wheel_tire_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Wheel Bearing",
+      "selectedGuideId": "ai2_aktc_0097",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    },
+    {
+      "sourceId": "aktc_0098",
+      "title": "Tire Pressure Monitoring System (TPMS)",
+      "expectedFault": "wheel_tire_fault",
+      "text": "TPMS warning light on. Low tire pressure",
+      "breakdownType": "flat_tyre",
+      "modelFault": "wheel_tire_fault",
+      "status": "ready_to_start",
+      "selectedGuide": "Tire Pressure Monitoring System (TPMS)",
+      "selectedGuideId": "ai2_aktc_0098",
+      "selectedGuideCanResolve": true,
+      "reason": null
+    },
+    {
+      "sourceId": "aktc_0099",
+      "title": "Wheel Hub",
+      "expectedFault": "wheel_tire_fault",
+      "text": "Clicking or popping noise when turning. Wheel wobbling",
+      "breakdownType": "flat_tyre",
+      "modelFault": "wheel_tire_fault",
+      "status": "professional_help_required",
+      "selectedGuide": "Wheel Hub",
+      "selectedGuideId": "ai2_aktc_0099",
+      "selectedGuideCanResolve": false,
+      "reason": "high_risk_guide"
+    }
+  ],
+  "safety": [
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "There is smoke coming from the battery",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "There is fire under the bonnet",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "I can smell petrol",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "Strong fuel smell",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "A burning smell from the wiring",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "The battery is leaking",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "The battery is swollen",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "Brake failure",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "The brakes are not working",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": false,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "My brakes have stopped working",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": false,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "Steering locked",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "I cannot control the steering",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": false,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "Severe overheating",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "The temperature gauge is in the red",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": false,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "The engine temperature gauge is at maximum",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": false,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "Steam is coming from the engine",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "I am in moving traffic",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "I am stranded in the middle of the highway",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": false,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "Low oil pressure warning",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "No smoke or fire",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": true,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "The battery is not leaking",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": true,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "Engine misfire",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": false,
+      "passed": true,
+      "result": "TROUBLESHOOTING"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "The engine is not overheating",
+      "expectedStop": false,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": false,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "TROUBLESHOOTING",
+      "message": "I don't smell fuel",
+      "expectedStop": false,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": false,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "There is smoke coming from the battery",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "There is fire under the bonnet",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "I can smell petrol",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "Strong fuel smell",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "A burning smell from the wiring",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "The battery is leaking",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "The battery is swollen",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "Brake failure",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "The brakes are not working",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "My brakes have stopped working",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "Steering locked",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "I cannot control the steering",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "Severe overheating",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "The temperature gauge is in the red",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "The engine temperature gauge is at maximum",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "Steam is coming from the engine",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "I am in moving traffic",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "I am stranded in the middle of the highway",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "Low oil pressure warning",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "No smoke or fire",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": true,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "The battery is not leaking",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": true,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "Engine misfire",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": true,
+      "result": "CLARIFICATION"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "The engine is not overheating",
+      "expectedStop": false,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": false,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "VERIFYING_ACTION",
+      "message": "I don't smell fuel",
+      "expectedStop": false,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": false,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "There is smoke coming from the battery",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "There is fire under the bonnet",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "I can smell petrol",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "Strong fuel smell",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "A burning smell from the wiring",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "The battery is leaking",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "The battery is swollen",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "Brake failure",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "The brakes are not working",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "My brakes have stopped working",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "Steering locked",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "I cannot control the steering",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "Severe overheating",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "The temperature gauge is in the red",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "The engine temperature gauge is at maximum",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "Steam is coming from the engine",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "I am in moving traffic",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "I am stranded in the middle of the highway",
+      "expectedStop": true,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": false,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "Low oil pressure warning",
+      "expectedStop": true,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": true,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "No smoke or fire",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": true,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "The battery is not leaking",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": true,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "Engine misfire",
+      "expectedStop": false,
+      "actualStop": false,
+      "gptRequested": true,
+      "passed": true,
+      "result": "CHECKING_RESOLUTION"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "The engine is not overheating",
+      "expectedStop": false,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": false,
+      "result": "ESCALATED"
+    },
+    {
+      "state": "CHECKING_RESOLUTION",
+      "message": "I don't smell fuel",
+      "expectedStop": false,
+      "actualStop": true,
+      "gptRequested": false,
+      "passed": false,
+      "result": "ESCALATED"
+    }
+  ],
+  "assertions": [
+    "All HIGH guides expose no active repair step",
+    "All terminal paths finish in a supported state",
+    "Every resolved path includes an explicit driver resolution answer",
+    "No completed check repeats",
+    "First uncertainty does not immediately escalate"
+  ],
+  "summary": {
+    "archiveRecords": 99,
+    "activeGuides": 87,
+    "excludedSourceRecords": 12,
+    "canConfirmResolution": 3,
+    "checksOnly": 22,
+    "immediateProfessionalHelp": 62,
+    "terminalPaths": 127,
+    "resolvedPaths": 4,
+    "uncertaintyPoints": 35,
+    "startupExamples": 99,
+    "safetyProbes": 72,
+    "safetyPassed": 48,
+    "safetyMismatches": 24
+  }
+}

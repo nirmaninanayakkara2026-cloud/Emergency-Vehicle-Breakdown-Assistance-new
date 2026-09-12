@@ -126,7 +126,6 @@ export function mapSymptomTypeToRequestType(breakdownType) {
     "transmission_problem",
     "strange_noise",
     "accident",
-    "towing_needed",
     "other"
   ];
   return backendTypes.includes(breakdownType) ? breakdownType : "other";

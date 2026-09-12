@@ -340,8 +340,8 @@ test("[Cost estimation] every service range has valid LKR schema", (t) => {
 });
 
 test("[Demo data] fixtures are safe, complete, and duplicate-resistant", (t) => {
-  assert.equal(DEMO_PROVIDERS.length, 10);
-  assert.equal(new Set(DEMO_PROVIDERS.map((item) => item[0])).size, 10);
+  assert.equal(DEMO_PROVIDERS.length, 9);
+  assert.equal(new Set(DEMO_PROVIDERS.map((item) => item[0])).size, 9);
   assert.ok(DEMO_PROVIDERS.every((item) => item[5] >= 1 && item[5] <= 5));
   const seedSource = fs.readFileSync(
     path.resolve(__dirname, "../scripts/seedDemoData.js"),
@@ -350,7 +350,7 @@ test("[Demo data] fixtures are safe, complete, and duplicate-resistant", (t) => 
   assert.match(seedSource, /findOneAndUpdate/);
   assert.doesNotMatch(seedSource, /deleteMany|dropDatabase/);
   t.diagnostic(
-    "providers=10, upsert=true, destructiveDeletes=none, passwordSource=environment",
+    "providers=9, upsert=true, destructiveDeletes=none, passwordSource=environment",
   );
 });
 

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, radii, spacing, typography } from "../theme";
 
-export default function AppInput({ label, value, onChangeText, placeholder, secureTextEntry, keyboardType, multiline, error, icon, ...props }) {
+export default function AppInput({ label, value, onChangeText, placeholder, secureTextEntry, showPasswordToggle = false, keyboardType, multiline, error, icon, ...props }) {
   const [focused, setFocused] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   return (
     <View style={styles.wrapper}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
@@ -14,7 +15,7 @@ export default function AppInput({ label, value, onChangeText, placeholder, secu
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          secureTextEntry={secureTextEntry}
+          secureTextEntry={secureTextEntry && !(showPasswordToggle && passwordVisible)}
           keyboardType={keyboardType}
           multiline={multiline}
           placeholderTextColor={colors.muted}
@@ -23,6 +24,20 @@ export default function AppInput({ label, value, onChangeText, placeholder, secu
           style={[styles.input, multiline && styles.multiline]}
           {...props}
         />
+        {secureTextEntry && showPasswordToggle ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={passwordVisible ? "Hide password" : "Show password"}
+            onPress={() => setPasswordVisible((visible) => !visible)}
+            style={styles.passwordToggle}
+          >
+            <Ionicons
+              name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+              size={22}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+        ) : null}
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
@@ -48,6 +63,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radii.md,
     paddingHorizontal: spacing.md
+  },
+  passwordToggle: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center"
   },
   focused: { borderColor: colors.teal, borderWidth: 1.5 },
   invalid: { borderColor: colors.danger },

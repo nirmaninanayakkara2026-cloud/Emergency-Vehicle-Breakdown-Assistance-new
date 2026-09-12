@@ -84,12 +84,41 @@ class TroubleshootingEngineTests(unittest.TestCase):
 
     def test_not_sure_never_forces_continuation(self) -> None:
         response = process_step_result("ai2_aktc_0098", "step_1", "not sure")
-        self.assertEqual(response["status"], "professional_help_required")
+        self.assertEqual(response["status"], "clarification_required")
 
     def test_current_step_and_escalation_service(self) -> None:
         step = get_current_step("ai2_aktc_0098", "step_1")
         self.assertEqual(step["step_id"], "step_1")
         self.assertEqual(get_escalation_service("ai2_aktc_0098"), "tire_mechanic")
+
+    def test_normal_observation_asks_for_resolution_without_claiming_repair(self):
+        result = process_step_result("ai2_aktc_0036", "step_1", "clean_terminals")
+        self.assertEqual(result["status"], "awaiting_resolution_confirmation")
+        self.assertIsNone(result["next_step"])
+        self.assertIn("Do not start", result["message"])
+
+    def test_unresolved_washer_check_has_a_distinct_next_approved_step(self):
+        result = process_step_result("ai2_aktc_0091", "step_1", "sufficient_fluid_level")
+        self.assertEqual(result["status"], "awaiting_resolution_confirmation")
+        self.assertEqual(result["next_step"]["step_id"], "step_2")
+        self.assertNotIn("source_instruction", result["next_step"])
+
+    def test_symptoms_select_pressure_guide_but_not_for_bearing_noise(self):
+        guide = get_guide_for_fault("wheel_tire_fault", "TPMS tyre pressure warning", "flat_tyre")
+        self.assertEqual(guide["id"], "ai2_aktc_0098")
+        bearing = get_guide_for_fault("wheel_tire_fault", "Grinding wheel bearing noise", "flat_tyre")
+        self.assertEqual(bearing["risk_level"], "HIGH")
+        battery = get_guide_for_fault("electrical_system_fault", "Car won't start with clicking and dim lights")
+        self.assertEqual(battery["id"], "ai2_aktc_0036")
+
+    def test_unknown_symptoms_do_not_select_an_arbitrary_guide(self):
+        self.assertIsNone(get_guide_for_fault("electrical_system_fault", "unrelated unknown symptom"))
+
+    def test_explicit_negation_and_substring_collisions_do_not_trigger_danger(self):
+        for text in ["No smoke or fire", "engine misfire", "battery is not leaking", ""]:
+            self.assertFalse(check_stop_condition("ai2_aktc_0036", text)["triggered"], text)
+        for text in ["No smoke but battery leaking", "No smoke and battery is leaking", "Not sure if there is smoke", "brakes not working", "unsafe location"]:
+            self.assertTrue(check_stop_condition("ai2_aktc_0036", text)["triggered"], text)
 
 
 if __name__ == "__main__":

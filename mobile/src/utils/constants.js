@@ -5,7 +5,6 @@ export const COLORS = { ...colors, accent: colors.amber };
 export const PROVIDER_ROLES = [
   "mechanic",
   "garage",
-  "towing_service",
   "spare_parts_shop"
 ];
 
@@ -46,7 +45,6 @@ export const PROVIDER_SPECIALIZATIONS = [
   { label: "Transmission mechanic", value: "transmission_mechanic" },
   { label: "Steering mechanic", value: "steering_mechanic" },
   { label: "Tyre mechanic", value: "tire_mechanic" },
-  { label: "Towing", value: "towing" },
   { label: "Fuel support", value: "fuel_support" },
   { label: "Spare parts", value: "spare_parts" }
 ];

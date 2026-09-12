@@ -195,7 +195,7 @@ export default function ProviderProfileScreen({ navigation, route }) {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer removeClippedSubviews={false}>
       <ScreenHeader eyebrow={shopOwner ? "Spare parts shop" : "Service provider"} title={shopOwner ? profileId ? "Spare Parts Shop Profile" : "Create Spare Parts Shop Profile" : profileId ? "Provider Profile" : "Create Provider Profile"} subtitle={shopOwner ? "Add the shop details drivers use to find your inventory." : "Keep service details accurate so drivers can choose with confidence."} />
       <View style={styles.profileHero}><View style={styles.profileIcon}><Ionicons name="business" size={32} color={colors.primary} /></View><Text style={styles.heroText}>{businessName || "Your service business"}</Text></View>
 

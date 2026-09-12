@@ -7,9 +7,9 @@
   ],
   "valid_actions": [
     "continue",
+    "verify_resolution",
     "resolved",
     "request_mechanic",
-    "request_towing",
     "stop"
   ],
   "always_high_fault_categories": [

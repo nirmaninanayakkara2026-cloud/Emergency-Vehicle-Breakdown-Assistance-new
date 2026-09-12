@@ -24,6 +24,7 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const completed = status === "resolved";
+  const confirmedResolved = completed && session?.status === "resolved";
   const unavailable = status === "troubleshooting_unavailable";
   const service = recommendedService || session?.recommendedService;
   // Save whether troubleshooting resolved the issue or route to professional help.
@@ -31,8 +32,13 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
     setSaving(true);
     setError("");
     try {
-      if (sessionId) await setSessionResult(sessionId, resolved);
-      if (resolved) navigation.navigate("DriverHome");
+      const response = sessionId ? await setSessionResult(sessionId, resolved) : null;
+      if (response?.status === "in_progress") {
+        navigation.replace("TroubleshootingConversation", {
+          sessionId, session: response.session, currentStep: response.currentStep,
+          currentPhase: response.currentPhase, prefill, aiPrediction, riskLevel,
+        });
+      } else if (resolved) navigation.navigate("DriverHome");
       else navigation.navigate("RequestMechanic", { prefill });
     } catch (resultError) {
       setError(resultError.message);
@@ -40,13 +46,6 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
       setSaving(false);
     }
   }
-  // Reuse the request draft when towing is the safer escalation path.
-  const towingPrefill = {
-    ...prefill,
-    breakdownType: "towing_needed",
-    requiredService: "towing_service",
-    requiredServiceType: "towing_service",
-  };
   // Display the troubleshooting outcome, safety guidance, and next actions.
   return (
     <ScreenContainer contentStyle={styles.screen}>
@@ -70,7 +69,7 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
           ]}
         >
           {completed
-            ? "Basic Troubleshooting Complete"
+            ? confirmedResolved ? "Problem Resolved" : "Basic Troubleshooting Complete"
             : unavailable
               ? "Self-Troubleshooting Unavailable"
               : "Professional Assistance Recommended"}
@@ -92,14 +91,16 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
             </Text>
           </View>
         ) : null}
-        {service ? (
+        {service && !completed ? (
           <View style={styles.detail}>
             <Text style={styles.detailLabel}>Recommended help</Text>
             <Text style={styles.detailValue}>{formatServiceType(service)}</Text>
           </View>
         ) : null}
         {error ? <InfoBanner tone="danger" message={error} /> : null}
-        {completed ? (
+        {confirmedResolved ? (
+          <AppButton title="Return Home" variant="success" onPress={() => navigation.navigate("DriverHome")} />
+        ) : completed ? (
           <>
             <Text style={styles.body}>
               That completes the basic troubleshooting steps.
@@ -130,18 +131,6 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
                 navigation.navigate("RequestMechanic", { prefill })
               }
             />
-            {riskLevel === "HIGH" || (service || "").includes("towing") ? (
-              <AppButton
-                title="Request Towing"
-                icon="car-outline"
-                variant="secondary"
-                onPress={() =>
-                  navigation.navigate("RequestMechanic", {
-                    prefill: towingPrefill,
-                  })
-                }
-              />
-            ) : null}
             <AppButton
               title="Return Home"
               variant="ghost"

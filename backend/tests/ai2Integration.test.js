@@ -60,7 +60,7 @@ function fakeSession(overrides = {}) {
       step_id: "step_1",
       instruction: "Use the approved visual check.",
       result_question: "What did you safely observe?",
-      possible_results: [{ value: "not_sure", label: "Not Sure" }],
+      possible_results: [{ value: "not_sure", label: "Not Sure" }, { value: "clean", label: "Clean" }],
     },
     currentPhase: "result",
     currentInstructionConfirmedAt: new Date(),
@@ -459,7 +459,7 @@ test("backend next step resets the persisted phase to instruction", async () => 
     const { res, error } = await invoke(controller.submitStep, {
       params: { sessionId },
       user: { _id: driverId },
-      body: { stepId: "step_1", selectedResult: "not_sure" },
+      body: { stepId: "step_1", selectedResult: "clean" },
     });
     assert.equal(error, undefined);
     assert.equal(res.body.nextStep.step_id, "step_2");
@@ -519,7 +519,7 @@ test("smoke stops an active session immediately", async () => {
   }
 });
 
-test("not sure is delegated to the authoritative engine", async () => {
+test("not sure is clarified without marking the current check complete", async () => {
   const originalFindById = TroubleshootingSession.findById;
   const originalStep = ai2Service.processStep;
   const session = fakeSession({
@@ -542,8 +542,9 @@ test("not sure is delegated to the authoritative engine", async () => {
       body: { stepId: "step_1", selectedResult: "not_sure" },
     });
     assert.equal(error, undefined);
-    assert.equal(res.body.status, "professional_help_required");
-    assert.equal(session.completedSteps.length, 1);
+    assert.equal(res.body.status, "in_progress");
+    assert.equal(res.body.state, "CLARIFICATION");
+    assert.equal(session.completedSteps.length, 0);
   } finally {
     TroubleshootingSession.findById = originalFindById;
     ai2Service.processStep = originalStep;
@@ -571,7 +572,7 @@ test("engine completion waits for the driver's real-world resolution confirmatio
       body: { stepId: "step_1", selectedResult: "clean" },
     });
     assert.equal(error, undefined);
-    assert.equal(res.body.status, "resolved");
+    assert.equal(res.body.status, "awaiting_resolution_confirmation");
     assert.equal(session.status, "awaiting_resolution_confirmation");
     assert.equal(session.completedAt, null);
     assert.equal(session.currentPhase, "completed");

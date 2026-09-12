@@ -85,6 +85,15 @@ export function buildSelfAssistantMechanicPrefill(payload, response = {}) {
   };
 }
 
+export function conversationState(session = {}) {
+  if (session.status === "resolved") return "RESOLVED";
+  if (session.status === "professional_help_required") return "ESCALATED";
+  if (session.status === "awaiting_resolution_confirmation") return "CHECKING_RESOLUTION";
+  if (session.status === "awaiting_safety_confirmation") return "SAFETY_CONFIRMATION";
+  if (session.pendingInterpretation || session.clarificationCount) return "CLARIFICATION";
+  return session.currentPhase === "result" ? "VERIFYING_ACTION" : "TROUBLESHOOTING";
+}
+
 export function routeSelfAssistantResponse(navigation, response, payload, options = {}) {
   const method = options.replace ? "replace" : "navigate";
   function goTo(name, params) {
@@ -128,7 +137,7 @@ export function routeSelfAssistantResponse(navigation, response, payload, option
     });
     return "clarifying";
   }
-  if (response.status === "ready_to_start") {
+  if (["ready_to_start", "in_progress", "awaiting_resolution_confirmation"].includes(response.status)) {
     goTo("TroubleshootingConversation", common);
     return "troubleshooting";
   }

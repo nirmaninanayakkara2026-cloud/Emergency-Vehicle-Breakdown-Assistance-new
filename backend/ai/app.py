@@ -121,7 +121,7 @@ def predict_fault_endpoint(payload: FaultPredictionRequest) -> dict[str, object]
 # AI 2 guide lookup endpoint.
 @app.post("/ai2/find-guide")
 def find_guide_endpoint(payload: FindGuideRequest) -> dict[str, object]:
-    guide = get_guide_for_fault(payload.fault_category.strip())
+    guide = get_guide_for_fault(payload.fault_category.strip(), payload.symptom_text, payload.breakdown_type)
     if not guide:
         return {
             "success": True,

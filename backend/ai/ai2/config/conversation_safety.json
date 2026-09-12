@@ -1,0 +1,13 @@
+{
+  "rules": [
+    {"id": "smoke_or_fire", "pattern": "\\b(smoke|smoking|fire|flames?)\\b", "emergency": true},
+    {"id": "fuel_hazard", "pattern": "\\b(fuel|petrol|gasoline|diesel)\\s+(smell|odou?r|leak\\w*)\\b|\\b(smell|leak\\w*)\\b.{0,25}\\b(fuel|petrol|gasoline|diesel)\\b", "emergency": true},
+    {"id": "electrical_burning", "pattern": "\\b(burning smell|smell of burning|burnt smell|sparks?|sparking|exposed (damaged )?wir\\w*)\\b", "emergency": false},
+    {"id": "battery_damage", "pattern": "\\b(battery|batteries)\\b.{0,25}\\b(leak\\w*|swollen|swelling|cracked|damaged|hissing|bulging)\\b|\\b(leak\\w*|swollen|cracked|damaged|bulging)\\b.{0,25}\\b(battery|batteries)\\b", "emergency": false},
+    {"id": "brake_failure", "pattern": "\\b(brake failure|brakes? (failed|failing|not working|won't work|do not work|don't work)|cannot stop|can't stop|brake pedal.{0,15}floor)\\b", "emergency": false},
+    {"id": "steering_failure", "pattern": "\\b(steering (failure|failed|locked|not working)|cannot steer|can't steer|lost steering)\\b", "emergency": false},
+    {"id": "overheating", "pattern": "\\b(overheat\\w*|temperature.{0,15}red|steam|uncontrolled fluid leak|serious fluid leak)\\b", "emergency": false},
+    {"id": "unsafe_location", "pattern": "\\b(unsafe (roadside |parking )?location|in (moving |live )?traffic|live lane|middle of (the )?road|not safely parked|not safe|unsafe here|vehicle instability|vehicle unstable|unexpected dangerous condition)\\b", "emergency": false},
+    {"id": "critical_indicator", "pattern": "\\b(low oil pressure|oil pressure warning|flashing check engine|check engine.{0,15}flashing)\\b", "emergency": false}
+  ]
+}

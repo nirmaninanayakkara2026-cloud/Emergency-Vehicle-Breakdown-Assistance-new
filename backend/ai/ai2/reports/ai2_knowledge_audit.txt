@@ -1,19 +1,20 @@
 AI 2 TROUBLESHOOTING KNOWLEDGE AUDIT
 
 Original archive records: 99
-Usable troubleshooting guides: 92
-LOW risk: 7
-CAUTION risk: 23
+Usable troubleshooting guides: 87
+LOW risk: 6
+CAUTION risk: 19
 HIGH risk: 62
 Guides requiring professional help: 62
 Fault categories represented: 12
-Records excluded: 7
-Records with incomplete branching: 30
-Total troubleshooting steps: 106
-Total result options: 150
+Records excluded: 12
+Records with incomplete branching: 25
+Total troubleshooting steps: 93
+Total result options: 124
 
 SAFETY POLICY
 Risk levels are produced only by deterministic project rules.
 HIGH-risk source procedures are retained only in source_diagnosis_steps and are not returned as user-facing steps.
-LOW and CAUTION paths preserve source order because the archive contains no result-specific branching.
+LOW and CAUTION paths preserve source order except for explicit conversation_overrides.json verification and escalation branches.
+Normal observations can ask about the original problem; only explicit driver confirmation in the Node state manager records resolution.
 No result is treated as a completed repair because the source does not establish repair outcomes.

@@ -394,34 +394,6 @@ export const symptomQuestionFlows = {
       ]
     }
   ],
-  towing_needed: [
-    {
-      id: "towing_reason",
-      question: "Why does the vehicle need towing?",
-      summaryLabel: "Towing reason",
-      type: "single_choice",
-      options: [
-        { value: "will_not_start", label: "It will not start" },
-        { value: "wheel_damage", label: "Wheel or tyre damage" },
-        { value: "accident_damage", label: "Accident damage" },
-        { value: "unsafe_to_drive", label: "It feels unsafe to drive" },
-        notSure
-      ]
-    },
-    {
-      id: "vehicle_position",
-      question: "Where is the vehicle now?",
-      summaryLabel: "Vehicle position",
-      type: "single_choice",
-      options: [
-        { value: "roadside", label: "Safe roadside area" },
-        { value: "traffic", label: "In or near traffic" },
-        { value: "parking", label: "Parking area" },
-        { value: "off_road", label: "Off the road" },
-        notSure
-      ]
-    }
-  ],
   other: [
     {
       id: "general_behavior",

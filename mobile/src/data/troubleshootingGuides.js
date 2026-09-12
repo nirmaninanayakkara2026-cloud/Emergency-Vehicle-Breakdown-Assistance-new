@@ -116,27 +116,12 @@ export const troubleshootingGuides = [
     stopConditions: ["Smoke", "Sparks", "Burning smell", "Damaged wiring"]
   },
   {
-    id: "towing_required",
-    vehicleTypes: ["car", "bike", "van", "three_wheeler", "truck"],
-    breakdownType: "towing_needed",
-    title: "Towing Required",
-    riskLevel: "high",
-    serviceType: "towing_service",
-    symptoms: ["Vehicle cannot move safely", "Wheel or steering damage", "Severe breakdown"],
-    warning: "Moving an unsafe vehicle can cause further damage or accidents.",
-    dangerReason: "A vehicle that cannot move safely should be handled by towing professionals.",
-    immediateActions: ["Stay in a safe location", "Use hazard lights if safe", "Request towing support"],
-    avoidActions: ["Do not push in traffic", "Do not tow with unsafe equipment", "Do not drive with steering damage"],
-    steps: [],
-    stopConditions: ["Steering failure", "Wheel damage", "Accident damage", "Vehicle stuck in traffic"]
-  },
-  {
     id: "accident_damage",
     vehicleTypes: ["car", "bike", "van", "three_wheeler", "truck"],
     breakdownType: "accident",
     title: "Accident or Collision Damage",
     riskLevel: "high",
-    serviceType: "towing_service",
+    serviceType: "general_mechanic",
     symptoms: ["Collision damage", "Airbag deployed", "Vehicle unsafe to drive"],
     warning: "Accident damage may hide fuel, electrical, steering, or brake hazards.",
     dangerReason: "Attempting repairs after an accident can expose you to serious safety risks.",

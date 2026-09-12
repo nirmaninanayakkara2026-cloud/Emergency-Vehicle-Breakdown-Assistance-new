@@ -26,7 +26,6 @@ export default function RegisterScreen({ navigation }) {
   const serviceProviderSelected = [
     "mechanic",
     "garage",
-    "towing_service",
   ].includes(role);
 
   // Validate the registration form and create the account through the auth context.
@@ -164,6 +163,9 @@ export default function RegisterScreen({ navigation }) {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          showPasswordToggle
+          autoCapitalize="none"
+          autoCorrect={false}
           autoComplete="new-password"
         />
         <AppInput
@@ -172,6 +174,9 @@ export default function RegisterScreen({ navigation }) {
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
+          showPasswordToggle
+          autoCapitalize="none"
+          autoCorrect={false}
         />
         {error ? <InfoBanner tone="danger" message={error} /> : null}
         <AppButton

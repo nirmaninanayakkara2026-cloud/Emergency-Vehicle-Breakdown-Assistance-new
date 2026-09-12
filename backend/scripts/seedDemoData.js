@@ -16,7 +16,6 @@ const DEMO_PROVIDERS = [
   ["Precision Transmission Help", "mechanic", "transmission_mechanic", 6.9500, 79.8750, 4.5, 34, 28, 25],
   ["SteadyWheel Steering Service", "mechanic", "steering_mechanic", 6.9200, 79.8450, 4.7, 41, 20, 18],
   ["Rapid Tyre Rescue", "mechanic", "tire_mechanic", 6.9350, 79.8500, 4.6, 56, 14, 20],
-  ["Colombo Demo Towing", "towing_service", "towing", 6.9450, 79.8650, 4.2, 25, 20, 30],
   ["Central Multi-Service Garage", "garage", "general_mechanic", 6.9050, 79.8550, 4.5, 44, 24, 25]
 ];
 

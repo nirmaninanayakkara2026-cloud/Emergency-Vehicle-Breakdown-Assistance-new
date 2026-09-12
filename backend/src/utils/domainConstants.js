@@ -1,7 +1,6 @@
 const PROVIDER_ROLES = [
   "mechanic",
   "garage",
-  "towing_service",
   "spare_parts_shop"
 ];
 
@@ -29,7 +28,6 @@ const BREAKDOWN_TYPES = [
   "transmission_problem",
   "strange_noise",
   "accident",
-  "towing_needed",
   "other"
 ];
 
@@ -83,8 +81,7 @@ const SERVICE_TYPE_MAP = {
   steering_problem: "steering_mechanic",
   transmission_problem: "transmission_mechanic",
   strange_noise: "general_mechanic",
-  accident: "towing_service",
-  towing_needed: "towing_service",
+  accident: "general_mechanic",
   other: "general_mechanic"
 };
 
