@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Linking, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
@@ -10,6 +10,9 @@ import InfoBanner from "../../components/ui/InfoBanner";
 import LoadingState from "../../components/ui/LoadingState";
 import ScreenHeader from "../../components/ui/ScreenHeader";
 import StatusBadge from "../../components/ui/StatusBadge";
+import ProviderRouteCard from "../../components/location/ProviderRouteCard";
+import useRequestPolling from "../../hooks/useRequestPolling";
+import { shouldRefreshRequest } from "../../utils/providerTracking";
 import { cancelRequest, getRequestById } from "../../services/requestService";
 import { colors, radii, spacing, typography } from "../../theme";
 import {
@@ -49,9 +52,13 @@ export default function RequestTrackingScreen({ navigation, route }) {
   const [cancellationReason, setCancellationReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const requestId = route.params?.requestId || request?._id;
+  const loadVersion = useRef(0);
   // Refresh request status and redirect completed requests to the completion page.
-  const loadRequest = useCallback(async () => {
-    setError("");
+  const loadRequest = useCallback(async (isActive = () => true) => {
+    // Button handlers may supply an event instead of a lifecycle callback.
+    if (typeof isActive !== "function") isActive = () => true;
+    const version = ++loadVersion.current;
+    const isCurrent = () => isActive() && version === loadVersion.current;
     if (!requestId) {
       setError("This request could not be opened.");
       setLoading(false);
@@ -60,33 +67,40 @@ export default function RequestTrackingScreen({ navigation, route }) {
     }
     try {
       const data = await getRequestById(requestId);
+      if (!isCurrent()) return;
+      setError("");
       if (data.status === "completed") {
         navigation.replace("JobCompletion", { requestId, request: data });
         return;
       }
       setRequest(data);
     } catch (requestError) {
-      setError(requestError.message);
+      if (isCurrent()) setError(requestError.message);
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (isCurrent()) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [navigation, requestId]);
-  useEffect(() => {
-    loadRequest();
-  }, [loadRequest]);
+  useRequestPolling(loadRequest, shouldRefreshRequest(request?.status) && !submitting);
   // Cancel the active request with the driver's optional reason.
   async function handleCancel() {
     setSubmitting(true);
     setError("");
     try {
-      setRequest(await cancelRequest(requestId, cancellationReason));
+      const cancelledRequest = await cancelRequest(requestId, cancellationReason);
+      loadVersion.current += 1;
+      setRequest(cancelledRequest);
     } catch (cancelError) {
       setError(cancelError.message);
     } finally {
       setSubmitting(false);
     }
   }
+  if (!loading && !request && error) return (
+    <ScreenContainer><ErrorState message={error} onRetry={loadRequest} /></ScreenContainer>
+  );
   if (loading || !request || request.status === "completed")
     return (
       <ScreenContainer scroll={false}>
@@ -190,6 +204,7 @@ export default function RequestTrackingScreen({ navigation, route }) {
           />
         ) : null}
       </AppCard>
+      <ProviderRouteCard request={request} />
       {/* Visual timeline of the request workflow. */}
       <AppCard>
         <Text style={styles.cardTitle}>Request Progress</Text>

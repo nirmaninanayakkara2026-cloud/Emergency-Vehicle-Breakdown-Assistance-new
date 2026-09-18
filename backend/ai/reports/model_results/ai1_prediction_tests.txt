@@ -15,6 +15,8 @@ Top 3 predictions:
   1. electrical_system_fault: 0.673244
   2. fuel_system_fault: 0.057273
   3. drivetrain_fault: 0.053869
+Expected fault: electrical_system_fault
+Check: PASS
 
 Cooling / overheating
 Input: temperature gauge is very high steam coming from engine area and coolant appears to be leaking
@@ -31,6 +33,8 @@ Top 3 predictions:
   1. engine_system_fault: 0.488995
   2. cooling_system_fault: 0.392642
   3. fuel_system_fault: 0.036865
+Expected fault: cooling_system_fault
+Check: FAIL
 
 Steering
 Input: steering wheel suddenly became very difficult to turn
@@ -47,6 +51,8 @@ Top 3 predictions:
   1. steering_system_fault: 0.995529
   2. wheel_tire_fault: 0.001485
   3. electrical_system_fault: 0.000967
+Expected fault: steering_system_fault
+Check: PASS
 
 Brake
 Input: brake pedal feels soft and vehicle takes much longer to stop
@@ -63,6 +69,8 @@ Top 3 predictions:
   1. brake_system_fault: 0.866181
   2. drivetrain_fault: 0.033041
   3. electrical_system_fault: 0.026756
+Expected fault: brake_system_fault
+Check: PASS
 
 Tyre
 Input: front tyre is completely flat and vehicle is pulling to one side
@@ -79,6 +87,8 @@ Top 3 predictions:
   1. wheel_tire_fault: 0.209169
   2. electrical_system_fault: 0.172889
   3. drivetrain_fault: 0.118181
+Expected fault: wheel_tire_fault
+Check: PASS
 
 Transmission
 Input: vehicle hesitates when changing gears and transmission slips while accelerating
@@ -95,6 +105,8 @@ Top 3 predictions:
   1. drivetrain_fault: 0.879410
   2. transmission_fault: 0.070425
   3. electrical_system_fault: 0.011028
+Expected fault: transmission_fault
+Check: FAIL
 
 Fuel
 Input: strong fuel smell vehicle loses power and fuel appears to be leaking
@@ -111,6 +123,8 @@ Top 3 predictions:
   1. fuel_system_fault: 0.960747
   2. drivetrain_fault: 0.008961
   3. electrical_system_fault: 0.006454
+Expected fault: fuel_system_fault
+Check: PASS
 
 Ambiguous
 Input: vehicle making strange noise and not working properly
@@ -127,14 +141,20 @@ Top 3 predictions:
   1. electrical_system_fault: 0.221934
   2. drivetrain_fault: 0.177149
   3. wheel_tire_fault: 0.119555
+Expected handling: needs_more_information=true
+Check: PASS
 
-AI 1 PREDICTION SERVICE PREPARATION COMPLETE
+AI 1 PREDICTION CHECK COMPLETE
 
 Model: Logistic Regression
 Fault classes: 9
 Fault-to-service mapping: Loaded
 Confidence policy: Loaded
 Test predictions: 8
+Correct example categories: 5/7
+Checks passed: 6/8
+Failed examples: Cooling / overheating, Transmission
 Ambiguous predictions: 3
 Low-confidence predictions: 2
-Ready for FastAPI integration: YES
+Prediction checks: FAIL
+Illustrative examples only; use held-out evaluation for model accuracy.

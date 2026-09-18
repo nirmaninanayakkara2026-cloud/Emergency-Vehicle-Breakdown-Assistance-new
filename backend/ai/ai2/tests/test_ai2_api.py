@@ -38,6 +38,21 @@ class AI2ApiTests(unittest.TestCase):
         self.assertEqual(response["guide"]["risk_level"], "CAUTION")
         self.assertNotIn("steps", response["guide"])
 
+    def test_guided_lookup_returns_only_public_approved_steps(self) -> None:
+        response = find_guide_endpoint(FindGuideRequest(
+            fault_category="electrical_system_fault",
+            symptom_text="battery clicking dim lights", include_steps=True,
+        ))
+        self.assertEqual(response["guide"]["guide_id"], "ai2_aktc_0036")
+        self.assertTrue(response["guide"]["steps"])
+        self.assertNotIn("source_instruction", response["guide"]["steps"][0])
+
+    def test_high_risk_lookup_never_exposes_steps(self) -> None:
+        response = find_guide_endpoint(FindGuideRequest(
+            fault_category="brake_system_fault", include_steps=True,
+        ))
+        self.assertEqual(response["guide"]["steps"], [])
+
     def test_caution_cannot_start_without_confirmation(self) -> None:
         response = start_guide_endpoint(StartGuideRequest(guide_id="ai2_aktc_0036"))
         self.assertEqual(response["status"], "safety_confirmation_required")

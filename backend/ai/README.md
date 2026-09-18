@@ -1,6 +1,6 @@
 # AI Module 1 — Fault Classification Dataset
 
-AI Module 1 will eventually convert driver-reported symptoms into a likely vehicle fault category. It does not recommend a specific mechanic directly.
+AI Module 1 converts driver-reported symptoms into a likely vehicle fault category using a saved text classifier. It does not recommend a specific mechanic directly.
 
 The intended separation is:
 
@@ -8,7 +8,7 @@ The intended separation is:
 driver symptoms → predicted vehicle fault → service-category mapping → provider recommendation
 ```
 
-No model is trained and no backend AI connection is made at this stage.
+The trained model is exposed through FastAPI and called by the Node backend.
 
 ## Dataset
 
@@ -128,6 +128,13 @@ Prepare and exercise the reusable local prediction service:
 ```powershell
 .\venv\Scripts\python.exe scripts\test_ai1_prediction.py
 ```
+
+This command checks seven expected fault categories and one ambiguous-input
+case, writes the prediction report, and exits with code 1 if a check fails.
+These are illustrative examples, not a held-out accuracy benchmark. The current
+model fails the cooling and transmission examples; successful inference alone
+does not establish correct classification. See the
+[AI 1 verification report](../../docs/ai1-verification.md) for verified results.
 
 The prediction service loads the selected pipeline once per Python process. It
 keeps fault prediction separate from the fault-to-service mapping and returns

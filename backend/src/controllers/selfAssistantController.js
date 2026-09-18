@@ -9,6 +9,8 @@ const { buildDiagnosticText } = require("../utils/buildDiagnosticText");
 const { normalizeSymptomCapture } = require("../utils/symptomNormalizer");
 const { mapBreakdownToServiceType, VEHICLE_TYPES } = require("../utils/domainConstants");
 const faultServiceMapping = require("../../ai/config/fault_service_mapping.json");
+const simpleAssistance = require("../services/simpleAssistanceService");
+const aiTroubleshootingHelp = require("../services/aiTroubleshootingHelpService");
 
 const TERMINAL_STATUSES = new Set([
   "resolved",
@@ -96,7 +98,7 @@ async function startSelfAssistant(req, res, next) {
       res.status(400);
       throw new Error("A supported vehicle type is required");
     }
-    if (!breakdownType || String(breakdownType).length > 100) {
+    if (typeof breakdownType !== "string" || !breakdownType.trim() || breakdownType.length > 100) {
       res.status(400);
       throw new Error("Breakdown type is required");
     }
@@ -112,6 +114,21 @@ async function startSelfAssistant(req, res, next) {
     if (!diagnosticInputText) {
       res.status(400);
       throw new Error("Symptom information is required");
+    }
+
+    if (req.body.driverType !== undefined) {
+      if (!["technical", "non_technical"].includes(req.body.driverType)) {
+        res.status(400);
+        throw new Error("Choose how you want to identify the problem.");
+      }
+      const safetyText = [suppliedText, buildDiagnosticText({
+        symptomCapture, problemDescription: req.body.problemDescription
+      })].join("\n");
+      const result = await simpleAssistance.start({
+        driverType: req.body.driverType, vehicleType, breakdownType,
+        symptomCapture, diagnosticInputText, safetyText
+      }, req.user._id);
+      return res.status(result.session ? 201 : 200).json(result);
     }
 
     const danger = detectDanger([suppliedText, buildDiagnosticText({
@@ -268,6 +285,7 @@ async function confirmSafety(req, res, next) {
       res.status(409);
       throw new Error("This session is not awaiting safety confirmation");
     }
+    if (session.driverType) return res.status(200).json(await simpleAssistance.confirmSafety(session));
     const result = await ai2Service.startGuide(session.guideId, true);
     if (result.status === "troubleshooting_unavailable") return unavailableResponse(res);
     if (result.status !== "in_progress" || !result.current_step) {
@@ -300,6 +318,10 @@ async function confirmSafety(req, res, next) {
 async function confirmStepAction(req, res, next) {
   try {
     const session = await findOwnedSession(req, res);
+    if (session.driverType) {
+      res.status(409);
+      throw new Error("Use the guided action buttons for this session.");
+    }
     const stepId = String(req.body.stepId || "");
     if (session.status !== "in_progress") {
       res.status(409);
@@ -333,6 +355,10 @@ async function confirmStepAction(req, res, next) {
 async function submitStep(req, res, next) {
   try {
     const session = await findOwnedSession(req, res);
+    if (session.driverType) {
+      res.status(409);
+      throw new Error("Use the guided action buttons for this session.");
+    }
     if (session.status !== "in_progress") {
       res.status(409);
       throw new Error("This troubleshooting session is not active");
@@ -409,6 +435,10 @@ function normalizeReply(value) {
 async function sendMessage(req, res, next) {
   try {
     const session = await findOwnedSession(req, res);
+    if (session.driverType) {
+      res.status(409);
+      throw new Error("Use Ask AI for More Help to explain the current step.");
+    }
     const message = typeof req.body.message === "string" ? req.body.message.trim() : "";
     const selectedResult = typeof req.body.selectedResult === "string" ? req.body.selectedResult : "";
     if ((!message && !selectedResult) || message.length > 1000 || selectedResult.length > 200) {
@@ -516,7 +546,8 @@ async function stopSession(req, res, next) {
     const condition = String(req.body.condition || "User requested professional assistance").slice(0, 200);
     conversation.record(session, "user", condition);
     const danger = detectDanger(condition);
-    conversation.escalate(session, danger?.id || "driver_requested_assistance", danger ? dangerMessage(danger) : "Troubleshooting stopped at your request. Professional assistance is available.");
+    if (session.driverType) simpleAssistance.stop(session, danger ? dangerMessage(danger) : "Troubleshooting stopped at your request. Professional assistance is available.");
+    else conversation.escalate(session, danger?.id || "driver_requested_assistance", danger ? dangerMessage(danger) : "Troubleshooting stopped at your request. Professional assistance is available.");
     await session.save();
     return res.status(200).json({
       success: true,
@@ -536,6 +567,14 @@ async function stopSession(req, res, next) {
 async function setResult(req, res, next) {
   try {
     const session = await findOwnedSession(req, res);
+    if (session.driverType) {
+      if (!["in_progress", "awaiting_resolution_confirmation", "resolved"].includes(session.status) || typeof req.body.resolved !== "boolean") {
+        res.status(409);
+        throw new Error("An active guidance session and an explicit resolution answer are required.");
+      }
+      if (session.status === "resolved") return res.status(200).json(simpleAssistance.response(session));
+      return res.status(200).json(await simpleAssistance.act(session, req.body.resolved ? "solved" : "still_not_fixed"));
+    }
     if (!["awaiting_resolution_confirmation", "resolved"].includes(session.status)) {
       res.status(409);
       throw new Error("Only a completed troubleshooting session can be marked resolved");
@@ -580,6 +619,7 @@ async function cancelSession(req, res, next) {
 async function getSession(req, res, next) {
   try {
     const session = await findOwnedSession(req, res);
+    if (session.driverType) return res.status(200).json(simpleAssistance.response(session));
     return res.status(200).json({ success: true, session: sessionPayload(session) });
   } catch (error) {
     if (error.name === "VersionError") res.status(409);
@@ -592,7 +632,70 @@ async function getHistory(req, res, next) {
     const sessions = await TroubleshootingSession.find({ driverId: req.user._id })
       .sort({ createdAt: -1 })
       .limit(5);
-    return res.status(200).json({ success: true, sessions });
+    return res.status(200).json({ success: true, sessions: sessions.map((session) =>
+      session.driverType ? simpleAssistance.response(session).session : session) });
+  } catch (error) {
+    if (error.name === "VersionError") res.status(409);
+    return next(error);
+  }
+}
+
+async function guidanceAction(req, res, next) {
+  try {
+    const session = await findOwnedSession(req, res);
+    if (!session.driverType || !["in_progress", "awaiting_resolution_confirmation"].includes(session.status)) {
+      res.status(409);
+      throw new Error("This guidance session is not active.");
+    }
+    const { action, selectedResult, stepId } = req.body;
+    if (!["solved", "still_not_fixed", "not_sure", "observation"].includes(action)) {
+      res.status(400);
+      throw new Error("Choose a guidance action.");
+    }
+    if ((stepId || null) !== (session.currentStepId || null)) {
+      res.status(409);
+      throw new Error("This step has changed. Reopen the session to continue.");
+    }
+    if (action === "observation" && !session.currentStep?.possible_results?.some((item) => item.value === selectedResult)) {
+      res.status(400);
+      throw new Error("Choose an observation from the current step.");
+    }
+    if (action === "observation") {
+      const option = session.currentStep.possible_results.find((item) => item.value === selectedResult);
+      const danger = detectDanger(`${option.value}. ${option.label}`);
+      if (danger) {
+        const safetyHelp = await aiTroubleshootingHelp.getDangerSafetyHelp({
+          danger, driverType: session.driverType, vehicleType: session.vehicleType,
+          symptoms: `${option.value}. ${option.label}`
+        });
+        session.safetyActions = safetyHelp.actions;
+        session.riskLevel = "HIGH";
+        if (safetyHelp.source === "OPENAI") session.troubleshootingSource = "OPENAI";
+        simpleAssistance.stop(session, dangerMessage(danger));
+        await session.save();
+        return res.status(200).json(simpleAssistance.response(session));
+      }
+    }
+    return res.status(200).json(await simpleAssistance.act(session, action, selectedResult));
+  } catch (error) {
+    if (error.name === "VersionError") res.status(409);
+    return next(error);
+  }
+}
+
+async function askForHelp(req, res, next) {
+  try {
+    const session = await findOwnedSession(req, res);
+    const question = typeof req.body.question === "string" ? req.body.question.trim() : "";
+    if (!question || question.length > 500) {
+      res.status(400);
+      throw new Error("Enter a question of 1 to 500 characters.");
+    }
+    if (!session.driverType || session.status !== "in_progress" || !session.currentStep) {
+      res.status(409);
+      throw new Error("Open an active guidance step to ask for an explanation.");
+    }
+    return res.status(200).json(await simpleAssistance.explain(session, question));
   } catch (error) {
     if (error.name === "VersionError") res.status(409);
     return next(error);
@@ -600,6 +703,8 @@ async function getHistory(req, res, next) {
 }
 
 module.exports = {
+  guidanceAction,
+  askForHelp,
   cancelSession,
   confirmStepAction,
   confirmSafety,

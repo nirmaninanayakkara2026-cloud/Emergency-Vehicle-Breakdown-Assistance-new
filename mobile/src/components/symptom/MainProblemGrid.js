@@ -14,7 +14,17 @@ const problemIcons = {
   steering_problem: "navigate-circle-outline",
   transmission_problem: "git-compare-outline",
   strange_noise: "volume-high-outline",
-  other: "help-circle-outline"
+  other: "help-circle-outline",
+  cooling_problem: "thermometer-outline",
+  vehicle_stopped: "hand-left-outline",
+  loss_of_power: "speedometer-outline",
+  warning_light: "alert-circle-outline",
+  smoke_steam: "cloud-outline",
+  vehicle_shaking: "pulse-outline",
+  liquid_leaking: "water-outline",
+  strange_smell: "flower-outline",
+  wheel_tyre_symptom: "disc-outline",
+  feels_hot: "thermometer-outline"
 };
 
 export default function MainProblemGrid({ options, value, onChange }) {

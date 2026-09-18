@@ -41,6 +41,18 @@ Both map options support tapping, dragging the pin, saved locations, and the exi
 
 If the location map times out, use **Retry Map** after checking connectivity. The loading overlay clears after 12 seconds so it cannot permanently hide the map. Current-location selection also remains available.
 
+## Driver provider route
+
+After a provider accepts, **Track Request** and **Request Details** show the provider's saved service location, the breakdown location, and a driving route between them. Both screens refresh active requests every 10 seconds while visible and refresh on returning to the app. This uses the profile's static location; it does not collect the provider's live GPS position.
+
+The embedded map uses Leaflet/OpenStreetMap. Road geometry, distance, and travel time come from an OSRM-compatible service, defaulting to the public demo at `https://router.project-osrm.org`. Set `EXPO_PUBLIC_ROUTING_BASE_URL` to your own OSRM host for production. Coordinates are sent to the routing service without app authentication. Route requests run only when the coordinates change or the user retries. Driving time excludes live traffic and provider preparation time; the provider's arrival estimate remains separate.
+
+**Open Route in Google Maps** opens directions from the provider to the breakdown location, including when the embedded route cannot load. Missing coordinates and network failures show an explanatory message and retry where applicable.
+
+Manual check: select a provider as a driver, leave Track Request open, then accept on the provider account. Within 10 seconds, verify both pins and the road route appear. Check Request Details too, advance the job status, cancel the request, and test map retry with connectivity disabled/restored.
+
+References: [OSRM route API](https://project-osrm.org/docs/v26.6.1/http), [Google Maps directions URLs](https://developers.google.com/maps/documentation/urls/get-started#directions).
+
 ## Completed Phase 1 Features
 
 - Backend authentication with role-based navigation.

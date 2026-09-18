@@ -4,6 +4,7 @@ import {
   symptomQuestionFlows
 } from "../data/symptomQuestionFlows";
 import { VEHICLE_TYPES } from "../utils/constants";
+import { getAssistanceProblems, getAssistanceQuestions } from "../data/assistanceOptions";
 
 const emptyObservedSymptoms = {
   see: [],
@@ -28,7 +29,8 @@ function formatAnswer(question, answer) {
   return findLabel(question.options, answer);
 }
 
-export function getQuestionsForProblem(breakdownType) {
+export function getQuestionsForProblem(breakdownType, driverType) {
+  if (driverType) return getAssistanceQuestions(breakdownType);
   const flowAliases = {
     fuel_problem: "fuel_issue",
     strange_noise: "strange_sound"
@@ -53,6 +55,7 @@ export function validateAnswer(question, answer) {
 
 export function buildStructuredSymptomPayload(data) {
   return {
+    ...(data.driverType ? { driverType: data.driverType } : {}),
     vehicleType: data.vehicleType,
     breakdownType: data.breakdownType,
     symptoms: { ...(data.symptoms || {}) },
@@ -66,7 +69,7 @@ export function buildStructuredSymptomPayload(data) {
 
 export function buildSymptomSummary(data) {
   const payload = buildStructuredSymptomPayload(data);
-  const questions = getQuestionsForProblem(payload.breakdownType);
+  const questions = getQuestionsForProblem(payload.breakdownType, payload.driverType);
   const answers = questions
     .filter((question) => {
       const answer = payload.symptoms[question.id];
@@ -89,7 +92,7 @@ export function buildSymptomSummary(data) {
 
   return {
     vehicle: findLabel(VEHICLE_TYPES, payload.vehicleType),
-    mainProblem: findLabel(SYMPTOM_BREAKDOWN_TYPES, payload.breakdownType),
+    mainProblem: findLabel(payload.driverType ? getAssistanceProblems(payload.driverType) : SYMPTOM_BREAKDOWN_TYPES, payload.breakdownType),
     answers,
     observations,
     description: payload.description

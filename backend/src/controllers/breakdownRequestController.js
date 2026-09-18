@@ -127,7 +127,20 @@ async function createBreakdownRequest(req, res, next) {
       : null;
     const fallbackRequiredService = troubleshootingSession?.recommendedService || carriedRequiredService ||
       mapBreakdownToServiceType(req.body.breakdownType);
-    const aiPrediction = await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
+    const savedFault = troubleshootingSession?.driverType ? troubleshootingSession.predictedFault : null;
+    const aiPrediction = savedFault ? {
+      predictedFault: savedFault.fault,
+      faultLabel: savedFault.label,
+      requiredService: troubleshootingSession.recommendedService,
+      confidence: savedFault.confidence,
+      confidenceLevel: savedFault.confidenceLevel,
+      predictionMargin: null,
+      isAmbiguous: savedFault.needsMoreInformation,
+      needsMoreInformation: savedFault.needsMoreInformation,
+      topPredictions: [],
+      predictionSource: !savedFault.fault ? "rule_fallback" :
+        savedFault.confidence == null ? "structured_problem" : "ai_model"
+    } : await structuredProblemRoutingService.diagnoseWithStructuredProblemPolicy(
       req.body.breakdownType,
       diagnosticInputText,
       { fallbackRequiredService }

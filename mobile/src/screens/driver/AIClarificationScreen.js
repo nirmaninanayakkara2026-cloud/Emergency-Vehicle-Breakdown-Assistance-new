@@ -147,6 +147,7 @@ export default function AIClarificationScreen({ navigation, route }) {
     if (selfAssistantMode) {
       navigation.navigate("GuidedSymptomCapture", {
         sourceRoute: "SelfBreakdownAssistant",
+        driverType: selfAssistantPayload?.driverType,
         vehicleType: selfAssistantPayload?.vehicleType,
         breakdownType: selfAssistantPayload?.breakdownType,
         initialData: selfAssistantPayload?.guidedSymptoms,

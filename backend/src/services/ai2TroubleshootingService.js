@@ -41,7 +41,8 @@ function findGuide(faultCategory, symptomText, breakdownType, options = {}) {
     {
       fault_category: faultCategory,
       symptom_text: symptomText || undefined,
-      breakdown_type: breakdownType || undefined
+      breakdown_type: breakdownType || undefined,
+      include_steps: Boolean(options.includeSteps)
     },
     options.httpClient
   );

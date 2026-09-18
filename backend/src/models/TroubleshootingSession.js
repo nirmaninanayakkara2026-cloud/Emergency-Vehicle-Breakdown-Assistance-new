@@ -48,6 +48,12 @@ const troubleshootingSessionSchema = new mongoose.Schema(
       default: null
     },
     vehicleType: { type: String, enum: VEHICLE_TYPES, required: true },
+    driverType: { type: String, enum: ["technical", "non_technical"], default: null },
+    identifiedProblem: { type: String, default: "", maxlength: 200 },
+    troubleshootingSource: { type: String, enum: ["LOCAL_KB", "OPENAI"], default: null },
+    guidanceSteps: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    safetyActions: { type: [String], default: [] },
+    resolved: { type: Boolean, default: false },
     breakdownType: { type: String, required: true, trim: true, maxlength: 100 },
     symptomCapture: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
     diagnosticInputText: { type: String, required: true, maxlength: 3000 },

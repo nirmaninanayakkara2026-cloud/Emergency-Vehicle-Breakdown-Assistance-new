@@ -40,6 +40,7 @@ export function buildSelfAssistantPayload(symptoms, overrides = {}) {
   const problemDescription = overrides.problemDescription ?? guidedSymptoms.description ?? "";
   const diagnosticInputText = overrides.diagnosticInputText || buildSymptomDescription(guidedSymptoms);
   return {
+    ...(guidedSymptoms.driverType ? { driverType: guidedSymptoms.driverType } : {}),
     vehicleType: overrides.vehicleType || guidedSymptoms.vehicleType || "car",
     breakdownType: overrides.breakdownType || guidedSymptoms.breakdownType || "other",
     diagnosticInputText,
@@ -158,6 +159,10 @@ export function routeSelfAssistantResponse(navigation, response, payload, option
 }
 
 export function selfAssistantClarificationQuestions(payload) {
+  if (payload?.driverType) return [
+    { id: "problem_onset", question: "Did this begin suddenly or get worse over time?", options: ["Suddenly", "It got worse over time", "It comes and goes", "Not sure"] },
+    { id: "recent_change", question: "Did you notice a recent change before this happened?", options: ["The vehicle was unused for a long time", "It happened after refuelling", "It happened after maintenance", "No recent change", "Not sure"] }
+  ];
   const startingProblem = payload?.breakdownType === "vehicle_not_starting";
   return startingProblem ? [
     { id: "starting_consistency", question: "Does the same thing happen every time you try to start?", options: ["Every time", "Only sometimes", "It changed recently", "Not sure"] },

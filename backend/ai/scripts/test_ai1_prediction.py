@@ -1,4 +1,4 @@
-"""Exercise the local AI 1 prediction service with application-style text."""
+"""Check AI 1 application examples; exit nonzero for incorrect predictions."""
 
 from __future__ import annotations
 
@@ -40,6 +40,18 @@ TEST_INPUTS = [
     ("Ambiguous", "vehicle making strange noise and not working properly"),
 ]
 
+# These are expected categories for the illustrative symptom descriptions,
+# independent of the model output. They are not a held-out accuracy benchmark.
+EXPECTED_FAULTS = {
+    "Battery/electrical": "electrical_system_fault",
+    "Cooling / overheating": "cooling_system_fault",
+    "Steering": "steering_system_fault",
+    "Brake": "brake_system_fault",
+    "Tyre": "wheel_tire_fault",
+    "Transmission": "transmission_fault",
+    "Fuel": "fuel_system_fault",
+}
+
 
 def _format_prediction(name: str, text: str, result: dict[str, Any]) -> str:
     top_lines = [
@@ -66,13 +78,26 @@ def _format_prediction(name: str, text: str, result: dict[str, Any]) -> str:
     )
 
 
-def main() -> None:
+def main() -> int:
     sections = ["AI 1 PREDICTION SERVICE TEST RESULTS", ""]
     results: list[dict[str, Any]] = []
+    failures: list[str] = []
+    correct_categories = 0
     for name, text in TEST_INPUTS:
         result = predict_fault(text)
         results.append(result)
         section = _format_prediction(name, text, result)
+        expected_fault = EXPECTED_FAULTS.get(name)
+        if expected_fault is not None:
+            passed = result["predicted_fault"] == expected_fault
+            correct_categories += int(passed)
+            expectation = f"Expected fault: {expected_fault}"
+        else:
+            passed = result["needs_more_information"] is True
+            expectation = "Expected handling: needs_more_information=true"
+        section += f"\n{expectation}\nCheck: {'PASS' if passed else 'FAIL'}"
+        if not passed:
+            failures.append(name)
         sections.extend([section, ""])
         print(f"\n{section}")
 
@@ -82,16 +107,20 @@ def main() -> None:
     )
     summary = "\n".join(
         [
-            "AI 1 PREDICTION SERVICE PREPARATION COMPLETE",
+            "AI 1 PREDICTION CHECK COMPLETE",
             "",
             f"Model: {MODEL_NAME}",
             f"Fault classes: {len(FAULT_CLASSES)}",
             "Fault-to-service mapping: Loaded",
             "Confidence policy: Loaded",
             f"Test predictions: {len(results)}",
+            f"Correct example categories: {correct_categories}/{len(EXPECTED_FAULTS)}",
+            f"Checks passed: {len(results) - len(failures)}/{len(results)}",
+            f"Failed examples: {', '.join(failures) if failures else 'none'}",
             f"Ambiguous predictions: {ambiguous_count}",
             f"Low-confidence predictions: {low_confidence_count}",
-            "Ready for FastAPI integration: YES",
+            f"Prediction checks: {'FAIL' if failures else 'PASS'}",
+            "Illustrative examples only; use held-out evaluation for model accuracy.",
         ]
     )
     sections.append(summary)
@@ -100,7 +129,8 @@ def main() -> None:
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(output, encoding="utf-8")
     print(f"\n{summary}")
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

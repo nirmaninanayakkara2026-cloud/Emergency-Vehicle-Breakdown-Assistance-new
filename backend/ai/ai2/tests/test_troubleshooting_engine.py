@@ -22,6 +22,18 @@ from ai2.services.troubleshooting_engine import (  # noqa: E402
 
 
 class TroubleshootingEngineTests(unittest.TestCase):
+    def test_explicit_negative_hazards_do_not_stop_but_failures_do(self) -> None:
+        for text in ["The engine is not overheating.", "I don't smell fuel.", "I don’t smell fuel.", "The battery is not leaking."]:
+            with self.subTest(text=text):
+                self.assertFalse(check_stop_condition("ai2_aktc_0036", text)["triggered"])
+        for text in ["My brakes are not working.", "The steering is not working.", "Fuel is leaking.", "The temperature gauge is in the red."]:
+            with self.subTest(text=text):
+                self.assertTrue(check_stop_condition("ai2_aktc_0036", text)["triggered"])
+
+    def test_generic_category_words_do_not_choose_an_unrelated_guide(self) -> None:
+        self.assertIsNone(get_guide_for_fault("engine_system_fault", "Engine problem. Not sure. No other signs."))
+        self.assertIsNone(get_guide_for_fault("electrical_system_fault", "The interior display shows an unfamiliar message."))
+
     def test_public_lookup_does_not_expose_internal_source_procedures(self) -> None:
         guide = get_guide_by_id("ai2_aktc_0001")
         self.assertIsNotNone(guide)
@@ -115,9 +127,9 @@ class TroubleshootingEngineTests(unittest.TestCase):
         self.assertIsNone(get_guide_for_fault("electrical_system_fault", "unrelated unknown symptom"))
 
     def test_explicit_negation_and_substring_collisions_do_not_trigger_danger(self):
-        for text in ["No smoke or fire", "engine misfire", "battery is not leaking", ""]:
+        for text in ["No smoke or fire", "No smoke or burning smell", "No smoke, sparks, or exposed damaged wiring", "There is no smoke, overheating, or fluid leak", "There is no warning light, smoke, burning smell, unusual noise, overheating, or fluid leak", "engine misfire", "battery is not leaking", ""]:
             self.assertFalse(check_stop_condition("ai2_aktc_0036", text)["triggered"], text)
-        for text in ["No smoke but battery leaking", "No smoke and battery is leaking", "Not sure if there is smoke", "brakes not working", "unsafe location"]:
+        for text in ["No smoke but battery leaking", "No smoke and battery is leaking", "No smoke and brakes are not working", "No warning light, but smoke is coming from the bonnet", "Not sure if there is smoke", "brakes not working", "unsafe location"]:
             self.assertTrue(check_stop_condition("ai2_aktc_0036", text)["triggered"], text)
 
 

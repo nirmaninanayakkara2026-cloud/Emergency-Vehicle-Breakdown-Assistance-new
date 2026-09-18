@@ -1,5 +1,7 @@
 # AI Evidence Index
 
+- [Simplified AI Assistance implementation and demo](ai-assistance-flow.md)
+
 ## AI 1 data preparation
 
 - [Initial dataset audit](../backend/ai/reports/dataset_audit.txt)
@@ -9,6 +11,7 @@
 
 ## AI 1 training and evaluation
 
+- [AI 1 verification and current failures](ai1-verification.md)
 - [Evaluation report](../backend/ai/reports/model_results/ai1_evaluation_report.txt)
 - [Model comparison](../backend/ai/reports/model_results/model_comparison.txt)
 - [Model metrics](../backend/ai/reports/model_results/model_metrics.csv)

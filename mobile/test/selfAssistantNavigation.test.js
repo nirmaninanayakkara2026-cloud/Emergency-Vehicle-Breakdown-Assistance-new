@@ -182,7 +182,7 @@ test("both problem selectors use the shared responsive accessible grid", () => {
   assert.match(grid, /accessibilityRole="radio"/);
   assert.match(grid, /accessibilityLabel=\{option\.label\}/);
   assert.match(requestScreen, /<MainProblemGrid\s+options=\{BREAKDOWN_TYPES\}/);
-  assert.match(selfScreen, /<MainProblemGrid\s+options=\{SYMPTOM_BREAKDOWN_TYPES\}/);
+  assert.match(selfScreen, /<MainProblemGrid\s+options=\{getAssistanceProblems\(driverType\)\}/);
 });
 
 test("engine problem guided capture includes every requested symptom and timing choice", () => {
@@ -377,29 +377,23 @@ test("request mechanic submits the carried post-clarification service", () => {
   assert.match(service, /predictedFault: payload\.predictedFault/);
 });
 
-test("AI 2 conversation enforces instruction then confirmation then result", () => {
+test("guided assistance shows instructions and explicit observations without continuous chat", () => {
   const screen = fs.readFileSync(path.join(sourceRoot, "screens/driver/TroubleshootingConversationScreen.js"), "utf8");
-  const service = fs.readFileSync(path.join(sourceRoot, "services/selfAssistantService.js"), "utf8");
-  assert.match(screen, /currentPhase.*"instruction"/s);
-  assert.match(screen, /currentPhase === "instruction"/);
-  assert.match(screen, /title="Done – I Checked"/);
-  assert.match(screen, /confirmTroubleshootingAction\(\s*sessionId,\s*currentStep\.step_id,?\s*\)/);
-  assert.match(screen, /const currentPhase = activeSession\.currentPhase/);
-  assert.match(screen, /currentPhase === "result"/);
-  assert.match(screen, /submitTroubleshootingStep/);
-  assert.match(screen, /async function runRequest/);
-  assert.match(screen, /currentPhase: response.currentPhase \|\| session.currentPhase/);
-  assert.match(service, /action-confirm/);
+  assert.match(screen, /step.instruction/);
+  assert.match(screen, /submitGuidanceAction/);
+  assert.match(screen, /After this check, what did you observe/);
+  assert.match(screen, /currentStepIndex >= 0 \? currentStepIndex \+ 1 : 1/);
+  assert.doesNotMatch(screen, /sendTroubleshootingMessage|confirm_interpretation|restoredMessages/);
+  assert.match(screen, /response\.status === "awaiting_safety_confirmation"/);
+  assert.match(screen, /navigation\.replace\("SelfAssistantSafety"/);
 });
 
-test("AI 2 conversation preserves all safety and escalation controls", () => {
+test("guided assistance keeps uncertainty, resolution and mechanic controls", () => {
   const screen = fs.readFileSync(path.join(sourceRoot, "screens/driver/TroubleshootingConversationScreen.js"), "utf8");
-  assert.match(screen, /title="I Can't Do This"/);
-  assert.match(screen, /That's okay\. Do not continue if you are unsure\./);
-  assert.match(screen, /value: "not_sure", label: "Not Sure"/);
-  assert.match(screen, /I Noticed Something Unsafe/);
-  assert.match(screen, /Stop & Request Mechanic/);
-  assert.match(screen, /response\.currentStep \|\| response\.nextStep/);
+  for (const title of ["Not sure", "Problem Solved", "Still Not Fixed", "Request Mechanic", "Ask AI for More Help"]) {
+    assert.ok(screen.includes(`title="${title}"`));
+  }
+  assert.match(screen, /triggerStopCondition/);
   assert.doesNotMatch(screen, /source_instruction|source record|dataset fields/i);
 });
 
@@ -412,6 +406,14 @@ test("completed AI 2 flow asks the driver to confirm real-world resolution", () 
   assert.match(source, /title="Request Mechanic"/);
 });
 
+test("professional-help result displays backend-provided immediate safety actions", () => {
+  const source = fs.readFileSync(path.join(sourceRoot, "screens/driver/SelfAssistantResultScreen.js"), "utf8");
+  assert.match(source, /session\?\.safetyActions\?\.length/);
+  assert.match(source, /What to do now/);
+  assert.match(source, /session\.safetyActions\.map/);
+  assert.match(source, /aiPrediction\.faultLabel \|\| formatFaultLabel\(aiPrediction\.predictedFault\)/);
+});
+
 test("resumed conversation state distinguishes clarification, pending verification, and completed repair", () => {
   assert.equal(conversationState({ status: "in_progress", currentPhase: "instruction" }), "TROUBLESHOOTING");
   assert.equal(conversationState({ status: "in_progress", currentPhase: "result" }), "VERIFYING_ACTION");
@@ -421,13 +423,59 @@ test("resumed conversation state distinguishes clarification, pending verificati
   assert.equal(conversationState({ status: "resolved" }), "RESOLVED");
 });
 
-test("conversation sends messages with current state and retains driver confirmation for model interpretations", () => {
+test("optional AI help is scoped to a step and guarded against repeated taps", () => {
   const screen = fs.readFileSync(path.join(sourceRoot, "screens/driver/TroubleshootingConversationScreen.js"), "utf8");
-  assert.match(screen, /sendTroubleshootingMessage/);
-  assert.match(screen, /expectedState: conversationState\(activeSession\)/);
-  assert.match(screen, /confirm_interpretation/);
-  assert.match(screen, /session\.messages\.map/);
-  const resultScreen = fs.readFileSync(path.join(sourceRoot, "screens/driver/SelfAssistantResultScreen.js"), "utf8");
-  assert.match(resultScreen, /service && !completed/);
-  assert.match(resultScreen, /confirmedResolved/);
+  assert.match(screen, /askForStepHelp\(sessionId, question.trim\(\)\)/);
+  assert.match(screen, /if \(busy.current/);
+  assert.match(screen, /helpOpen && step/);
+  assert.match(screen, /maxLength=\{500\}/);
+});
+
+const { getAssistanceProblems, getAssistanceQuestions } = require("../src/data/assistanceOptions");
+test("nontechnical choices describe observations without requiring a fault diagnosis", () => {
+  const options = getAssistanceProblems("non_technical");
+  assert.equal(options.length, 12);
+  assert.ok(options.some((item) => item.value === "smoke_steam"));
+  assert.ok(options.some((item) => item.value === "liquid_leaking"));
+  assert.doesNotMatch(options.map((item) => item.label).join(" "), /transmission|cooling|electrical|engine fault/i);
+  assert.ok(getAssistanceProblems("technical").some((item) => item.value === "transmission_problem"));
+  assert.ok(getAssistanceProblems("technical").some((item) => item.value === "visibility_problem"));
+  assert.equal(getAssistanceQuestions("visibility_problem")[0].id, "washer_behavior");
+  assert.ok(getAssistanceProblems("technical").some((item) => item.value === "cabin_filter_problem"));
+  assert.equal(getAssistanceQuestions("cabin_filter_problem")[0].id, "cabin_airflow");
+});
+
+test("both paths have short question sets with Not sure and no duplicate questions", () => {
+  for (const driver of ["technical", "non_technical"]) {
+    for (const problem of getAssistanceProblems(driver)) {
+      const questions = getAssistanceQuestions(problem.value);
+      assert.ok(questions.length >= 2 && questions.length <= 4);
+      assert.equal(new Set(questions.map((q) => q.id)).size, questions.length);
+      assert.ok(questions.every((q) => q.options.some((option) => option.value === "not_sure")));
+    }
+  }
+});
+
+test("vehicle feels too hot offers a cold-engine low-coolant observation", () => {
+  const questions = getAssistanceQuestions("feels_hot", "non_technical");
+  const hotSigns = questions.find((item) => item.id === "hot_signs");
+  assert.ok(hotSigns);
+  assert.ok(hotSigns.options.some((option) => option.value === "coolant_low" && /after the engine cooled/i.test(option.label)));
+});
+
+test("driver type and clear observable answers survive capture, prediction and mechanic handoff", () => {
+  for (const driverType of ["technical", "non_technical"]) {
+    const data = buildStructuredSymptomPayload({ vehicleType: "car", driverType,
+      breakdownType: driverType === "technical" ? "electrical_problem" : "vehicle_not_starting",
+      symptoms: { starting_behavior: "clicking", light_condition: "dim", danger_signs: ["none"] },
+    });
+    const payload = buildSelfAssistantPayload(data);
+    assert.equal(payload.driverType, driverType);
+    assert.match(payload.diagnosticInputText, /clicking sound/i);
+    assert.match(payload.diagnosticInputText, /Weak or dim/i);
+    const prefill = buildSelfAssistantMechanicPrefill(payload, { session: { _id: "session-id", recommendedService: "battery_electrical_mechanic" } });
+    assert.equal(prefill.troubleshootingSessionId, "session-id");
+    assert.equal(prefill.requiredService, "battery_electrical_mechanic");
+    assert.equal(prefill.diagnosticInputText, payload.diagnosticInputText);
+  }
 });

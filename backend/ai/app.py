@@ -60,6 +60,7 @@ class FindGuideRequest(BaseModel):
     fault_category: str = Field(..., min_length=1, max_length=100)
     symptom_text: str | None = Field(default=None, max_length=3000)
     breakdown_type: str | None = Field(default=None, max_length=100)
+    include_steps: bool = False
 
 
 class StartGuideRequest(BaseModel):
@@ -129,10 +130,13 @@ def find_guide_endpoint(payload: FindGuideRequest) -> dict[str, object]:
             "professional_help_required": True,
             "recommended_service": "general_mechanic",
         }
+    summary = _guide_summary(guide)
+    if payload.include_steps:
+        summary["steps"] = guide["steps"] if guide["risk_level"] != "HIGH" and not guide["professional_help_required"] else []
     return {
         "success": True,
         "guide_available": True,
-        "guide": _guide_summary(guide),
+        "guide": summary,
     }
 
 

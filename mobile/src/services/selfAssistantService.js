@@ -55,3 +55,11 @@ export function getSession(sessionId) {
 export function getTroubleshootingHistory() {
   return request(() => api.get("/self-assistant/history"));
 }
+
+export function submitGuidanceAction(sessionId, action, stepId, selectedResult) {
+  return request(() => api.post(`/self-assistant/${sessionId}/guidance-action`, { action, stepId, selectedResult }));
+}
+
+export function askForStepHelp(sessionId, question) {
+  return request(() => api.post(`/self-assistant/${sessionId}/help`, { question }));
+}

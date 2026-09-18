@@ -80,14 +80,21 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
               ? "Self-troubleshooting is temporarily unavailable."
               : "This issue may be unsafe to troubleshoot without professional help.")}
         </Text>
+        {session?.safetyActions?.length ? (
+          <View style={styles.detail}>
+            <Text style={styles.detailLabel}>What to do now</Text>
+            {session.safetyActions.map((action, index) => (
+              <Text key={`${index}-${action}`} style={styles.detailValue}>
+                {index + 1}. {action}
+              </Text>
+            ))}
+          </View>
+        ) : null}
         {aiPrediction?.faultLabel ? (
           <View style={styles.detail}>
             <Text style={styles.detailLabel}>Possible problem</Text>
             <Text style={styles.detailValue}>
-              {formatFaultLabel(
-                aiPrediction.predictedFault,
-                aiPrediction.faultLabel,
-              )}
+              {aiPrediction.faultLabel || formatFaultLabel(aiPrediction.predictedFault)}
             </Text>
           </View>
         ) : null}

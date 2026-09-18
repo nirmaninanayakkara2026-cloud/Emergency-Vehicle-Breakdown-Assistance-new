@@ -29,7 +29,7 @@ export default function DriverNavigator() {
     >
       <Stack.Screen name="DriverHome" component={DriverHomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="RequestMechanic" component={RequestMechanicScreen} options={{ title: "Request Help" }} />
-      <Stack.Screen name="SelfBreakdownAssistant" component={SelfBreakdownAssistantScreen} options={{ title: "Breakdown Assistant" }} />
+      <Stack.Screen name="SelfBreakdownAssistant" component={SelfBreakdownAssistantScreen} options={{ title: "AI Assistance" }} />
       <Stack.Screen name="GuidedSymptomCapture" component={GuidedSymptomCaptureScreen} options={{ title: "Describe the Problem" }} />
       <Stack.Screen name="AIClarification" component={AIClarificationScreen} options={{ title: "A Few Quick Questions" }} />
       <Stack.Screen name="SymptomSummary" component={SymptomSummaryScreen} options={{ title: "Symptom Summary" }} />

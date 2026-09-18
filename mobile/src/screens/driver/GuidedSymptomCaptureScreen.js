@@ -32,6 +32,7 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
   // Restore compatible draft data when the user returns to symptom capture.
   const initialData = route.params?.initialData || {};
   const sourceRoute = route.params?.sourceRoute || "RequestMechanic";
+  const driverType = route.params?.driverType || initialData.driverType;
   const requestedVehicleType = route.params?.vehicleType || "car";
   const requestedBreakdownType = route.params?.breakdownType || "other";
   const initialDataMatches =
@@ -42,8 +43,8 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
   const vehicleType = requestedVehicleType;
   const breakdownType = requestedBreakdownType;
   const questions = useMemo(
-    () => getQuestionsForProblem(breakdownType),
-    [breakdownType],
+    () => getQuestionsForProblem(breakdownType, driverType),
+    [breakdownType, driverType],
   );
   const [stepIndex, setStepIndex] = useState(0);
   const [symptoms, setSymptoms] = useState(currentInitialData.symptoms || {});
@@ -58,9 +59,9 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
   const [activeObservation, setActiveObservation] = useState("see");
 
   const currentQuestion = getCurrentQuestion(questions, stepIndex);
-  const observationStep = stepIndex === questions.length;
-  const descriptionStep = stepIndex === questions.length + 1;
-  const totalSteps = questions.length + 2;
+  const observationStep = !driverType && stepIndex === questions.length;
+  const descriptionStep = stepIndex === questions.length + (driverType ? 0 : 1);
+  const totalSteps = questions.length + (driverType ? 1 : 2);
 
   // Save the answer for the current guided symptom question.
   function updateAnswer(answer) {
@@ -108,6 +109,7 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
     }
 
     const structuredSymptoms = buildStructuredSymptomPayload({
+      driverType,
       vehicleType,
       breakdownType,
       symptoms,

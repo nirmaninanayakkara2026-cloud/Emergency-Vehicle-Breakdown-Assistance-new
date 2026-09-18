@@ -9,7 +9,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
-import AppInput from "../../components/AppInput";
 import AppSelect from "../../components/AppSelect";
 import ScreenContainer from "../../components/ScreenContainer";
 import SymptomSummaryCard from "../../components/symptom/SymptomSummaryCard";
@@ -18,14 +17,13 @@ import EmptyState from "../../components/ui/EmptyState";
 import InfoBanner from "../../components/ui/InfoBanner";
 import ScreenHeader from "../../components/ui/ScreenHeader";
 import SectionHeader from "../../components/ui/SectionHeader";
-import { SYMPTOM_BREAKDOWN_TYPES } from "../../data/symptomQuestionFlows";
+import { DRIVER_OPTIONS, getAssistanceProblems } from "../../data/assistanceOptions";
 import {
   buildSymptomDescription,
   buildSymptomSummary,
 } from "../../services/symptomCaptureService";
 import {
   getTroubleshootingHistory,
-  startSelfAssistant,
 } from "../../services/selfAssistantService";
 import { COLORS, VEHICLE_TYPES } from "../../utils/constants";
 import { formatSymptomValue } from "../../utils/symptomDisplay";
@@ -33,19 +31,17 @@ import { colors, radii, spacing, typography } from "../../theme";
 import {
   buildSelfAssistantMechanicPrefill,
   buildSelfAssistantPayload,
-  routeSelfAssistantResponse,
 } from "../../utils/selfAssistantFlow";
 
 export default function SelfBreakdownAssistantScreen({ navigation, route }) {
   // Store symptom input, guided capture state, history, and request state.
   const [vehicleType, setVehicleType] = useState("car");
+  const [driverType, setDriverType] = useState(null);
   const [breakdownType, setBreakdownType] = useState("vehicle_not_starting");
   const [problemDescription, setProblemDescription] = useState("");
   const [guidedSymptoms, setGuidedSymptoms] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [history, setHistory] = useState([]);
-  const [error, setError] = useState("");
   const guidedSummary = guidedSymptoms
     ? buildSymptomSummary(guidedSymptoms)
     : null;
@@ -71,6 +67,7 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
     const captured = route.params?.guidedSymptoms;
     if (!captured) return;
     setGuidedSymptoms(captured);
+    setDriverType(captured.driverType || "non_technical");
     setVehicleType(captured.vehicleType);
     setBreakdownType(captured.breakdownType);
     setProblemDescription(captured.description || "");
@@ -99,9 +96,11 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
         : null;
     navigation.navigate("GuidedSymptomCapture", {
       sourceRoute: "SelfBreakdownAssistant",
+      driverType,
       vehicleType,
       breakdownType,
       initialData: currentGuidedSymptoms || {
+        driverType,
         vehicleType,
         breakdownType,
         symptoms: {},
@@ -114,6 +113,7 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
   // Build the payload shared by self-assistance and mechanic fallback flows.
   function currentPayload() {
     const symptomData = guidedSymptoms || {
+      driverType,
       vehicleType,
       breakdownType,
       symptoms: {},
@@ -130,27 +130,13 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
     });
   }
 
-  // Start the safety-aware assistant and route the returned session state.
-  async function handleStart() {
-    setError("");
-    setLoading(true);
-    try {
-      const payload = currentPayload();
-      const response = await startSelfAssistant(payload);
-      routeSelfAssistantResponse(navigation, response, payload);
-    } catch (startError) {
-      setError(startError.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   // Reopen an unfinished self-assistance session from history.
   function resumeSession(item) {
     const payload = {
       vehicleType: item.vehicleType,
       breakdownType: item.breakdownType,
       symptomCapture: item.symptomCapture,
+      driverType: item.driverType,
       diagnosticInputText: item.diagnosticInputText,
       problemDescription: item.diagnosticInputText,
     };
@@ -192,8 +178,8 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
       {/* Self-assistant header and safety introduction. */}
       <ScreenHeader
         eyebrow="Safe guided checks"
-        title="Self Breakdown Assistant"
-        subtitle="Try safe guided checks for suitable vehicle problems."
+        title="AI Assistance"
+        subtitle="Answer a few questions to find suitable guidance."
       />
       <View style={styles.heroIcon}>
         <Ionicons name="shield-checkmark" size={38} color={colors.teal} />
@@ -206,42 +192,41 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
       {/* Symptom input, guided capture, and assistant start actions. */}
       <AppCard>
         <SectionHeader
-          title="Tell us what happened"
-          subtitle="We'll check whether a guided self-check is suitable."
+          title="How would you like to identify the problem?"
+          subtitle="Choose the option that feels right for you."
         />
+        {DRIVER_OPTIONS.map((option) => (
+          <AppButton key={option.value} title={option.label}
+            variant={driverType === option.value ? "primary" : "secondary"}
+            onPress={() => {
+              setDriverType(option.value);
+              setBreakdownType(option.value === "technical" ? "electrical_problem" : "vehicle_not_starting");
+              setGuidedSymptoms(null);
+              setProblemDescription("");
+            }} />
+        ))}
+      </AppCard>
+      {driverType ? <AppCard>
         <AppSelect
           label="Vehicle type"
           options={VEHICLE_TYPES}
           value={vehicleType}
           onChange={changeVehicleType}
         />
-        <Text style={styles.fieldLabel}>Main problem</Text>
+        <Text style={styles.fieldLabel}>{driverType === "technical" ? "Select Problem Category" : "What are you noticing with your vehicle?"}</Text>
         <MainProblemGrid
-          options={SYMPTOM_BREAKDOWN_TYPES}
+          options={getAssistanceProblems(driverType)}
           value={breakdownType}
           onChange={changeBreakdownType}
-        />
-        <AppInput
-          label="What did you notice?"
-          value={problemDescription}
-          onChangeText={setProblemDescription}
-          multiline
         />
         <AppButton
           title={
             guidedSymptoms
               ? "Edit Guided Symptoms"
-              : "Smart Guided Symptom Capture"
+              : "Continue to Questions"
           }
           variant="secondary"
           onPress={openGuidedSymptoms}
-        />
-        {error ? <InfoBanner tone="danger" message={error} /> : null}
-        <AppButton
-          title="Start Safety Check"
-          icon="shield-checkmark-outline"
-          onPress={handleStart}
-          loading={loading}
         />
         <AppButton
           title="Request Mechanic Instead"
@@ -253,7 +238,7 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
             })
           }
         />
-      </AppCard>
+      </AppCard> : null}
       {/* Summary of captured guided symptoms. */}
       {guidedSummary ? (
         <SymptomSummaryCard summary={guidedSummary} compact />

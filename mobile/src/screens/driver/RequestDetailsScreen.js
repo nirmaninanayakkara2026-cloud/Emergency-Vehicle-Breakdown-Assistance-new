@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
@@ -9,6 +9,9 @@ import ErrorState from "../../components/ui/ErrorState";
 import LoadingState from "../../components/ui/LoadingState";
 import ScreenHeader from "../../components/ui/ScreenHeader";
 import StatusBadge from "../../components/ui/StatusBadge";
+import ProviderRouteCard from "../../components/location/ProviderRouteCard";
+import useRequestPolling from "../../hooks/useRequestPolling";
+import { shouldRefreshRequest } from "../../utils/providerTracking";
 import { cancelRequest, getRequestById } from "../../services/requestService";
 import { COLORS } from "../../utils/constants";
 import { colors, radii, spacing, typography } from "../../theme";
@@ -30,14 +33,20 @@ export default function RequestDetailsScreen({ navigation, route }) {
   const [error, setError] = useState("");
 
   const requestId = route.params?.requestId || request?._id;
+  const loadVersion = useRef(0);
 
   // Load current request data and move completed requests to the completion screen.
-  const loadDetails = useCallback(async () => {
-    setError("");
+  const loadDetails = useCallback(async (isActive = () => true) => {
+    if (typeof isActive !== "function") isActive = () => true;
+    const version = ++loadVersion.current;
+    const isCurrent = () => isActive() && version === loadVersion.current;
     try {
+      if (!requestId) throw new Error("This request could not be opened.");
       const requestData = await (requestId
         ? getRequestById(requestId)
         : Promise.resolve(request));
+      if (!isCurrent()) return;
+      setError("");
       if (requestData.status === "completed") {
         navigation.replace("JobCompletion", {
           requestId: requestData._id,
@@ -47,16 +56,16 @@ export default function RequestDetailsScreen({ navigation, route }) {
       }
       setRequest(requestData);
     } catch (detailsError) {
-      setError(detailsError.message);
+      if (isCurrent()) setError(detailsError.message);
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (isCurrent()) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [navigation, requestId]);
 
-  useEffect(() => {
-    loadDetails();
-  }, [loadDetails]);
+  useRequestPolling(loadDetails, shouldRefreshRequest(request?.status) && !actionLoading);
 
   async function handleRefresh() {
     setRefreshing(true);
@@ -69,6 +78,7 @@ export default function RequestDetailsScreen({ navigation, route }) {
     setError("");
     try {
       const updatedRequest = await cancelRequest(request._id);
+      loadVersion.current += 1;
       setRequest(updatedRequest);
     } catch (cancelError) {
       setError(cancelError.message);
@@ -77,6 +87,9 @@ export default function RequestDetailsScreen({ navigation, route }) {
     }
   }
 
+  if (!loading && !request && error) return (
+    <ScreenContainer><ErrorState message={error} onRetry={loadDetails} /></ScreenContainer>
+  );
   if (loading || !request || request.status === "completed") {
     return (
       <ScreenContainer>
@@ -133,6 +146,7 @@ export default function RequestDetailsScreen({ navigation, route }) {
         />
       ) : null}
 
+      <ProviderRouteCard request={request} />
       {/* Vehicle, breakdown, location, provider, and request action details. */}
       <AppCard>
         <View style={styles.cardHeader}>

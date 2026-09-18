@@ -106,14 +106,19 @@ def get_guide_for_fault(fault_category: str, symptom_text: str = "", breakdown_t
     context = _normalize(f"{symptom_text or ''} {breakdown_type or ''}").replace("tyre", "tire")
     if not context:
         return _public_guide(guides[0])  # Legacy callers without symptom context.
-    ignored = {"the", "a", "is", "on", "from", "when", "with", "and", "of", "in", "car", "vehicle", "problem", "fault", "system"}
+    ignored = {"the", "a", "is", "on", "from", "when", "with", "and", "of", "in", "car", "vehicle", "problem", "fault", "system", "engine", "electrical", "cooling", "fuel", "transmission", "steering", "brake", "other", "not", "no", "sure", "none", "normal", "signs", "noticed", "warning", "light", "driving"}
     words = set(context.split("_")) - ignored
     def score(guide):
         phrases = guide.get("matching_keywords", [])
         exact = sum(5 for phrase in phrases if f"_{_normalize(phrase).replace('tyre', 'tire')}_" in f"_{context}_")
         title = set(_normalize(guide["subcategory"]).replace("tyre", "tire").split("_")) - ignored
         symptoms = set(_normalize(" ".join(guide["symptoms"])).replace("tyre", "tire").split("_")) - ignored
-        return exact + 3 * len(words & title) + len(words & symptoms)
+        title_matches = len(words & title)
+        symptom_matches = len(words & symptoms)
+        # A shared generic word must not select an unrelated component guide.
+        if not exact and not title_matches and symptom_matches < 2:
+            return 0
+        return exact + 3 * title_matches + symptom_matches
     ranked = sorted(guides, key=lambda guide: (-score(guide), guide["id"]))
     return _public_guide(ranked[0]) if score(ranked[0]) > 0 else None
 
