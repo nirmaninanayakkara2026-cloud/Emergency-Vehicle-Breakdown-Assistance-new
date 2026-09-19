@@ -23,7 +23,9 @@ const originals = {};
 let modelCalls = 0;
 let helpCalls = 0;
 let safetyHelpCalls = 0;
+let professionalExplanationCalls = 0;
 let lastHelpContext;
+let lastProfessionalExplanationContext;
 
 function pythonCall(code, input) {
   const result = spawnSync(python, ["-c", code], { cwd: aiRoot, input: JSON.stringify(input), encoding: "utf8", timeout: 30000 });
@@ -37,6 +39,7 @@ before(() => {
   originals.guide = ai2.findGuide;
   originals.help = aiHelp.getAiTroubleshootingHelp;
   originals.safetyHelp = aiHelp.getDangerSafetyHelp;
+  originals.professionalExplanation = aiHelp.getProfessionalAssistanceExplanation;
   Session.prototype.save = async function () {
     const error = this.validateSync();
     if (error) throw error;
@@ -61,7 +64,7 @@ print(json.dumps({'success':True,'guide_available':bool(guide),'guide':dict(guid
       explanation: "Look only at the visible terminals from a safe position. A white crust may be corrosion. Do not touch them.",
       steps: ["Read the warning message already displayed on the dashboard.", "Consult the vehicle handbook for that message."] };
   };
-  aiHelp.getDangerSafetyHelp = async ({ danger, driverType }) => {
+  aiHelp.getDangerSafetyHelp = async ({ danger, driverType, vehicleType, symptoms }) => {
     safetyHelpCalls += 1;
     const actions = [
       "If the vehicle is already stopped safely, switch it off and apply the parking brake.",
@@ -69,13 +72,28 @@ print(json.dumps({'success':True,'guide_available':bool(guide),'guide':dict(guid
       "Request a mechanic or recovery vehicle and describe the warning signs you observed."
     ];
     if (danger.emergency) actions.splice(1, 0, "If there is smoke, fire or a fuel leak, leave the vehicle using a safe route and keep everyone away.");
-    if (danger.id === "overheating" && driverType === "technical") actions.splice(-1, 0,
+    const liquidCooledBike = vehicleType !== "bike" ||
+      /liquid[ -]?cooled|coolant (?:reservoir|level|looked low)/i.test(symptoms || "");
+    if (danger.id === "overheating" && driverType === "technical" && liquidCooledBike) actions.splice(-1, 0,
       "Keep the engine switched off until it is completely cold. Never remove a radiator or coolant-reservoir cap while the system is hot.",
       "Only after the engine is completely cold, use the vehicle handbook to identify the coolant reservoir and visually inspect for leakage.",
       "Only if there is no visible leak, the reservoir is not empty, and the handbook permits it, add the exact specified premixed coolant through the coolant reservoir up to its marked level.",
       "Do not drive if the reservoir is empty, a leak or damaged belt is visible, or the temperature warning returns. Request vehicle recovery."
     );
     return { available: true, source: "OPENAI", professionalHelp: true, actions };
+  };
+  aiHelp.getProfessionalAssistanceExplanation = async (context) => {
+    professionalExplanationCalls += 1;
+    lastProfessionalExplanationContext = context;
+    return {
+      available: true,
+      source: "OPENAI",
+      explanation: "The reported warning can affect safe vehicle operation, so a mechanic needs to assess it.",
+      observationSteps: [
+        "Note any warning symbol already visible without starting the vehicle.",
+        "Tell the mechanic what you observed."
+      ]
+    };
   };
 });
 after(() => {
@@ -85,6 +103,7 @@ after(() => {
   ai2.findGuide = originals.guide;
   aiHelp.getAiTroubleshootingHelp = originals.help;
   aiHelp.getDangerSafetyHelp = originals.safetyHelp;
+  aiHelp.getProfessionalAssistanceExplanation = originals.professionalExplanation;
 });
 
 async function call(handler, body, id, user = driverId) {
@@ -131,6 +150,60 @@ test("technical electrical category narrows to battery guidance", async () => {
   assert.equal(result.error, undefined);
   assert.equal(result.body.session.guideId, "ai2_aktc_0036");
   assert.equal(result.body.session.driverType, "technical");
+});
+
+test("bike starting controls identify a normal-control fix without relying on AI 1 confidence", async () => {
+  const result = await call(controller.startSelfAssistant, {
+    driverType: "non_technical", vehicleType: "bike", breakdownType: "vehicle_not_starting",
+    diagnosticInputText: "Vehicle type: bike. Nothing happens. Engine stop switch is in the OFF position. No danger signs.",
+    symptomCapture: { symptoms: {
+      starting_behavior: "nothing", bike_starting_control: "engine_stop_switch_off", danger_signs: ["none"]
+    } }
+  });
+  assert.equal(result.error, undefined);
+  assert.equal(result.body.status, "in_progress");
+  assert.equal(result.body.session.predictedFault.fault, "electrical_system_fault");
+  assert.equal(result.body.session.identifiedProblem, "Bike Engine Stop Switch Is Off");
+  assert.match(result.body.currentStep.instruction, /set it to RUN/i);
+  assert.match(result.body.currentStep.instruction, /Do not bypass/i);
+});
+
+test("bike chain observation identifies drivetrain while van tyre observation identifies tyre system", async () => {
+  const bike = await call(controller.startSelfAssistant, {
+    driverType: "non_technical", vehicleType: "bike", breakdownType: "strange_noise",
+    diagnosticInputText: "Rattling or clunking from the chain or rear-wheel drive area. No danger signs.",
+    symptomCapture: { symptoms: {
+      sound_type: "rattling", bike_sound_location: "chain_rear_wheel", danger_signs: ["none"]
+    } }
+  });
+  assert.equal(bike.error, undefined);
+  assert.equal(bike.body.session.predictedFault.fault, "drivetrain_fault");
+  assert.equal(bike.body.session.identifiedProblem, "Bike Chain / Final Drive Problem");
+  assert.equal(bike.body.status, "professional_help_required");
+
+  const van = await call(controller.startSelfAssistant, {
+    driverType: "non_technical", vehicleType: "van", breakdownType: "wheel_tyre_symptom",
+    diagnosticInputText: "The van tyre pressure looks low. No puncture, visible damage or danger signs.",
+    symptomCapture: { symptoms: {
+      affected_tyre: "front_left", tyre_condition: "low_pressure", danger_signs: ["none"]
+    } }
+  });
+  assert.equal(van.error, undefined);
+  assert.equal(van.body.session.predictedFault.fault, "wheel_tire_fault");
+  assert.match(van.body.session.identifiedProblem, /tyre/i);
+  assert.notEqual(van.body.status, "more_information_required");
+});
+
+test("air-cooled bike overheating never receives coolant-system actions", async () => {
+  const result = await originals.safetyHelp({
+    danger: { id: "overheating", emergency: false },
+    driverType: "technical", vehicleType: "bike",
+    symptoms: "Bike cooling signs: Bike is air-cooled or has no coolant reservoir. Temperature warning is red."
+  }, { model: "test-model", client: { responses: { create: async () => ({
+    output_text: JSON.stringify({ actionIds: ["switch_off", "hazards", "avoid_traffic", "do_not_restart", "professional_help"] })
+  }) } } });
+  assert.equal(result.professionalHelp, true);
+  assert.doesNotMatch(result.actions.join(" "), /coolant|radiator|reservoir/i);
 });
 
 test("technical washer selection bypasses AI 1 clarification and opens its local guide", async () => {
@@ -201,7 +274,7 @@ test("nontechnical red temperature warning can enter the guarded low-coolant che
   assert.equal(result.error, undefined);
   assert.equal(result.body.status, "awaiting_safety_confirmation");
   assert.equal(result.body.session.predictedFault.fault, "cooling_system_fault");
-  assert.equal(result.body.session.identifiedProblem, "Coolant Reservoir");
+  assert.equal(result.body.session.identifiedProblem, "Low Coolant / Coolant Reservoir");
   assert.equal(result.body.session.guideId, "ai2_aktc_0088");
   assert.equal(result.body.session.troubleshootingSource, "LOCAL_KB");
 });
@@ -341,6 +414,55 @@ test("more help explains the current step without advancing or changing the sour
   assert.equal(result.body.session.currentStepId, session.currentStepId);
   assert.equal(result.body.session.troubleshootingSource, "LOCAL_KB");
   assert.equal(result.body.session.completedSteps.length, 0);
+});
+
+test("professional-help result can ask AI to explain the recommendation without reopening troubleshooting", async () => {
+  const started = await call(controller.startSelfAssistant, {
+    ...batteryInput,
+    diagnosticInputText: "Smoke is coming from the vehicle and it will not start.",
+    symptomCapture: { symptoms: { danger_signs: ["smoke"] } }
+  });
+  assert.equal(started.body.status, "professional_help_required");
+  const previousGeneralHelp = helpCalls;
+  const previousProfessionalHelp = professionalExplanationCalls;
+  const result = await call(controller.askForHelp,
+    { question: "Why do I need professional assistance?" }, started.body.session._id);
+  assert.equal(result.error, undefined);
+  assert.equal(result.body.status, "professional_help_required");
+  assert.equal(result.body.session.currentStep, null);
+  assert.match(result.body.help, /mechanic needs to assess/i);
+  assert.deepEqual(result.body.observationSteps, [
+    "Note any warning symbol already visible without starting the vehicle.",
+    "Tell the mechanic what you observed."
+  ]);
+  assert.equal(helpCalls, previousGeneralHelp);
+  assert.equal(professionalExplanationCalls, previousProfessionalHelp + 1);
+  assert.match(lastProfessionalExplanationContext.reason, /professional assistance|required|danger|smoke/i);
+  assert.ok(lastProfessionalExplanationContext.safetyActions.length);
+});
+
+test("new danger reported from professional-help AI panel refreshes safety actions", async () => {
+  const started = await call(controller.startSelfAssistant, {
+    ...batteryInput,
+    diagnosticInputText: "The vehicle stopped suddenly and cannot be restarted.",
+    symptomCapture: { symptoms: { danger_signs: ["none"] } }
+  });
+  const session = await Session.findById(started.body.session._id);
+  session.status = "professional_help_required";
+  session.currentStep = null;
+  session.currentStepId = null;
+  session.lastMessage = "Professional assistance is recommended.";
+  await session.save();
+  const previousProfessionalHelp = professionalExplanationCalls;
+  const previousSafetyHelp = safetyHelpCalls;
+  const result = await call(controller.askForHelp,
+    { question: "There is fire now. What should I do?" }, session._id);
+  assert.equal(result.error, undefined);
+  assert.equal(result.body.status, "professional_help_required");
+  assert.equal(professionalExplanationCalls, previousProfessionalHelp);
+  assert.equal(safetyHelpCalls, previousSafetyHelp + 1);
+  assert.ok(result.body.session.safetyActions.some((action) => /leave the vehicle/i.test(action)));
+  assert.deepEqual(result.body.observationSteps, []);
 });
 
 test("danger reported while asking for help stops repair guidance and returns safety actions", async () => {
@@ -548,6 +670,54 @@ test("OpenAI uses controlled structured output and supplied step context", async
   assert.equal(payload.tools, undefined);
 });
 
+test("professional-result AI explanation accepts safe context and rejects procedural guidance", async () => {
+  const context = {
+    vehicleType: "van",
+    problem: "Brake System Problem",
+    reason: "Professional assistance is required.",
+    symptoms: "A red brake warning appeared.",
+    recommendedService: "brake_mechanic",
+    safetyActions: ["Remain in the safest available place."],
+    question: "Why do I need a mechanic?"
+  };
+  const safe = await originals.professionalExplanation(context, {
+    model: "test-model",
+    client: { responses: { create: async (payload) => {
+      const input = JSON.parse(payload.input);
+      assert.equal(payload.text.format.strict, true);
+      assert.ok(input.approvedObservations.some((item) =>
+        item.id === "dashboard" && /Without starting or operating/i.test(item.instruction)));
+      assert.ok(input.approvedObservations.some((item) =>
+        item.id === "stop_observing" && /stop observing/i.test(item.instruction)));
+      return {
+        output_text: JSON.stringify({
+          explanation: "A brake warning may affect safe control of the vehicle. The mechanic needs the warning details shown here.",
+          observationIds: ["dashboard", "timing"]
+        })
+      };
+    } } }
+  });
+  assert.equal(safe.available, true);
+  assert.match(safe.explanation, /brake warning/i);
+  assert.equal(safe.observationSteps.length, 2);
+  assert.match(safe.observationSteps[0], /Without starting or operating/i);
+  assert.match(safe.observationSteps[1], /sudden, gradual or intermittent/i);
+
+  const unsafe = await originals.professionalExplanation(context, {
+    model: "test-model",
+    client: { responses: { create: async () => ({
+      output_text: JSON.stringify({
+        explanation: "Open the brake reservoir and refill it before driving.",
+        observationIds: ["dashboard"]
+      })
+    }) } }
+  });
+  assert.equal(unsafe.available, false);
+  assert.match(unsafe.explanation, /follow the safety actions/i);
+  assert.ok(unsafe.observationSteps.every((step) =>
+    /Without starting|current safe position|Note when|Tell the mechanic/i.test(step)));
+});
+
 test("OpenAI selects only the applicable fixed driver self-fix pack", async () => {
   const cases = [
     ["electrical_system_fault", "Weak 12V battery", "Clicking and dim lights; still not fixed", "retry_start_with_low_load"],
@@ -606,6 +776,49 @@ test("a conservative model refusal cannot hide a uniquely approved engine air-fi
   }) } } });
   assert.equal(result.professionalHelp, false);
   assert.match(result.steps.join(" "), /correct replacement/i);
+});
+
+test("reviewed self-fixes support bike, van and three-wheeler vehicle types", async () => {
+  const client = { responses: { create: async () => ({
+    output_text: JSON.stringify({ professionalHelp: true, actionIds: [] })
+  }) } };
+  const bikeTyre = await originals.help({
+    mode: "fallback", category: "wheel_tire_fault", problem: "Tyre pressure problem",
+    vehicleType: "bike", symptoms: "The tyre pressure is low with no visible damage or puncture."
+  }, { model: "configured-test-model", client });
+  const vanWasher = await originals.help({
+    mode: "fallback", category: "visibility_system_fault", problem: "Windscreen Washer Fluid",
+    vehicleType: "van", symptoms: "No washer spray. The washer fluid is low. There is no visible leak."
+  }, { model: "configured-test-model", client });
+  const threeWheelerFilter = await originals.help({
+    mode: "fallback", category: "engine_system_fault", problem: "Air Filter",
+    vehicleType: "three_wheeler", symptoms: "The engine air filter is dirty and clogged. There is no smoke, overheating, or fluid leak."
+  }, { model: "configured-test-model", client });
+  assert.equal(bikeTyre.professionalHelp, false);
+  assert.doesNotMatch(bikeTyre.steps.join(" "), /driver'?s door/i);
+  assert.equal(vanWasher.professionalHelp, false);
+  assert.equal(threeWheelerFilter.professionalHelp, false);
+});
+
+test("bike guidance does not offer car-only washer or cabin-filter action packs", async () => {
+  let fixedActionRequests = 0;
+  const client = { responses: { create: async (payload) => {
+    if (payload.text?.format?.name === "approved_driver_self_fix") fixedActionRequests += 1;
+    return { output_text: JSON.stringify({
+      professionalHelp: true, risk: "HIGH", steps: [], explanation: ""
+    }) };
+  } } };
+  const washer = await originals.help({
+    mode: "fallback", category: "visibility_system_fault", problem: "Windscreen Washer Fluid",
+    vehicleType: "bike", symptoms: "No washer spray and washer fluid is low."
+  }, { model: "configured-test-model", client });
+  const cabinFilter = await originals.help({
+    mode: "fallback", category: "air_conditioning_fault", problem: "Cabin Air Filter",
+    vehicleType: "bike", symptoms: "Cabin air filter is dirty and airflow is weak."
+  }, { model: "configured-test-model", client });
+  assert.equal(washer.professionalHelp, true);
+  assert.equal(cabinFilter.professionalHelp, true);
+  assert.equal(fixedActionRequests, 0);
 });
 
 test("a conservative model refusal cannot hide a uniquely approved washer-fluid refill", async () => {

@@ -14,7 +14,7 @@ export function parseMapMessage(data) {
   return null;
 }
 
-export function buildMapHtml(initialLocation) {
+export function buildMapHtml(initialLocation, { readOnly = false } = {}) {
   const selected = normalizeLocation(initialLocation);
   const center = selected || SRI_LANKA_REGION;
   return `<!doctype html>
@@ -39,7 +39,7 @@ if(typeof L==='undefined'){send({type:'error'});}else{
   L.control.attribution({position:'bottomleft',prefix:false}).addTo(map);
   var tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom:19,
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution:'&copy; <a target="_blank" rel="noopener noreferrer" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
   tiles.on('tileload',function(){send({type:'ready'});});
   tiles.on('tileerror',function(){send({type:'error'});});
@@ -55,13 +55,13 @@ if(typeof L==='undefined'){send({type:'error'});}else{
     if(!location){if(marker){map.removeLayer(marker);marker=null;}return;}
     var point=[location.latitude,location.longitude];
     if(marker){marker.setLatLng(point);}else{
-      marker=L.marker(point,{draggable:true,icon:pin,title:'Service location'}).addTo(map);
+      marker=L.marker(point,{draggable:${!readOnly},icon:pin,title:'Service location'}).addTo(map);
       marker.on('dragend',function(){selectPoint(marker.getLatLng());});
     }
     if(centerMap)map.setView(point,15);
   };
   window.setSelectedLocation(${JSON.stringify(selected)},false);
-  map.on('click',function(event){selectPoint(event.latlng);});
+  ${readOnly ? "" : "map.on('click',function(event){selectPoint(event.latlng);});"}
   window.addEventListener('resize',function(){map.invalidateSize();});
 }
 </script></body></html>`;

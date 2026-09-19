@@ -43,8 +43,8 @@ export default function GuidedSymptomCaptureScreen({ navigation, route }) {
   const vehicleType = requestedVehicleType;
   const breakdownType = requestedBreakdownType;
   const questions = useMemo(
-    () => getQuestionsForProblem(breakdownType, driverType),
-    [breakdownType, driverType],
+    () => getQuestionsForProblem(breakdownType, driverType, vehicleType),
+    [breakdownType, driverType, vehicleType],
   );
   const [stepIndex, setStepIndex] = useState(0);
   const [symptoms, setSymptoms] = useState(currentInitialData.symptoms || {});

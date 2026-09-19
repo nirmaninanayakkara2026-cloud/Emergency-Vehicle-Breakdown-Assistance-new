@@ -77,6 +77,9 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
   function changeVehicleType(nextVehicleType) {
     if (guidedSymptoms && guidedSymptoms.vehicleType !== nextVehicleType)
       setGuidedSymptoms(null);
+    const availableProblems = getAssistanceProblems(driverType, nextVehicleType);
+    if (!availableProblems.some((item) => item.value === breakdownType))
+      setBreakdownType(availableProblems[0]?.value || "other");
     setVehicleType(nextVehicleType);
   }
 
@@ -215,7 +218,7 @@ export default function SelfBreakdownAssistantScreen({ navigation, route }) {
         />
         <Text style={styles.fieldLabel}>{driverType === "technical" ? "Select Problem Category" : "What are you noticing with your vehicle?"}</Text>
         <MainProblemGrid
-          options={getAssistanceProblems(driverType)}
+          options={getAssistanceProblems(driverType, vehicleType)}
           value={breakdownType}
           onChange={changeBreakdownType}
         />

@@ -72,6 +72,13 @@ function batterySymptoms(text) {
 function safeFirstCheck(details = {}) {
   const capture = details.symptomCapture || {};
   const symptoms = capture.symptoms || {};
+  const symptomValues = Object.values(symptoms)
+    .flatMap((value) => Array.isArray(value) ? value : [value])
+    .filter(Boolean)
+    .map((value) => String(value).toLowerCase());
+  const hasSymptom = (...values) => values.some((value) => symptomValues.includes(value));
+  const description = [capture.additionalDescription, details.diagnosticInputText]
+    .filter(Boolean).join(" ");
   const observations = Object.values(capture.observedSymptoms || {})
     .flatMap((value) => Array.isArray(value) ? value : [])
     .map((value) => String(value).toLowerCase());
@@ -83,14 +90,16 @@ function safeFirstCheck(details = {}) {
     : [symptoms.danger_signs].filter(Boolean);
   const onlyNoDangerSelection = dangerSigns.length === 0 || dangerSigns.every((value) => value === "none");
   const lowCoolantReported = symptoms.hot_signs === "coolant_low" ||
+    symptoms.bike_cooling_signs === "liquid_cooled_low_coolant" ||
     /\bcoolant\b.{0,35}\b(?:low|below|min(?:imum)?)\b|\b(?:low|below|min(?:imum)?)\b.{0,35}\bcoolant\b/i
-      .test(capture.additionalDescription || "");
+      .test(description);
   const otherSafetyText = String(details.safetyText || "")
     .replace(/\btemperature(?:\s+(?:meter|gauge))?.{0,35}\bred(?:\s+zone)?\b/gi, "")
     .replace(/\bengine\s+(?:is\s+)?overheating\b/gi, "");
   const hasOtherDanger = Boolean(detectDanger(otherSafetyText));
 
-  if (details.breakdownType === "feels_hot" && symptoms.warning_detail === "temperature_red" &&
+  if (["feels_hot", "cooling_problem"].includes(details.breakdownType) &&
+      symptoms.warning_detail === "temperature_red" &&
       lowCoolantReported && onlyNoDangerSelection && !hasOtherDanger) {
     return {
       id: "guarded_coolant_check",
@@ -98,6 +107,103 @@ function safeFirstCheck(details = {}) {
       problem: "Low Coolant / Coolant Reservoir",
       guideSearchText: "engine overheating low coolant coolant reservoir"
     };
+  }
+
+  if (["flat_tyre", "wheel_tyre_symptom"].includes(details.breakdownType) ||
+      symptoms.warning_detail === "tire_pressure_warning") {
+    const lowPressure = hasSymptom("low_pressure", "tire_pressure_warning");
+    return {
+      id: "vehicle_tyre_observation",
+      category: "wheel_tire_fault",
+      problem: lowPressure ? "Low Tyre Pressure / Tyre Problem" : "Tyre / Wheel Problem",
+      guideSearchText: lowPressure
+        ? "low tyre pressure no visible puncture"
+        : "flat tyre wheel damage roadside"
+    };
+  }
+
+  const warningRoutes = {
+    battery_warning: ["electrical_system_fault", "Charging / Electrical Warning"],
+    check_engine_steady: ["engine_system_fault", "Engine Warning"],
+    flashing_check_engine: ["engine_system_fault", "Flashing Engine Warning"],
+    oil_pressure_warning: ["engine_system_fault", "Engine Oil Pressure Warning"],
+    temperature_red: ["cooling_system_fault", "Engine Overheating Warning"]
+  };
+  if (warningRoutes[symptoms.warning_detail]) {
+    const [category, problem] = warningRoutes[symptoms.warning_detail];
+    return { id: "identified_warning", category, problem,
+      guideSearchText: `${problem} ${symptoms.warning_detail}` };
+  }
+
+  if (details.breakdownType === "vehicle_stopped" && symptoms.stopped_behavior === "gauge_empty") {
+    return {
+      id: "fuel_gauge_empty",
+      category: "fuel_system_fault",
+      problem: "Possible Empty Fuel Tank / Fuel Supply Problem",
+      guideSearchText: "fuel gauge empty vehicle stopped"
+    };
+  }
+
+  if (details.vehicleType === "bike") {
+    if (symptoms.bike_starting_control === "engine_stop_switch_off") {
+      return {
+        id: "bike_engine_stop_switch",
+        category: "electrical_system_fault",
+        problem: "Bike Engine Stop Switch Is Off",
+        guideSearchText: "motorcycle engine stop switch off no start",
+        guidanceSteps: [{
+          step_id: "bike_engine_stop_control",
+          instruction: "Keep the bike stationary and select Neutral. Use the owner's handbook to identify the normal engine stop switch and set it to RUN. Do not bypass or alter the switch. Then try the starter once and stop if you notice heat, smoke, sparks or a burning smell.",
+          possible_results: []
+        }]
+      };
+    }
+    if (["side_stand_in_gear", "neutral_not_confirmed"].includes(symptoms.bike_starting_control)) {
+      return {
+        id: "bike_starting_interlock",
+        category: "electrical_system_fault",
+        problem: "Bike Starting Safety Interlock",
+        guideSearchText: "motorcycle neutral side stand clutch starting interlock",
+        guidanceSteps: [{
+          step_id: "bike_normal_starting_controls",
+          instruction: "Keep the bike stable and follow its owner's handbook for a normal start: select Neutral, confirm the neutral indicator where fitted, raise the side stand where required, and use the clutch control as specified. Never bypass a side-stand, neutral or clutch safety switch. Try the starter once.",
+          possible_results: []
+        }]
+      };
+    }
+    if (symptoms.bike_sound_location === "chain_rear_wheel" ||
+        /\b(chain|final drive|rear sprocket)\b/i.test(description)) {
+      return {
+        id: "bike_chain_drive",
+        category: "drivetrain_fault",
+        problem: "Bike Chain / Final Drive Problem",
+        guideSearchText: "motorcycle chain final drive rear sprocket noise"
+      };
+    }
+    if (/\b(regulator[ -]?rectifier|rectifier|stator|charging system)\b/i.test(description)) {
+      return {
+        id: "bike_charging_system",
+        category: "electrical_system_fault",
+        problem: "Bike Charging System / Regulator-Rectifier Problem",
+        guideSearchText: "motorcycle charging system regulator rectifier stator"
+      };
+    }
+    if (/\b(spark plug|no spark|ignition spark)\b/i.test(description)) {
+      return {
+        id: "bike_ignition_system",
+        category: "engine_system_fault",
+        problem: "Bike Ignition / Spark Plug Problem",
+        guideSearchText: "motorcycle ignition spark plug no spark"
+      };
+    }
+    if (symptoms.bike_cooling_signs === "air_cooled") {
+      return {
+        id: "air_cooled_bike_heat",
+        category: "engine_system_fault",
+        problem: "Air-Cooled Bike Engine Heat Problem",
+        guideSearchText: "air cooled motorcycle engine excessive heat"
+      };
+    }
   }
 
   if (details.driverType === "non_technical" && details.breakdownType === "loss_of_power" &&
@@ -231,9 +337,9 @@ async function start(details, driverId) {
     needsMoreInformation: prediction.needsMoreInformation
   };
   session.recommendedService = faultServices[category] || "general_mechanic";
-  session.identifiedProblem = battery
+  session.identifiedProblem = firstCheck?.problem || (battery
     ? "Weak 12V Battery / Battery Connection Issue"
-    : firstCheck?.problem || session.predictedFault.label;
+    : session.predictedFault.label);
 
   if (!category || prediction.needsMoreInformation) {
     // The existing clarification screen asks one bounded follow-up round.
@@ -242,19 +348,34 @@ async function start(details, driverId) {
       message: "We need a little more detail to identify a useful check." });
   }
 
-  const guideSearchText = battery
+  const guideSearchText = firstCheck?.guideSearchText || (battery
     ? "battery clicking dim lights"
-    : firstCheck?.guideSearchText || modelInput;
-  const lookup = await ai2.findGuide(category, guideSearchText,
-    "", { includeSteps: true });
-  let guide = lookup.guide_available ? lookup.guide : null;
+    : modelInput);
+  let guide;
+  if (firstCheck?.guidanceSteps?.length) {
+    guide = {
+      guide_id: `vehicle_rule_${firstCheck.id}`,
+      title: `${firstCheck.problem} Safety Guide`,
+      risk_level: "LOW",
+      professional_help_required: false,
+      safety_warning: "Use only the bike's normal controls while it is stationary. Never bypass a safety switch.",
+      before_you_begin: ["Keep the bike stable and clear of traffic.", "Stop if anything appears damaged or unsafe."],
+      steps: firstCheck.guidanceSteps
+    };
+  } else {
+    const lookup = await ai2.findGuide(category, guideSearchText,
+      "", { includeSteps: true });
+    guide = lookup.guide_available ? lookup.guide : null;
+  }
   if (guide && firstCheck?.id === "guarded_coolant_check") {
     guide = { ...guide, steps: guardedCoolantCheckSteps() };
   }
   if (guide) {
     session.guideId = guide.guide_id;
     session.guideTitle = guide.title;
-    if (!battery) session.identifiedProblem = guide.title.replace(/\s*Safety Guide$/i, "");
+    if (!battery && !firstCheck) {
+      session.identifiedProblem = guide.title.replace(/\s*Safety Guide$/i, "");
+    }
     session.riskLevel = guide.risk_level;
     session.safetyWarning = guide.safety_warning;
     session.beforeYouBegin = guide.before_you_begin;
@@ -433,4 +554,35 @@ async function explain(session, question) {
     helpAvailable: help.available });
 }
 
-module.exports = { start, response, confirmSafety, act, explain, buildModelInput, safeFirstCheck, stop };
+async function explainProfessional(session, question) {
+  const danger = detectDanger(question);
+  if (danger) {
+    await attachDangerSafetyActions(session, danger, question);
+    stop(session, dangerMessage(danger));
+    await session.save();
+    return response(session, {
+      help: dangerMessage(danger),
+      observationSteps: [],
+      helpAvailable: true
+    });
+  }
+  const help = await aiHelp.getProfessionalAssistanceExplanation({
+    problem: session.identifiedProblem || session.predictedFault?.label,
+    vehicleType: session.vehicleType,
+    symptoms: session.diagnosticInputText,
+    reason: session.escalationReason || session.lastMessage,
+    recommendedService: session.recommendedService,
+    safetyActions: session.safetyActions,
+    question
+  });
+  return response(session, {
+    help: help.explanation,
+    observationSteps: help.observationSteps || [],
+    helpAvailable: help.available
+  });
+}
+
+module.exports = {
+  start, response, confirmSafety, act, explain, explainProfessional,
+  buildModelInput, safeFirstCheck, stop
+};

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Linking, StyleSheet, Text, View } from "react-native";
-import { WebView } from "react-native-webview";
+import MapDocument from "./MapDocument";
 import AppButton from "../AppButton";
 import AppCard from "../AppCard";
 import InfoBanner from "../ui/InfoBanner";
@@ -36,7 +36,7 @@ function RouteCard({ provider, origin, destination }) {
   const directionsUrl = buildDirectionsUrl(origin, destination);
 
   function updateRoute(route) {
-    webRef.current?.injectJavaScript(`window.setRoadRoute && window.setRoadRoute(${JSON.stringify(route?.coordinates || [])});true;`);
+    webRef.current?.setRoadRoute(route?.coordinates || []);
   }
 
   useEffect(() => {
@@ -89,7 +89,7 @@ function RouteCard({ provider, origin, destination }) {
       <Text style={styles.note}>Uses the provider's saved service location.</Text>
       {origin || destination ? (
         <View style={styles.mapFrame}>
-          <WebView key={attempt} ref={webRef} source={source} style={styles.map}
+          <MapDocument key={attempt} ref={webRef} source={source} style={styles.map}
             originWhitelist={["*"]} applicationNameForUserAgent="RoadCare/1.0"
             javaScriptEnabled domStorageEnabled cacheEnabled scrollEnabled={false} bounces={false}
             onMessage={handleMessage} onError={failMap} onHttpError={failMap}

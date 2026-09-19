@@ -17,6 +17,7 @@ require.extensions[".js"] = function compileMobileSource(module, filename) {
 };
 
 const { buildMapHtml, parseMapMessage } = require("../src/utils/openStreetMap");
+const { buildWebMapDocument } = require("../src/utils/webMapDocument");
 
 test("map bridge accepts coordinates and rejects invalid or unrelated messages", () => {
   assert.deepEqual(parseMapMessage(JSON.stringify({ type: "select", location: { latitude: "6.9", longitude: "79.8" } })), {
@@ -36,7 +37,7 @@ test("map page serializes only validated coordinates and keeps attribution visib
   assert.match(html, /position:'bottomleft'/);
 });
 
-function mountMap(location) {
+function mountMap(location, options) {
   const messages = [];
   const mapEvents = {};
   const tileEvents = {};
@@ -53,7 +54,7 @@ function mountMap(location) {
     divIcon() {},
     marker() { markerCount++; return marker; }
   } });
-  for (const script of buildMapHtml(location).matchAll(/<script>([\s\S]*?)<\/script>/g)) {
+  for (const script of buildMapHtml(location, options).matchAll(/<script>([\s\S]*?)<\/script>/g)) {
     vm.runInContext(script[1], context);
   }
   return { messages, mapEvents, tileEvents, markerEvents, point, window, markerCount: () => markerCount };
@@ -79,4 +80,35 @@ test("saved and GPS pins do not emit a second selection or claim unloaded tiles 
   assert.deepEqual(page.messages.pop(), { type: "error" });
   page.tileEvents.tileload();
   assert.deepEqual(page.messages.pop(), { type: "ready" });
+});
+
+test("detail maps keep the saved pin fixed when the user clicks the map", () => {
+  const page = mountMap({ latitude: 6.9, longitude: 79.8 }, { readOnly: true });
+  assert.equal(page.markerCount(), 1);
+  assert.equal(page.mapEvents.click, undefined);
+  assert.deepEqual(page.messages, []);
+});
+
+test("browser map bridge forwards events and accepts only map commands from its parent", () => {
+  const sent = [], updates = [], listeners = {};
+  const parent = { postMessage: (data) => sent.push(data) };
+  const window = {
+    parent, addEventListener: (name, listener) => { listeners[name] = listener; },
+    setSelectedLocation: (value, center) => updates.push({ value, center }),
+    setRoadRoute: (value) => updates.push(value)
+  };
+  const html = buildWebMapDocument("<html><head></head><body></body></html>");
+  vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], { window });
+  window.ReactNativeWebView.postMessage('{"type":"ready"}');
+  assert.equal(sent[0].channel, "roadcare-map");
+  assert.equal(sent[0].data, '{"type":"ready"}');
+  const command = { channel: "roadcare-map-command", method: "setSelectedLocation", value: { latitude: 6.9, longitude: 79.8 } };
+  listeners.message({ source: {}, data: command });
+  listeners.message({ source: parent, data: { ...command, channel: "unrelated" } });
+  listeners.message({ source: parent, data: { ...command, method: "eval" } });
+  assert.equal(updates.length, 0);
+  listeners.message({ source: parent, data: command });
+  assert.deepEqual(updates[0], { value: command.value, center: true });
+  listeners.message({ source: parent, data: { ...command, method: "setRoadRoute", value: [command.value] } });
+  assert.deepEqual(updates[1], [command.value]);
 });

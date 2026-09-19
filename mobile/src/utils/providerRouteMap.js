@@ -24,7 +24,7 @@ if(typeof L==='undefined'){send('error');}else{
  var map=L.map('map',{attributionControl:false}).setView([${center.latitude},${center.longitude}],13);
  L.control.attribution({position:'bottomleft',prefix:false}).addTo(map);
  var tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  maxZoom:19,attribution:'&copy; <a target="_blank" rel="noopener noreferrer" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
  });
  tiles.on('tileload',function(){send('ready');});
  tiles.on('tileerror',function(){send('error');});

@@ -1,22 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Linking, StyleSheet } from "react-native";
-import { WebView } from "react-native-webview";
+import MapDocument from "./MapDocument";
 import { buildMapHtml, parseMapMessage } from "../../utils/openStreetMap";
 import { normalizeLocation } from "../../utils/locationPicker";
 
-export default function OpenStreetMapView({ location, onSelect, onReady, onError }) {
+export default function OpenStreetMapView({ location, onSelect, onReady, onError, readOnly = false }) {
   const webRef = useRef(null);
   const readyRef = useRef(false);
   // Keep the page stable while the driver moves the pin or edits the address.
-  const [source] = useState(() => ({ html: buildMapHtml(location) }));
+  const [source] = useState(() => ({ html: buildMapHtml(location, { readOnly }) }));
   const selected = normalizeLocation(location);
   const latestLocation = useRef(selected);
   latestLocation.current = selected;
 
   function updatePin(point) {
-    webRef.current?.injectJavaScript(
-      `window.setSelectedLocation && window.setSelectedLocation(${JSON.stringify(point)},true);true;`
-    );
+    webRef.current?.setSelectedLocation(point);
   }
 
   useEffect(() => {
@@ -30,16 +28,16 @@ export default function OpenStreetMapView({ location, onSelect, onReady, onError
         readyRef.current = true;
         updatePin(latestLocation.current);
       }
-      onReady();
+      onReady?.();
     } else if (message?.type === "select") {
-      onSelect(message.location);
+      onSelect?.(message.location);
     } else if (message?.type === "error") {
-      onError();
+      onError?.();
     }
   }
 
   return (
-    <WebView
+    <MapDocument
       ref={webRef}
       source={source}
       style={styles.map}

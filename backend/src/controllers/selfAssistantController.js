@@ -691,9 +691,16 @@ async function askForHelp(req, res, next) {
       res.status(400);
       throw new Error("Enter a question of 1 to 500 characters.");
     }
-    if (!session.driverType || session.status !== "in_progress" || !session.currentStep) {
+    if (!session.driverType) {
       res.status(409);
-      throw new Error("Open an active guidance step to ask for an explanation.");
+      throw new Error("AI explanations are unavailable for this session.");
+    }
+    if (session.status === "professional_help_required") {
+      return res.status(200).json(await simpleAssistance.explainProfessional(session, question));
+    }
+    if (session.status !== "in_progress" || !session.currentStep) {
+      res.status(409);
+      throw new Error("Open an active guidance step or professional-assistance result to ask for an explanation.");
     }
     return res.status(200).json(await simpleAssistance.explain(session, question));
   } catch (error) {

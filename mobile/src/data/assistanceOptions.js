@@ -71,6 +71,73 @@ const startingQuestions = symptomQuestionFlows.vehicle_not_starting.slice(0, 2).
     ? { ...option, label: "Engine turns but does not start" } : option)
 }));
 
+const bikeStartingQuestions = [
+  question("starting_behavior", "What happens when you press the starter or use the kick starter?", [
+    ["nothing", "Nothing happens"], ["clicking", "I hear a clicking sound"],
+    ["engine_turns", "The engine turns but does not start"],
+    ["starts_then_stops", "It starts and then stops"]
+  ]),
+  question("bike_starting_control", "What do you notice before trying again?", [
+    ["engine_stop_switch_off", "Engine stop switch is in the OFF position"],
+    ["side_stand_in_gear", "Side stand is down and the bike is in gear"],
+    ["neutral_not_confirmed", "Neutral light is not on"],
+    ["lights_dim", "Lights are weak or dim"],
+    ["controls_look_normal", "These controls look normal"]
+  ])
+];
+
+const bikeTyreQuestions = [
+  question("affected_tyre", "Which bike tyre seems affected?", [
+    ["front", "Front tyre"], ["rear", "Rear tyre"], ["both", "Both tyres"]
+  ]),
+  question("tyre_condition", "What do you notice?", [
+    ["completely_flat", "Completely flat"], ["low_pressure", "Low pressure"],
+    ["visible_damage", "Visible damage"], ["bike_pulling_side", "Bike pulls or leans unexpectedly"]
+  ])
+];
+
+const bikeSteeringQuestions = [
+  question("steering_behavior", "What happens when you turn or hold the handlebars?", [
+    ["hard_to_turn", "Handlebars are difficult to turn"],
+    ["steering_not_working", "Handlebars will not turn normally"],
+    ["handlebar_wobble", "Handlebars wobble or shake"],
+    ["steering_noise", "There is a noise while turning"]
+  ]),
+  timingQuestion
+];
+
+const bikeBrakeQuestions = [
+  question("brake_behavior", "What happens when you use the brake lever or pedal?", [
+    ["weak", "Brakes feel weak"], ["longer_stop", "Bike takes longer to stop"],
+    ["control_unusual", "Brake lever or pedal feels unusual"],
+    ["strange_noise", "Strange brake noise"], ["not_working", "Brakes are not working properly"]
+  ]),
+  question("brake_warning", "Did you notice a brake warning light or liquid leak?", [
+    ["warning_light", "Brake warning light"], ["fluid_leak", "Liquid leak"], ["neither", "Neither"]
+  ])
+];
+
+const bikeNoiseQuestions = [
+  question("sound_type", "What kind of sound do you hear?", [
+    ["clicking", "Clicking"], ["grinding", "Grinding"], ["knocking", "Knocking"],
+    ["squealing", "Squealing"], ["rattling", "Rattling or clunking"]
+  ]),
+  question("bike_sound_location", "Where does the sound seem to come from?", [
+    ["engine_area", "Engine area"], ["chain_rear_wheel", "Chain or rear-wheel drive area"],
+    ["front_wheel", "Front wheel"], ["rear_wheel", "Rear wheel"], ["exhaust", "Exhaust area"]
+  ])
+];
+
+const bikeHotQuestions = [
+  warningQuestion,
+  question("bike_cooling_signs", "What else did you notice from a safe distance?", [
+    ["liquid_cooled_low_coolant", "Liquid-cooled bike: coolant looked low after it cooled"],
+    ["air_cooled", "Bike is air-cooled or has no coolant reservoir"],
+    ["steam", "Steam"], ["smoke", "Smoke"], ["fluid_leak", "Liquid leaking"],
+    ["none", "Nothing else"]
+  ])
+];
+
 const extraQuestions = {
   electrical_problem: startingQuestions,
   vehicle_not_starting: startingQuestions,
@@ -121,11 +188,34 @@ const extraQuestions = {
   ]), timingQuestion]
 };
 
-export function getAssistanceProblems(driverType) {
-  return driverType === "technical" ? TECHNICAL_PROBLEMS : OBSERVABLE_PROBLEMS;
+export function getAssistanceProblems(driverType, vehicleType) {
+  if (driverType !== "technical") return OBSERVABLE_PROBLEMS;
+  if (vehicleType === "bike") {
+    const bikeLabels = {
+      cooling_problem: "Engine Too Hot / Cooling",
+      transmission_problem: "Transmission / Clutch / Chain",
+      steering_problem: "Steering / Handling",
+      flat_tyre: "Bike Tyre / Wheel Problem"
+    };
+    return TECHNICAL_PROBLEMS
+      .filter((item) => !["visibility_problem", "cabin_filter_problem"].includes(item.value))
+      .map((item) => ({ ...item, label: bikeLabels[item.value] || item.label }));
+  }
+  if (vehicleType === "three_wheeler") {
+    return TECHNICAL_PROBLEMS.filter((item) => item.value !== "cabin_filter_problem");
+  }
+  return TECHNICAL_PROBLEMS;
 }
 
-export function getAssistanceQuestions(problem) {
+export function getAssistanceQuestions(problem, vehicleType) {
+  if (vehicleType === "bike") {
+    if (["vehicle_not_starting", "electrical_problem"].includes(problem)) return [...bikeStartingQuestions, safetyQuestion];
+    if (["flat_tyre", "wheel_tyre_symptom"].includes(problem)) return [...bikeTyreQuestions, safetyQuestion];
+    if (problem === "steering_problem") return [...bikeSteeringQuestions, safetyQuestion];
+    if (problem === "brake_problem") return [...bikeBrakeQuestions, safetyQuestion];
+    if (problem === "strange_noise") return [...bikeNoiseQuestions, safetyQuestion];
+    if (["feels_hot", "cooling_problem"].includes(problem)) return [...bikeHotQuestions, safetyQuestion];
+  }
   const aliases = { wheel_tyre_symptom: "flat_tyre", fuel_problem: "fuel_issue", strange_noise: "strange_sound" };
   const questions = extraQuestions[problem] || symptomQuestionFlows[aliases[problem] || problem] || symptomQuestionFlows.other;
   return [...questions.slice(0, 2), safetyQuestion];

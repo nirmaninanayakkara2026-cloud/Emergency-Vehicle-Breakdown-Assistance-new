@@ -29,8 +29,9 @@ function formatAnswer(question, answer) {
   return findLabel(question.options, answer);
 }
 
-export function getQuestionsForProblem(breakdownType, driverType) {
-  if (driverType) return getAssistanceQuestions(breakdownType);
+export function getQuestionsForProblem(breakdownType, driverType, vehicleType) {
+  if (driverType) return getAssistanceQuestions(breakdownType, vehicleType);
+  if (vehicleType === "bike") return getAssistanceQuestions(breakdownType, vehicleType);
   const flowAliases = {
     fuel_problem: "fuel_issue",
     strange_noise: "strange_sound"
@@ -69,7 +70,7 @@ export function buildStructuredSymptomPayload(data) {
 
 export function buildSymptomSummary(data) {
   const payload = buildStructuredSymptomPayload(data);
-  const questions = getQuestionsForProblem(payload.breakdownType, payload.driverType);
+  const questions = getQuestionsForProblem(payload.breakdownType, payload.driverType, payload.vehicleType);
   const answers = questions
     .filter((question) => {
       const answer = payload.symptoms[question.id];
@@ -92,7 +93,7 @@ export function buildSymptomSummary(data) {
 
   return {
     vehicle: findLabel(VEHICLE_TYPES, payload.vehicleType),
-    mainProblem: findLabel(payload.driverType ? getAssistanceProblems(payload.driverType) : SYMPTOM_BREAKDOWN_TYPES, payload.breakdownType),
+    mainProblem: findLabel(payload.driverType ? getAssistanceProblems(payload.driverType, payload.vehicleType) : SYMPTOM_BREAKDOWN_TYPES, payload.breakdownType),
     answers,
     observations,
     description: payload.description

@@ -3,9 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
+import AppInput from "../../components/AppInput";
 import ScreenContainer from "../../components/ScreenContainer";
 import InfoBanner from "../../components/ui/InfoBanner";
-import { setSessionResult } from "../../services/selfAssistantService";
+import { askForStepHelp, setSessionResult } from "../../services/selfAssistantService";
 import { colors, radii, spacing, typography } from "../../theme";
 import { formatFaultLabel, formatServiceType } from "../../utils/displayLabels";
 
@@ -22,11 +23,20 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
     riskLevel,
   } = route.params || {};
   const [saving, setSaving] = useState(false);
+  const [resultSession, setResultSession] = useState(session || {});
   const [error, setError] = useState("");
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [help, setHelp] = useState("");
+  const [observationSteps, setObservationSteps] = useState([]);
   const completed = status === "resolved";
-  const confirmedResolved = completed && session?.status === "resolved";
+  const confirmedResolved = completed && resultSession?.status === "resolved";
   const unavailable = status === "troubleshooting_unavailable";
-  const service = recommendedService || session?.recommendedService;
+  const service = recommendedService || resultSession?.recommendedService;
+  const canAskAi = Boolean(
+    sessionId && resultSession?.driverType &&
+    (status === "professional_help_required" || resultSession?.status === "professional_help_required")
+  );
   // Save whether troubleshooting resolved the issue or route to professional help.
   async function recordResult(resolved) {
     setSaving(true);
@@ -42,6 +52,23 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
       else navigation.navigate("RequestMechanic", { prefill });
     } catch (resultError) {
       setError(resultError.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  async function askAiForHelp() {
+    if (!question.trim()) return;
+    setSaving(true);
+    setError("");
+    setHelp("");
+    setObservationSteps([]);
+    try {
+      const response = await askForStepHelp(sessionId, question.trim());
+      if (response.session) setResultSession(response.session);
+      setHelp(response.help || "AI could not provide an additional explanation. Follow the displayed safety guidance and request a mechanic.");
+      setObservationSteps(Array.isArray(response.observationSteps) ? response.observationSteps : []);
+    } catch (helpError) {
+      setError(helpError.message);
     } finally {
       setSaving(false);
     }
@@ -80,10 +107,10 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
               ? "Self-troubleshooting is temporarily unavailable."
               : "This issue may be unsafe to troubleshoot without professional help.")}
         </Text>
-        {session?.safetyActions?.length ? (
+        {resultSession?.safetyActions?.length ? (
           <View style={styles.detail}>
             <Text style={styles.detailLabel}>What to do now</Text>
-            {session.safetyActions.map((action, index) => (
+            {resultSession.safetyActions.map((action, index) => (
               <Text key={`${index}-${action}`} style={styles.detailValue}>
                 {index + 1}. {action}
               </Text>
@@ -138,6 +165,52 @@ export default function SelfAssistantResultScreen({ navigation, route }) {
                 navigation.navigate("RequestMechanic", { prefill })
               }
             />
+            {canAskAi ? (
+              <AppButton
+                title="Ask AI for More Help"
+                icon="chatbubble-ellipses-outline"
+                variant="secondary"
+                disabled={saving}
+                onPress={() => setHelpOpen((open) => !open)}
+              />
+            ) : null}
+            {helpOpen && canAskAi ? (
+              <View style={styles.helpPanel}>
+                <Text style={styles.detailLabel}>Ask about this recommendation</Text>
+                <Text style={styles.helpNote}>
+                  AI can describe the possible problem and show passive observations only. Do not try, test, touch, open or repair anything.
+                </Text>
+                <AppInput
+                  label="What would you like to know?"
+                  value={question}
+                  onChangeText={setQuestion}
+                  maxLength={500}
+                  multiline
+                />
+                <AppButton
+                  title="Get Description and Observations"
+                  loading={saving}
+                  disabled={saving || !question.trim()}
+                  onPress={askAiForHelp}
+                />
+              </View>
+            ) : null}
+            {help ? (
+              <View style={styles.aiResult}>
+                <Text style={styles.detailLabel}>Possible problem explained</Text>
+                <Text style={styles.helpResult}>{help}</Text>
+                {observationSteps.length ? (
+                  <View style={styles.safeSteps}>
+                    <Text style={styles.detailLabel}>Safe observations only</Text>
+                    {observationSteps.map((step, index) => (
+                      <Text key={`${index}-${step}`} style={styles.detailValue}>
+                        {index + 1}. {step}
+                      </Text>
+                    ))}
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
             <AppButton
               title="Return Home"
               variant="ghost"
@@ -181,6 +254,21 @@ const styles = StyleSheet.create({
   },
   detailLabel: { ...typography.caption, color: colors.textSecondary },
   detailValue: { ...typography.bodyStrong, color: colors.textPrimary },
+  helpPanel: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  helpNote: { ...typography.body, color: colors.textSecondary },
+  aiResult: {
+    backgroundColor: colors.blueLight,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  helpResult: { ...typography.body, color: colors.textPrimary },
+  safeSteps: { gap: spacing.xs },
   question: {
     ...typography.cardTitle,
     color: colors.primaryDark,

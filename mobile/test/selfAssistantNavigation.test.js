@@ -182,7 +182,7 @@ test("both problem selectors use the shared responsive accessible grid", () => {
   assert.match(grid, /accessibilityRole="radio"/);
   assert.match(grid, /accessibilityLabel=\{option\.label\}/);
   assert.match(requestScreen, /<MainProblemGrid\s+options=\{BREAKDOWN_TYPES\}/);
-  assert.match(selfScreen, /<MainProblemGrid\s+options=\{getAssistanceProblems\(driverType\)\}/);
+  assert.match(selfScreen, /<MainProblemGrid\s+options=\{getAssistanceProblems\(driverType, vehicleType\)\}/);
 });
 
 test("engine problem guided capture includes every requested symptom and timing choice", () => {
@@ -408,10 +408,16 @@ test("completed AI 2 flow asks the driver to confirm real-world resolution", () 
 
 test("professional-help result displays backend-provided immediate safety actions", () => {
   const source = fs.readFileSync(path.join(sourceRoot, "screens/driver/SelfAssistantResultScreen.js"), "utf8");
-  assert.match(source, /session\?\.safetyActions\?\.length/);
+  assert.match(source, /resultSession\?\.safetyActions\?\.length/);
   assert.match(source, /What to do now/);
-  assert.match(source, /session\.safetyActions\.map/);
+  assert.match(source, /resultSession\.safetyActions\.map/);
   assert.match(source, /aiPrediction\.faultLabel \|\| formatFaultLabel\(aiPrediction\.predictedFault\)/);
+  assert.match(source, /title="Ask AI for More Help"/);
+  assert.match(source, /askForStepHelp\(sessionId, question\.trim\(\)\)/);
+  assert.match(source, /AI can describe the possible problem and show passive observations only/);
+  assert.match(source, /setObservationSteps\(Array\.isArray\(response\.observationSteps\)/);
+  assert.match(source, /Safe observations only/);
+  assert.match(source, /Get Description and Observations/);
 });
 
 test("resumed conversation state distinguishes clarification, pending verification, and completed repair", () => {
@@ -457,10 +463,47 @@ test("both paths have short question sets with Not sure and no duplicate questio
 });
 
 test("vehicle feels too hot offers a cold-engine low-coolant observation", () => {
-  const questions = getAssistanceQuestions("feels_hot", "non_technical");
+  const questions = getAssistanceQuestions("feels_hot", "car");
   const hotSigns = questions.find((item) => item.id === "hot_signs");
   assert.ok(hotSigns);
   assert.ok(hotSigns.options.some((option) => option.value === "coolant_low" && /after the engine cooled/i.test(option.label)));
+});
+
+test("bike questions use bike controls and keep air-cooled bikes out of coolant guidance", () => {
+  const starting = getAssistanceQuestions("vehicle_not_starting", "bike");
+  assert.match(starting[0].question, /starter|kick starter/i);
+  assert.ok(starting[1].options.some((option) => option.value === "engine_stop_switch_off"));
+  assert.ok(starting[1].options.some((option) => option.value === "side_stand_in_gear"));
+
+  const steering = getAssistanceQuestions("steering_problem", "bike");
+  assert.match(steering[0].question, /handlebars/i);
+  assert.doesNotMatch(steering.map((item) => item.question).join(" "), /steering wheel/i);
+
+  const tyre = getAssistanceQuestions("wheel_tyre_symptom", "bike");
+  assert.deepEqual(tyre[0].options.filter((option) => option.value !== "not_sure")
+    .map((option) => option.value), ["front", "rear", "both"]);
+
+  const heat = getAssistanceQuestions("feels_hot", "bike");
+  const bikeCooling = heat.find((item) => item.id === "bike_cooling_signs");
+  assert.ok(bikeCooling.options.some((option) => option.value === "air_cooled"));
+  assert.ok(bikeCooling.options.some((option) => option.value === "liquid_cooled_low_coolant"));
+  assert.equal(bikeCooling.options.some((option) => option.value === "coolant_low"), false);
+
+  const noise = getAssistanceQuestions("strange_noise", "bike");
+  assert.ok(noise.find((item) => item.id === "bike_sound_location")
+    .options.some((option) => option.value === "chain_rear_wheel"));
+});
+
+test("technical problem choices match the selected vehicle type", () => {
+  const bike = getAssistanceProblems("technical", "bike").map((item) => item.value);
+  const van = getAssistanceProblems("technical", "van").map((item) => item.value);
+  const threeWheeler = getAssistanceProblems("technical", "three_wheeler").map((item) => item.value);
+  assert.equal(bike.includes("visibility_problem"), false);
+  assert.equal(bike.includes("cabin_filter_problem"), false);
+  assert.ok(van.includes("visibility_problem"));
+  assert.ok(van.includes("cabin_filter_problem"));
+  assert.ok(threeWheeler.includes("visibility_problem"));
+  assert.equal(threeWheeler.includes("cabin_filter_problem"), false);
 });
 
 test("driver type and clear observable answers survive capture, prediction and mechanic handoff", () => {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker } from "../../components/location/MapView";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import AppInput from "../../components/AppInput";

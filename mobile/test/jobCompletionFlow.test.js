@@ -24,7 +24,7 @@ test("completion screen shows final price, summary, review, and safe exit action
 
 test("history routes completed work to completion details and home excludes it from active activity", () => {
   const history = read("screens/driver/MyRequestsScreen.js"); const home = read("screens/driver/DriverHomeScreen.js");
-  assert.match(history, /request\.status === "completed" \? "JobCompletion"/); assert.match(history, /request\.finalCost/); assert.match(history, /request\.review/);
+  assert.match(history, /request\.status === "completed"\s*\?\s*"JobCompletion"/); assert.match(history, /request\.finalCost/); assert.match(history, /request\.review/);
   assert.match(home, /setRecentRequest\(current \|\| null\)/); assert.doesNotMatch(home, /current \|\| items\[0\]/);
 });
 

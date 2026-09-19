@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "./MapView";
 import AppButton from "../AppButton";
 import AppInput from "../AppInput";
 import InfoBanner from "../ui/InfoBanner";
@@ -45,7 +45,7 @@ export default function LocationPicker({
   const [locationError, setLocationError] = useState("");
   const [locationPermissionStatus, setLocationPermissionStatus] = useState(null);
   const selectedLocation = normalizeLocation(initialLocation);
-  const useOpenStreetMap = nativeMapFailed;
+  const useOpenStreetMap = Platform.OS === "web" || nativeMapFailed;
 
   useEffect(() => {
     if (!selectedLocation) return;

@@ -58,7 +58,7 @@ test("formats a readable reverse-geocoded address without duplicate parts", () =
 
 test("location picker uses the real map, tap selection, draggable marker, and shared current-location action", () => {
   const picker = fs.readFileSync(path.join(sourceRoot, "components/location/LocationPicker.js"), "utf8");
-  assert.match(picker, /from "react-native-maps"/);
+  assert.match(picker, /from "\.\/MapView"/);
   assert.match(picker, /provider=\{Platform\.OS === "android" \? PROVIDER_GOOGLE : undefined\}/);
   assert.match(picker, /requestForegroundPermissionsAsync/);
   assert.match(picker, /withTimeout/);

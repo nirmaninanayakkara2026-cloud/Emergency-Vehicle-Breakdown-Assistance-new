@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Linking, StyleSheet, Text, View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker } from "../../components/location/MapView";
 import AppButton from "../../components/AppButton";
 import AppCard from "../../components/AppCard";
 import ScreenContainer from "../../components/ScreenContainer";
