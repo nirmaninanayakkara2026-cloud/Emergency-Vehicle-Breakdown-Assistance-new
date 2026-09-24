@@ -34,7 +34,11 @@ const {
   mapSymptomTypeToRequestType
 } = require("../src/services/symptomCaptureService");
 const { SYMPTOM_BREAKDOWN_TYPES } = require("../src/data/symptomQuestionFlows");
-const { BREAKDOWN_TYPES } = require("../src/utils/constants");
+const {
+  BREAKDOWN_TYPES,
+  getBreakdownTypesForVehicle,
+  getCompatibleBreakdownType
+} = require("../src/utils/constants");
 
 const exactSymptoms = {
   vehicleType: "car",
@@ -181,7 +185,8 @@ test("both problem selectors use the shared responsive accessible grid", () => {
   assert.match(grid, /numberOfLines=\{2\}/);
   assert.match(grid, /accessibilityRole="radio"/);
   assert.match(grid, /accessibilityLabel=\{option\.label\}/);
-  assert.match(requestScreen, /<MainProblemGrid\s+options=\{BREAKDOWN_TYPES\}/);
+  assert.match(requestScreen, /<MainProblemGrid\s+options=\{getBreakdownTypesForVehicle\(vehicleType\)\}/);
+  assert.match(requestScreen, /getCompatibleBreakdownType\(nextVehicleType, current\)/);
   assert.match(selfScreen, /<MainProblemGrid\s+options=\{getAssistanceProblems\(driverType, vehicleType\)\}/);
 });
 
@@ -474,6 +479,19 @@ test("bike questions use bike controls and keep air-cooled bikes out of coolant 
   assert.match(starting[0].question, /starter|kick starter/i);
   assert.ok(starting[1].options.some((option) => option.value === "engine_stop_switch_off"));
   assert.ok(starting[1].options.some((option) => option.value === "side_stand_in_gear"));
+  assert.ok(starting[1].options.some((option) => option.value === "spark_plug_cap_loose"));
+  assert.ok(starting[1].options.some((option) => option.value === "fuel_tap_off"));
+  assert.ok(starting[1].options.some((option) => option.value === "fuel_reserve_available"));
+
+  const technicalEngine = getAssistanceQuestions("engine_problem", "bike", "technical");
+  assert.ok(technicalEngine.find((item) => item.id === "bike_engine_issue")
+    .options.some((option) => option.value === "spark_plug_fouled"));
+  assert.ok(technicalEngine.find((item) => item.id === "bike_engine_issue")
+    .options.some((option) => option.value === "engine_oil_low"));
+
+  const technicalDrive = getAssistanceQuestions("transmission_problem", "bike", "technical");
+  assert.ok(technicalDrive.find((item) => item.id === "bike_drive_issue")
+    .options.some((option) => option.value === "chain_dry"));
 
   const steering = getAssistanceQuestions("steering_problem", "bike");
   assert.match(steering[0].question, /handlebars/i);
@@ -500,10 +518,26 @@ test("technical problem choices match the selected vehicle type", () => {
   const threeWheeler = getAssistanceProblems("technical", "three_wheeler").map((item) => item.value);
   assert.equal(bike.includes("visibility_problem"), false);
   assert.equal(bike.includes("cabin_filter_problem"), false);
+  assert.equal(bike.includes("cooling_problem"), false);
   assert.ok(van.includes("visibility_problem"));
   assert.ok(van.includes("cabin_filter_problem"));
   assert.ok(threeWheeler.includes("visibility_problem"));
   assert.equal(threeWheeler.includes("cabin_filter_problem"), false);
+});
+
+test("request help and AI assistance show only categories supported by the selected vehicle", () => {
+  const bikeRequest = getBreakdownTypesForVehicle("bike");
+  const vanRequest = getBreakdownTypesForVehicle("van");
+  assert.equal(bikeRequest.some((item) => item.value === "engine_overheating"), false);
+  assert.equal(vanRequest.some((item) => item.value === "engine_overheating"), true);
+  assert.match(bikeRequest.find((item) => item.value === "transmission_problem").label, /Clutch \/ Chain/);
+  assert.match(bikeRequest.find((item) => item.value === "steering_problem").label, /Handling/);
+  assert.equal(getCompatibleBreakdownType("bike", "engine_overheating"), "engine_problem");
+
+  const bikeNontechnical = getAssistanceProblems("non_technical", "bike");
+  const vanNontechnical = getAssistanceProblems("non_technical", "van");
+  assert.equal(bikeNontechnical.some((item) => item.value === "feels_hot"), false);
+  assert.equal(vanNontechnical.some((item) => item.value === "feels_hot"), true);
 });
 
 test("driver type and clear observable answers survive capture, prediction and mechanic handoff", () => {

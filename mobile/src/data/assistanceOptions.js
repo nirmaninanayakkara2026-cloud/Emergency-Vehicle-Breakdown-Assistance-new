@@ -82,7 +82,37 @@ const bikeStartingQuestions = [
     ["side_stand_in_gear", "Side stand is down and the bike is in gear"],
     ["neutral_not_confirmed", "Neutral light is not on"],
     ["lights_dim", "Lights are weak or dim"],
+    ["fuel_tap_off", "Carburettor bike: fuel tap is set to OFF"],
+    ["fuel_reserve_available", "Carburettor bike: fuel is low and RESERVE is available"],
+    ["spark_plug_cap_loose", "Spark-plug cap looks loose or disconnected"],
     ["controls_look_normal", "These controls look normal"]
+  ])
+];
+
+const bikeTechnicalEngineQuestions = [
+  question("bike_engine_issue", "Which bike engine condition did you identify?", [
+    ["spark_plug_fouled", "Spark plug is fouled or damaged"],
+    ["engine_oil_low", "Engine-oil level is below MIN and there is no visible leak"],
+    ["air_filter_dirty", "Owner-serviceable engine air filter is dirty"],
+    ["other_engine_issue", "Another engine problem"]
+  ]),
+  question("bike_owner_service_status", "What does the bike handbook say?", [
+    ["owner_service_confirmed", "It confirms this is owner-serviceable and I have the exact part or fluid"],
+    ["parts_removal_required", "Access requires removing the tank, major panels or other parts"],
+    ["not_confirmed", "I cannot confirm the procedure or specification"]
+  ])
+];
+
+const bikeTechnicalDriveQuestions = [
+  question("bike_drive_issue", "What did you identify in the bike drive system?", [
+    ["chain_dry", "Drive chain only appears dry"],
+    ["chain_loose_or_damaged", "Chain is loose, damaged, kinked or misaligned"],
+    ["clutch_issue", "Clutch does not operate normally"],
+    ["gear_issue", "Bike does not select or hold gears normally"]
+  ]),
+  question("bike_chain_service_status", "Can the chain be serviced exactly as the handbook describes?", [
+    ["owner_service_confirmed", "Yes, at a safe work area with the specified chain lubricant"],
+    ["unsafe_or_unsupported", "No, the bike is roadside, unstable or the procedure is unclear"]
   ])
 ];
 
@@ -189,16 +219,20 @@ const extraQuestions = {
 };
 
 export function getAssistanceProblems(driverType, vehicleType) {
-  if (driverType !== "technical") return OBSERVABLE_PROBLEMS;
+  if (driverType !== "technical") {
+    if (vehicleType === "bike") {
+      return OBSERVABLE_PROBLEMS.filter((item) => item.value !== "feels_hot");
+    }
+    return OBSERVABLE_PROBLEMS;
+  }
   if (vehicleType === "bike") {
     const bikeLabels = {
-      cooling_problem: "Engine Too Hot / Cooling",
       transmission_problem: "Transmission / Clutch / Chain",
       steering_problem: "Steering / Handling",
       flat_tyre: "Bike Tyre / Wheel Problem"
     };
     return TECHNICAL_PROBLEMS
-      .filter((item) => !["visibility_problem", "cabin_filter_problem"].includes(item.value))
+      .filter((item) => !["cooling_problem", "visibility_problem", "cabin_filter_problem"].includes(item.value))
       .map((item) => ({ ...item, label: bikeLabels[item.value] || item.label }));
   }
   if (vehicleType === "three_wheeler") {
@@ -207,9 +241,11 @@ export function getAssistanceProblems(driverType, vehicleType) {
   return TECHNICAL_PROBLEMS;
 }
 
-export function getAssistanceQuestions(problem, vehicleType) {
+export function getAssistanceQuestions(problem, vehicleType, driverType) {
   if (vehicleType === "bike") {
     if (["vehicle_not_starting", "electrical_problem"].includes(problem)) return [...bikeStartingQuestions, safetyQuestion];
+    if (problem === "engine_problem" && driverType === "technical") return [...bikeTechnicalEngineQuestions, safetyQuestion];
+    if (problem === "transmission_problem" && driverType === "technical") return [...bikeTechnicalDriveQuestions, safetyQuestion];
     if (["flat_tyre", "wheel_tyre_symptom"].includes(problem)) return [...bikeTyreQuestions, safetyQuestion];
     if (problem === "steering_problem") return [...bikeSteeringQuestions, safetyQuestion];
     if (problem === "brake_problem") return [...bikeBrakeQuestions, safetyQuestion];

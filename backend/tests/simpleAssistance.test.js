@@ -168,6 +168,45 @@ test("bike starting controls identify a normal-control fix without relying on AI
   assert.match(result.body.currentStep.instruction, /Do not bypass/i);
 });
 
+test("bike fuel tap and reserve observations provide normal-control guidance", async () => {
+  const cases = [
+    ["fuel_tap_off", "Bike Fuel Tap Is Off", /from OFF to ON/i],
+    ["fuel_reserve_available", "Bike Fuel Level Is Low / Reserve Needed", /select RESERVE/i]
+  ];
+  for (const [bikeStartingControl, problem, instruction] of cases) {
+    const result = await call(controller.startSelfAssistant, {
+      driverType: "non_technical", vehicleType: "bike", breakdownType: "vehicle_not_starting",
+      diagnosticInputText: "Bike does not start. Selected bike control: " + bikeStartingControl + ". No danger signs.",
+      symptomCapture: { symptoms: {
+        starting_behavior: "engine_turns", bike_starting_control: bikeStartingControl, danger_signs: ["none"]
+      } }
+    });
+    assert.equal(result.error, undefined);
+    assert.equal(result.body.status, "in_progress");
+    assert.equal(result.body.session.identifiedProblem, problem);
+    assert.match(result.body.currentStep.instruction, instruction);
+    assert.match(result.body.currentStep.instruction, /fuel/i);
+  }
+});
+
+test("loose bike spark-plug cap bypasses the car knowledge base and routes to controlled OpenAI help", async () => {
+  const previousHelp = helpCalls;
+  const result = await call(controller.startSelfAssistant, {
+    driverType: "non_technical", vehicleType: "bike", breakdownType: "vehicle_not_starting",
+    diagnosticInputText: "The engine turns but does not start. Spark-plug cap looks loose or disconnected. No danger signs.",
+    symptomCapture: { symptoms: {
+      starting_behavior: "engine_turns", bike_starting_control: "spark_plug_cap_loose", danger_signs: ["none"]
+    } }
+  });
+  assert.equal(result.error, undefined);
+  assert.equal(helpCalls, previousHelp + 1);
+  assert.equal(result.body.session.predictedFault.fault, "engine_system_fault");
+  assert.equal(result.body.session.identifiedProblem, "Possible Loose Bike Spark-Plug Cap");
+  assert.equal(result.body.session.troubleshootingSource, "OPENAI");
+  assert.equal(lastHelpContext.vehicleType, "bike");
+  assert.match(lastHelpContext.problem, /spark-plug cap/i);
+});
+
 test("bike chain observation identifies drivetrain while van tyre observation identifies tyre system", async () => {
   const bike = await call(controller.startSelfAssistant, {
     driverType: "non_technical", vehicleType: "bike", breakdownType: "strange_noise",
@@ -397,8 +436,8 @@ test("only a technical driver receives the cold-engine overheating checks", asyn
   assert.equal(nontechnical.body.session.safetyActions.some((action) => /specified premixed coolant/i.test(action)), false);
 });
 
-test("negative observations do not trigger danger; affirmative failures still do", () => {
-  for (const text of ["The engine is not overheating.", "I don't smell fuel.", "No smoke. No fuel smell.", "The battery is not leaking.", "No fire or smoke.", "No smoke or burning smell.", "No smoke, sparks, or exposed damaged wiring.", "There is no smoke, overheating, or fluid leak.", "There is no warning light, smoke, burning smell, unusual noise, overheating, or fluid leak."]) {
+test("negative observations and spark-plug component names do not trigger danger; affirmative failures still do", () => {
+  for (const text of ["The engine is not overheating.", "I don't smell fuel.", "No smoke. No fuel smell.", "The battery is not leaking.", "No fire or smoke.", "No smoke or burning smell.", "No smoke, sparks, or exposed damaged wiring.", "There is no smoke, overheating, or fluid leak.", "There is no warning light, smoke, burning smell, unusual noise, overheating, or fluid leak.", "The bike spark-plug cap looks loose."]) {
     assert.equal(detectDanger(text), null, text);
   }
   for (const text of ["My brakes are not working", "No smoke and brakes are not working", "No warning light, but smoke is coming from the bonnet", "Fuel is leaking", "Battery is leaking", "I am not sure if it is overheating", "The temperature gauge is in the red"]) {
@@ -725,12 +764,16 @@ test("OpenAI selects only the applicable fixed driver self-fix pack", async () =
     ["visibility_system_fault", "Windshield washer fluid", "Local check result: Low fluid level", "refill_washer_fluid"],
     ["air_conditioning_fault", "Cabin Air Filter", "Debris blocks the cabin air filter", "replace_cabin_filter"],
     ["electrical_system_fault", "Horn fuse", "Horn is not working; fuse is blown", "replace_owner_serviceable_fuse"],
-    ["engine_system_fault", "Air Filter", "Engine air filter is dirty", "replace_engine_air_filter"]
+    ["engine_system_fault", "Air Filter", "Engine air filter is dirty", "replace_engine_air_filter"],
+    ["engine_system_fault", "Possible Loose Bike Spark-Plug Cap", "Spark-plug cap is loose or disconnected", "reseat_bike_spark_plug_cap", "bike"],
+    ["engine_system_fault", "Bike Spark Plug Needs Replacement", "Spark plug is fouled. The handbook confirms it is owner-serviceable.", "replace_bike_spark_plug", "bike", "technical"],
+    ["engine_system_fault", "Low Bike Engine-Oil Level", "Engine-oil level is below minimum with no visible leak. The handbook confirms the specified oil.", "top_up_bike_engine_oil", "bike", "technical"],
+    ["drivetrain_fault", "Dry Bike Drive Chain", "Drive chain only appears dry. Safe work area with specified chain lubricant.", "lubricate_bike_drive_chain", "bike", "technical"]
   ];
-  for (const [category, problem, symptoms, actionId] of cases) {
+  for (const [category, problem, symptoms, actionId, vehicleType = "car", driverType] of cases) {
     let payload;
     const result = await originals.help({ mode: "fallback", category, problem,
-      vehicleType: "car", symptoms }, { model: "configured-test-model",
+      vehicleType, driverType, symptoms }, { model: "configured-test-model",
       client: { responses: { create: async (value) => {
         payload = value;
         return { output_text: JSON.stringify({ professionalHelp: false, actionIds: [actionId] }) };
@@ -776,6 +819,37 @@ test("a conservative model refusal cannot hide a uniquely approved engine air-fi
   }) } } });
   assert.equal(result.professionalHelp, false);
   assert.match(result.steps.join(" "), /correct replacement/i);
+});
+
+test("a loose bike spark-plug cap receives only the reviewed guarded action", async () => {
+  const result = await originals.help({
+    mode: "fallback", category: "engine_system_fault",
+    problem: "Possible Loose Bike Spark-Plug Cap", vehicleType: "bike",
+    symptoms: "The spark-plug cap looks loose or disconnected. No smoke, fuel smell, heat or exposed wire."
+  }, { model: "configured-test-model", client: { responses: { create: async () => ({
+    output_text: JSON.stringify({ professionalHelp: true, actionIds: [] })
+  }) } } });
+  assert.equal(result.professionalHelp, false);
+  assert.equal(result.risk, "CAUTION");
+  assert.match(result.steps.join(" "), /engine and exhaust are completely cool/i);
+  assert.match(result.steps.join(" "), /hold the rubber cap rather than the wire/i);
+  assert.match(result.steps.join(" "), /try one normal start/i);
+});
+
+test("technical bike actions remain unavailable to nontechnical riders", async () => {
+  let fixedActionRequests = 0;
+  const result = await originals.help({
+    mode: "fallback", category: "engine_system_fault", driverType: "non_technical",
+    problem: "Bike Spark Plug Needs Replacement", vehicleType: "bike",
+    symptoms: "Spark plug is fouled. The handbook confirms it is owner-serviceable."
+  }, { model: "configured-test-model", client: { responses: { create: async (payload) => {
+    if (payload.text?.format?.name === "approved_driver_self_fix") fixedActionRequests += 1;
+    return { output_text: JSON.stringify({
+      professionalHelp: true, risk: "HIGH", steps: [], explanation: ""
+    }) };
+  } } } });
+  assert.equal(result.professionalHelp, true);
+  assert.equal(fixedActionRequests, 0);
 });
 
 test("reviewed self-fixes support bike, van and three-wheeler vehicle types", async () => {

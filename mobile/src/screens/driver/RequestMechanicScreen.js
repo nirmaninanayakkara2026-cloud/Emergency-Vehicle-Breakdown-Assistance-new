@@ -19,7 +19,8 @@ import {
   mapSymptomTypeToRequestType,
 } from "../../services/symptomCaptureService";
 import {
-  BREAKDOWN_TYPES,
+  getBreakdownTypesForVehicle,
+  getCompatibleBreakdownType,
   MOCK_LOCATION,
   URGENCY_LEVELS,
   VEHICLE_TYPES,
@@ -29,10 +30,14 @@ import { spacing } from "../../theme";
 export default function RequestMechanicScreen({ navigation, route }) {
   // Initialize the request form from any previous or AI-generated draft.
   const prefill = route.params?.prefill || {};
-  const [vehicleType, setVehicleType] = useState(prefill.vehicleType || "car");
+  const initialVehicleType = prefill.vehicleType || "car";
+  const [vehicleType, setVehicleType] = useState(initialVehicleType);
   const [vehicleModel, setVehicleModel] = useState(prefill.vehicleModel || "");
   const [breakdownType, setBreakdownType] = useState(
-    mapRequestTypeToSymptomType(prefill.breakdownType || "flat_tyre"),
+    getCompatibleBreakdownType(
+      initialVehicleType,
+      mapRequestTypeToSymptomType(prefill.breakdownType || "flat_tyre"),
+    ),
   );
   const [urgencyLevel, setUrgencyLevel] = useState(
     prefill.urgencyLevel || "medium",
@@ -66,13 +71,18 @@ export default function RequestMechanicScreen({ navigation, route }) {
     if (!capturedSymptoms) return;
     setGuidedSymptoms(capturedSymptoms);
     setVehicleType(capturedSymptoms.vehicleType);
-    setBreakdownType(capturedSymptoms.breakdownType);
+    setBreakdownType(getCompatibleBreakdownType(
+      capturedSymptoms.vehicleType,
+      capturedSymptoms.breakdownType,
+    ));
   }, [route.params?.guidedSymptoms]);
 
   // Clear guided symptoms when the selected vehicle or problem changes.
   function changeVehicleType(nextVehicleType) {
     if (guidedSymptoms && guidedSymptoms.vehicleType !== nextVehicleType)
       setGuidedSymptoms(null);
+    setBreakdownType((current) =>
+      getCompatibleBreakdownType(nextVehicleType, current));
     setVehicleType(nextVehicleType);
   }
   // Clear guided symptoms when the selected vehicle or problem changes.
@@ -248,7 +258,7 @@ export default function RequestMechanicScreen({ navigation, route }) {
           subtitle="Choose the closest match."
         />
         <MainProblemGrid
-          options={BREAKDOWN_TYPES}
+          options={getBreakdownTypesForVehicle(vehicleType)}
           value={breakdownType}
           onChange={changeBreakdownType}
         />

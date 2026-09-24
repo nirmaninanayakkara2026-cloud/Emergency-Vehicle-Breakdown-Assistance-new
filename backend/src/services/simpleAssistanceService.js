@@ -145,6 +145,90 @@ function safeFirstCheck(details = {}) {
   }
 
   if (details.vehicleType === "bike") {
+    if (symptoms.bike_starting_control === "fuel_tap_off") {
+      return {
+        id: "bike_fuel_tap_off",
+        category: "fuel_system_fault",
+        problem: "Bike Fuel Tap Is Off",
+        guideSearchText: "carburettor motorcycle fuel tap off no start",
+        guidanceSteps: [{
+          step_id: "bike_fuel_tap_on",
+          instruction: "Keep the bike stationary with the ignition off. Use the bike handbook to identify the normal fuel tap and move it from OFF to ON. Do not disconnect a fuel hose or continue if you smell or see fuel. Then try one normal start.",
+          possible_results: []
+        }]
+      };
+    }
+    if (symptoms.bike_starting_control === "fuel_reserve_available") {
+      return {
+        id: "bike_fuel_reserve",
+        category: "fuel_system_fault",
+        problem: "Bike Fuel Level Is Low / Reserve Needed",
+        guideSearchText: "carburettor motorcycle low fuel use reserve tap",
+        guidanceSteps: [{
+          step_id: "bike_select_fuel_reserve",
+          instruction: "Keep the bike stationary with the ignition off. If the handbook confirms that this bike has a RESERVE fuel-tap position, select RESERVE using only the normal control and try one normal start. Stop if fuel is leaking or you smell fuel. Refuel safely as soon as possible and return the tap to its normal position as the handbook directs.",
+          possible_results: []
+        }]
+      };
+    }
+    if (symptoms.bike_starting_control === "spark_plug_cap_loose") {
+      return {
+        id: "bike_loose_spark_plug_cap",
+        category: "engine_system_fault",
+        problem: "Possible Loose Bike Spark-Plug Cap",
+        guideSearchText: "motorcycle spark plug cap loose disconnected engine turns but does not start",
+        // The automotive knowledge base does not contain a suitable bike guide.
+        // Route this observation to the controlled OpenAI action selector instead.
+        skipLocalGuide: true
+      };
+    }
+    if (details.driverType === "technical" &&
+        symptoms.bike_owner_service_status === "owner_service_confirmed") {
+      const technicalEngineChecks = {
+        spark_plug_fouled: {
+          id: "bike_spark_plug_replacement",
+          problem: "Bike Spark Plug Needs Replacement",
+          guideSearchText: "motorcycle owner serviceable fouled damaged spark plug replacement"
+        },
+        engine_oil_low: {
+          id: "bike_low_engine_oil",
+          problem: "Low Bike Engine-Oil Level",
+          guideSearchText: "motorcycle low engine oil level no visible leak correct oil top up"
+        },
+        air_filter_dirty: {
+          id: "bike_dirty_air_filter",
+          problem: "Dirty Bike Engine Air Filter",
+          guideSearchText: "motorcycle owner serviceable dirty engine air filter replacement"
+        }
+      };
+      const check = technicalEngineChecks[symptoms.bike_engine_issue];
+      if (check) {
+        return {
+          ...check,
+          category: "engine_system_fault",
+          skipLocalGuide: true
+        };
+      }
+    }
+    if (details.driverType === "technical" && symptoms.bike_drive_issue === "chain_dry" &&
+        symptoms.bike_chain_service_status === "owner_service_confirmed") {
+      return {
+        id: "bike_dry_drive_chain",
+        category: "drivetrain_fault",
+        problem: "Dry Bike Drive Chain",
+        guideSearchText: "motorcycle dry drive chain handbook specified lubricant",
+        skipLocalGuide: true,
+        skipProfessionalGate: true
+      };
+    }
+    if (symptoms.bike_drive_issue === "chain_loose_or_damaged") {
+      return {
+        id: "bike_unsafe_drive_chain",
+        category: "drivetrain_fault",
+        problem: "Loose or Damaged Bike Drive Chain",
+        guideSearchText: "motorcycle loose damaged kinked misaligned drive chain"
+      };
+    }
     if (symptoms.bike_starting_control === "engine_stop_switch_off") {
       return {
         id: "bike_engine_stop_switch",
@@ -362,7 +446,7 @@ async function start(details, driverId) {
       before_you_begin: ["Keep the bike stable and clear of traffic.", "Stop if anything appears damaged or unsafe."],
       steps: firstCheck.guidanceSteps
     };
-  } else {
+  } else if (!firstCheck?.skipLocalGuide) {
     const lookup = await ai2.findGuide(category, guideSearchText,
       "", { includeSteps: true });
     guide = lookup.guide_available ? lookup.guide : null;
@@ -391,7 +475,8 @@ async function start(details, driverId) {
     }
   }
   if (session.status !== "professional_help_required" && !session.guidanceSteps.length) {
-    if (aiHelp.requiresProfessionalHelp(category, diagnosticInputText)) {
+    if (!firstCheck?.skipProfessionalGate &&
+        aiHelp.requiresProfessionalHelp(category, diagnosticInputText)) {
       await attachDangerSafetyActions(session, { id: "professional_category", emergency: false }, diagnosticInputText);
       stop(session, "This problem cannot be safely resolved using driver self-guidance.");
     }
@@ -399,7 +484,7 @@ async function start(details, driverId) {
   if (session.status !== "professional_help_required" && !session.guidanceSteps.length) {
     const help = await aiHelp.getAiTroubleshootingHelp({
       mode: "fallback", problem: session.identifiedProblem, category,
-      symptoms: diagnosticInputText, vehicleType
+      symptoms: diagnosticInputText, vehicleType, driverType
     });
     session.troubleshootingSource = help.available ? "OPENAI" : null;
     if (help.professionalHelp) stop(session, help.reason);
@@ -410,7 +495,9 @@ async function start(details, driverId) {
         step_id: `ai_step_${index + 1}`, instruction, possible_results: []
       }));
       session.safetyWarning = "Continue only from a safe parked position. Stop if there is smoke, a fuel smell, heat, leaking liquid or anything unsafe.";
-      session.beforeYouBegin = ["Stay clear of traffic.", "Switch off the engine and apply the parking brake.", "Do not touch, dismantle or repair vehicle parts."];
+      session.beforeYouBegin = help.actionId
+        ? ["Keep the bike secure and clear of traffic.", "Follow only the displayed handbook-based action.", "Stop if the part is inaccessible, damaged or unsafe."]
+        : ["Stay clear of traffic.", "Switch off the engine and apply the parking brake.", "Do not touch, dismantle or repair vehicle parts."];
     }
   }
   if (session.guidanceSteps.length && session.status !== "professional_help_required") {
@@ -446,6 +533,7 @@ async function continueWithGeneratedGuidance(session, observation) {
   const help = await aiHelp.getAiTroubleshootingHelp({
     mode: "fallback", category: session.predictedFault.fault,
     problem: session.identifiedProblem, vehicleType: session.vehicleType,
+    driverType: session.driverType,
     symptoms: [session.diagnosticInputText, observation].filter(Boolean).join("\n"),
     currentStep: session.currentStep?.instruction,
     steps: session.guidanceSteps.map((item) => item.instruction)
@@ -540,7 +628,8 @@ async function explain(session, question) {
   }
   const help = await aiHelp.getAiTroubleshootingHelp({
     mode: "explain", category: session.predictedFault.fault, problem: session.identifiedProblem,
-    vehicleType: session.vehicleType, symptoms: session.diagnosticInputText,
+    vehicleType: session.vehicleType, driverType: session.driverType,
+    symptoms: session.diagnosticInputText,
     currentStep: session.currentStep?.instruction, question,
     steps: session.guidanceSteps.map((step) => step.instruction)
   });

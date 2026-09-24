@@ -30,6 +30,33 @@ export const BREAKDOWN_TYPES = [
   { label: "Other", value: "other" }
 ];
 
+const VEHICLE_BREAKDOWN_EXCLUSIONS = Object.freeze({
+  bike: new Set(["engine_overheating"])
+});
+
+const VEHICLE_BREAKDOWN_LABELS = Object.freeze({
+  bike: {
+    flat_tyre: "Bike Tyre / Wheel Problem",
+    steering_problem: "Steering / Handling Problem",
+    transmission_problem: "Transmission / Clutch / Chain"
+  }
+});
+
+export function getBreakdownTypesForVehicle(vehicleType) {
+  const excluded = VEHICLE_BREAKDOWN_EXCLUSIONS[vehicleType] || new Set();
+  const labels = VEHICLE_BREAKDOWN_LABELS[vehicleType] || {};
+  return BREAKDOWN_TYPES
+    .filter((problem) => !excluded.has(problem.value))
+    .map((problem) => ({ ...problem, label: labels[problem.value] || problem.label }));
+}
+
+export function getCompatibleBreakdownType(vehicleType, breakdownType) {
+  const available = getBreakdownTypesForVehicle(vehicleType);
+  if (available.some((problem) => problem.value === breakdownType)) return breakdownType;
+  if (vehicleType === "bike" && breakdownType === "engine_overheating") return "engine_problem";
+  return available[0]?.value || "other";
+}
+
 export const URGENCY_LEVELS = [
   { label: "Low", value: "low" },
   { label: "Medium", value: "medium" },

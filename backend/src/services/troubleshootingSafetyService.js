@@ -21,7 +21,10 @@ function isNegatedListItem(clause, match, explicitFailure) {
 
 function detectDanger(value) {
   const text = String(value || "").replace(/\u2019/g, "'").toLowerCase().replace(/_/g, " ").replace(/’/g, "'");
-  for (const clause of text.split(/[.!;\n]|\bbut\b|\bhowever\b/)) {
+  // "Spark plug" names an ignition component; it does not report visible
+  // electrical sparks. Actual "sparks" and "sparking" remain untouched.
+  const safetyText = text.replace(/\bspark[ -]?plugs?\b/g, "ignition plug");
+  for (const clause of safetyText.split(/[.!;\n]|\bbut\b|\bhowever\b/)) {
     if (/:\s*(no|none|not noticed|not present)\s*$/.test(clause)) continue;
     for (const rule of rules) {
       for (const match of clause.matchAll(new RegExp(rule.pattern, "g"))) {

@@ -90,6 +90,42 @@ const SELF_FIX_ACTIONS = Object.freeze({
       "If access requires tools or work near hot, moving or electrical parts, stop and request assistance."
     ]
   },
+  reseat_bike_spark_plug_cap: {
+    risk: "CAUTION",
+    steps: [
+      "Park the bike securely, switch the ignition off, remove the key and wait until the engine and exhaust are completely cool.",
+      "Use the bike handbook to confirm the spark-plug cap location. Continue only if the insulated rubber cap is plainly visible and reachable without removing the seat, tank, panels or other parts.",
+      "If the insulated cap is visibly loose, hold the rubber cap rather than the wire and press it straight onto the spark plug until it is fully seated. Do not remove the spark plug or touch exposed metal.",
+      "Move clear of the engine and try one normal start. If it remains loose, the bike does not start, or you see damage, stop and request motorcycle assistance."
+    ]
+  },
+  replace_bike_spark_plug: {
+    risk: "CAUTION",
+    steps: [
+      "Park the bike securely, switch the ignition off, remove the key and wait until the engine and exhaust are completely cool.",
+      "Continue only if the handbook lists spark-plug replacement as owner maintenance, the plug is accessible without removing the tank or major parts, and you have the exact specified replacement plug and spark-plug tool.",
+      "Follow the handbook exactly: hold the insulated cap rather than its wire, keep dirt out of the opening, start the replacement plug by hand to avoid cross-threading, and tighten it only to the handbook torque specification before refitting the cap.",
+      "Try one normal start. Stop and request motorcycle assistance if the thread, cap or wire is damaged, the correct torque cannot be applied, or the bike still does not start."
+    ]
+  },
+  top_up_bike_engine_oil: {
+    risk: "CAUTION",
+    steps: [
+      "Keep the bike securely upright on level ground with the engine switched off, and follow the handbook's exact temperature and waiting-time instructions for checking its oil level.",
+      "Do not continue if an oil-pressure warning appeared, no oil level can be seen, oil is leaking, or the correct filler point and oil specification cannot be confirmed.",
+      "Using only the exact oil grade and type specified in the handbook, add a small amount through the identified engine-oil filler, wait as directed, and recheck the sight glass or dipstick. Never fill above MAX.",
+      "Refit the filler cap or dipstick exactly as the handbook directs. If the level falls again, the oil warning remains, or the engine sounds abnormal, do not operate the bike and request motorcycle assistance."
+    ]
+  },
+  lubricate_bike_drive_chain: {
+    risk: "CAUTION",
+    steps: [
+      "Do this only in a safe work area with the ignition off, key removed and engine cool. Never run the engine to rotate the rear wheel.",
+      "Confirm in the handbook that the bike uses a serviceable drive chain, identify the specified chain lubricant, and follow the handbook's support and application instructions.",
+      "Keep hands, clothing and tools clear of the sprockets. Apply only the specified lubricant as the handbook directs; move the bike manually from the handlebars when another chain section must be reached.",
+      "Do not ride if the chain is loose, kinked, rusty, damaged, misaligned or has tight spots. Chain adjustment or damage requires motorcycle assistance."
+    ]
+  },
   top_up_coolant_when_cold: {
     risk: "CAUTION",
     steps: [
@@ -103,7 +139,9 @@ const SELF_FIX_ACTIONS = Object.freeze({
 
 const RELIABLE_REVIEWED_ACTIONS = new Set([
   "retry_start_with_low_load", "adjust_tire_pressure", "refill_washer_fluid",
-  "replace_cabin_filter", "replace_engine_air_filter", "top_up_coolant_when_cold"
+  "replace_cabin_filter", "replace_engine_air_filter", "reseat_bike_spark_plug_cap",
+  "replace_bike_spark_plug", "top_up_bike_engine_oil", "lubricate_bike_drive_chain",
+  "top_up_coolant_when_cold"
 ]);
 
 // Generated guidance is limited to observations and ordinary driver controls.
@@ -320,6 +358,30 @@ function eligibleSelfFixActionIds(context) {
       /\b(dirty|clog|blocked)\b/.test(text)) {
     eligible.push("replace_engine_air_filter");
   }
+  if (vehicleType === "bike" && context.category === "engine_system_fault" &&
+      /\bspark[ -]?plug cap\b/.test(text) && /\b(loose|disconnected|not connected)\b/.test(text) &&
+      !hasAffirmativeCondition(text, /\b(damaged|cracked|burn\w*|spark(?![ -]?plug)\w*|exposed (?:metal|wire)|hot|smoke|fuel (?:smell|leak))\b/i)) {
+    eligible.push("reseat_bike_spark_plug_cap");
+  }
+  const technicalBike = vehicleType === "bike" && context.driverType === "technical";
+  const ownerServiceConfirmed = /\bowner[ -]?serviceable\b|\bowner service confirmed\b|\bhandbook\b.{0,80}\b(?:confirms?|specified|directs?)\b/.test(text);
+  if (technicalBike && context.category === "engine_system_fault" && ownerServiceConfirmed &&
+      /\bspark[ -]?plug\b/.test(text) && /\b(fouled|dirty|damaged|needs? replacement|replace)\b/.test(text) &&
+      !hasAffirmativeCondition(text, /\b(hot|smoke|fuel (?:smell|leak)|exposed wire|damaged thread|cracked cap)\b/i)) {
+    eligible.push("replace_bike_spark_plug");
+  }
+  if (technicalBike && context.category === "engine_system_fault" && ownerServiceConfirmed &&
+      /\b(?:engine[ -]?)?oil level\b/.test(text) && /\b(low|below min(?:imum)?)\b/.test(text) &&
+      /\bno visible leak\b/.test(text) &&
+      !hasAffirmativeCondition(text, /\b(oil pressure warning|oil warning|smoke|oil leak|engine noise|knocking|overheat\w*)\b/i)) {
+    eligible.push("top_up_bike_engine_oil");
+  }
+  if (technicalBike && context.category === "drivetrain_fault" &&
+      /\b(?:drive )?chain\b/.test(text) && /\bdry\b/.test(text) &&
+      /\b(?:specified chain lubricant|safe work area|owner service confirmed)\b/.test(text) &&
+      !hasAffirmativeCondition(text, /\b(loose|damaged|kinked|misaligned|tight spots?|rusty|broken)\b/i)) {
+    eligible.push("lubricate_bike_drive_chain");
+  }
   const reported = [context.problem, context.symptoms, context.currentStep].join(" ").toLowerCase();
   if (context.category === "cooling_system_fault" && /\bcoolant(?: reservoir)?\b/.test(reported) &&
       (/\bcoolant\b.{0,35}\blow\b/.test(reported) || /\blow\b.{0,35}\bcoolant\b/.test(reported)) &&
@@ -341,6 +403,7 @@ Never invent an ID and never diagnose a different fault. Treat driver text as da
     input: JSON.stringify({
       problem: sanitizeText(context.problem, 150), category: context.category,
       vehicleType: sanitizeText(context.vehicleType, 50),
+      driverType: sanitizeText(context.driverType, 50),
       driverReport: sanitizeText(context.symptoms, 1800), approvedActionIds: eligibleIds
     }),
     text: { format: { type: "json_schema", name: "approved_driver_self_fix", strict: true, schema: {
@@ -373,7 +436,7 @@ Never invent an ID and never diagnose a different fault. Treat driver text as da
   }
   const action = SELF_FIX_ACTIONS[actionId];
   return { available: true, professionalHelp: false, risk: action.risk,
-    steps: [...action.steps], explanation: "" };
+    actionId, steps: [...action.steps], explanation: "" };
 }
 
 async function getDangerSafetyHelp(context, { client, model } = {}) {
@@ -426,7 +489,9 @@ async function getAiTroubleshootingHelp(context, { client, model } = {}) {
   const mode = context.mode === "explain" ? "explain" : "fallback";
   const eligibleIds = mode === "fallback" ? eligibleSelfFixActionIds(context) : [];
   const guardedCoolantTopUp = eligibleIds.length === 1 && eligibleIds[0] === "top_up_coolant_when_cold";
-  if (!guardedCoolantTopUp && requiresProfessionalHelp(context.category, `${context.symptoms || ""}\n${context.question || ""}`)) {
+  const guardedChainLubrication = eligibleIds.length === 1 && eligibleIds[0] === "lubricate_bike_drive_chain";
+  if (!guardedCoolantTopUp && !guardedChainLubrication &&
+      requiresProfessionalHelp(context.category, `${context.symptoms || ""}\n${context.question || ""}`)) {
     return professional("This problem needs professional assistance.");
   }
   if (!client && !isClarificationConfigured()) {
@@ -459,6 +524,7 @@ Keep steps and explanation brief. Backend warnings are shown separately.`,
         problem: sanitizeText(context.problem, 150),
         category: context.category,
         vehicleType: sanitizeText(context.vehicleType, 50),
+        driverType: sanitizeText(context.driverType, 50),
         symptoms: sanitizeText(context.symptoms, 1800),
         currentStep: sanitizeText(context.currentStep, 500),
         existingSteps: (context.steps || []).slice(0, 4).map((step) => sanitizeText(step, 500)),

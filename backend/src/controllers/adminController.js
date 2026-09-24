@@ -58,7 +58,7 @@ function providerSummary(profile) {
     createdAt: profile.createdAt
   };
 }
-
+// The following function is used to create an admin action record in the database.
 async function createAdminAction(adminId, actionType, targetType, targetId, reason = "", metadata = {}) {
   return AdminAction.create({ adminId, actionType, targetType, targetId, reason, metadata });
 }

@@ -1,9 +1,8 @@
 import {
   OBSERVED_SYMPTOM_GROUPS,
-  SYMPTOM_BREAKDOWN_TYPES,
   symptomQuestionFlows
 } from "../data/symptomQuestionFlows";
-import { VEHICLE_TYPES } from "../utils/constants";
+import { getBreakdownTypesForVehicle, VEHICLE_TYPES } from "../utils/constants";
 import { getAssistanceProblems, getAssistanceQuestions } from "../data/assistanceOptions";
 
 const emptyObservedSymptoms = {
@@ -30,8 +29,8 @@ function formatAnswer(question, answer) {
 }
 
 export function getQuestionsForProblem(breakdownType, driverType, vehicleType) {
-  if (driverType) return getAssistanceQuestions(breakdownType, vehicleType);
-  if (vehicleType === "bike") return getAssistanceQuestions(breakdownType, vehicleType);
+  if (driverType) return getAssistanceQuestions(breakdownType, vehicleType, driverType);
+  if (vehicleType === "bike") return getAssistanceQuestions(breakdownType, vehicleType, driverType);
   const flowAliases = {
     fuel_problem: "fuel_issue",
     strange_noise: "strange_sound"
@@ -93,7 +92,9 @@ export function buildSymptomSummary(data) {
 
   return {
     vehicle: findLabel(VEHICLE_TYPES, payload.vehicleType),
-    mainProblem: findLabel(payload.driverType ? getAssistanceProblems(payload.driverType, payload.vehicleType) : SYMPTOM_BREAKDOWN_TYPES, payload.breakdownType),
+    mainProblem: findLabel(payload.driverType
+      ? getAssistanceProblems(payload.driverType, payload.vehicleType)
+      : getBreakdownTypesForVehicle(payload.vehicleType), payload.breakdownType),
     answers,
     observations,
     description: payload.description
